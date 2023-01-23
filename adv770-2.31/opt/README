@@ -1,0 +1,6 @@
+ ============================================================================
+
+ The opt sub-directory contains any optional game sources, typically
+ providing additional wizard mode (i.e. debug) facilities.
+
+ ============================================================================

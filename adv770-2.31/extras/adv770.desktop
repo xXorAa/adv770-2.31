@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Adv770
+GenericName=Mike Arnautov's 770 point expansion of the original Adventure
+Comment=A QT5 build of an interactive fiction game
+Exec=adv770
+Icon=adv770
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=Game

@@ -1,0 +1,22 @@
+                     =================================
+                                    acdc
+                        A-code to ANSI C translator
+                               Version 12.47
+                     =================================
+
+ The acdc translator converts A-code source of an adventure game into ANSI C
+ source (.acd -> .c == acdc :-)). The derived C source files (the adv<nn>.c
+ and adv<n>.h, where 'n' is a digit) need to be compiled and linked with the
+ supplied adventure kernel sources (adv00.c, adv01.c and adv0.h) into an
+ executable game.
+
+ Please see the supplied PDF A-code documentation for ways of using the
+ translator, be it directly or indirectly via the advbld script.
+
+ The NEWS file contains details of acdc changes in this version.
+
+                                                               Mike Arnautov
+                                                              mla@mipmip.org
+                                                                 23 Mar 2022
+
+ ============================================================================

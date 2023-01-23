@@ -1,0 +1,57 @@
+# Adventure770 -- Copyleft Mike Arnautov 1984-2022.
+#
+# Define some variables.
+#
+variable arg1, arg2
+variable here, there
+variable drop.here, drop.text, throw.here, throw.text, throw.it
+variable temp.ptr, obj.ptr, place.ptr, text.ptr, word.ptr
+variable stuck
+variable safe.exit, snake.exit
+variable talk.next, talk.end
+variable last.owl, password
+variable foof, swag.to.drop
+variable giant.will.watch
+variable cave.entered
+variable last.hintable
+variable losses, actual.score
+variable codex.reward
+variable faked.object
+variable spare..v..01, spare..v..02, spare..v..03, spare..v..04
+variable status, admin, context
+variable lamplife
+variable spare..v..05, spare..v..06, spare..v..07, spare..v..08, spare..v..09
+variable invct
+variable deaths, penalties, scorex, maxscore
+variable undo.status
+variable turns, moves
+variable foobar
+variable dwarfcount, clock, stage, nuffink, ok
+variable hint.time
+variable strength, mushtime, dragtime, masktime, lastclock
+variable escape
+variable spare..v..10, backlash, fleetfoot
+variable west.count
+variable blocked.dir, unblocked.dir
+variable tide
+variable recent.event
+variable shown.vision
+variable hints, quips, island.quips
+variable mlcount
+variable cat.factor, rest.exit, portal.exit
+variable direction
+array    c.exit, 16
+variable crown.chance
+variable orc.mutter, mutter.time
+variable giant.time, mouse.time, thirst.time
+variable swag.count, swag.time
+variable forest.block, forest.trap
+variable vessel
+variable sip.count
+variable result 
+variable last.it
+variable silence
+variable object.state
+variable desloc, desmask, desbit, destime
+variable bridge.limit
+variable dwarven

@@ -1,0 +1,452 @@
+-------------------------------------------------------------------------
+
+New in 12.89
+
+1. Fixed orphan command word handling in single turn build modes - cloud,
+   library and HTML/JavaScript.
+
+2. Renamed two adv00.c functions: 
+   input() to get_command() - because it may not actually result in a prompt
+   to the player
+   getinput to get_input() - in keeping with get_command from which it
+   gets called if current command line has been exhausted.
+
+-------------------------------------------------------------------------
+
+New in 12.88
+
+1. Fixed spurious double blank lines following centered game messages.
+
+-------------------------------------------------------------------------
+
+New in 12.87
+
+1. DUMPDATA (formerly DUMP) no longer depends on presence of cross-
+   reference files. It now shows symbolic names if either the special
+   variable ENTNAME is defined, or acdc is given the -debug command line
+   option. It also provides a wealth of other information, representing
+   the complete current state of the game.
+
+2. If log is explicitly specified rather than just requested by naked
+   -l, and the specification is not an absolute pathname, it is 
+   interpereted as relative to the current working directory. If it amounts
+   to a directory, then the default log name is appended (name of the
+   game, suffixed with .log). If only -l is given, then the default name
+   log is created alongside game save files.
+
+3. The -d acdc option now causes the game to report at run-time A-code
+   lines being executed.
+
+-------------------------------------------------------------------------
+
+New in 12.86
+
+1. Fixed occasional game crashes in the Windows console mode.
+
+-------------------------------------------------------------------------
+
+New in 12.85
+
+1. HTML centering of tables and divs changed to the HTML5 standard.
+
+2. Fixed centering of individual lines and of blocks of lines in non-HTML
+   displays
+
+-------------------------------------------------------------------------
+
+New in 12.84
+
+1. Fixed the CGI mode to signal game being resumed on auto-load.
+
+2. The help text now lists available baud rate values.
+
+3. Added handling of IFTURN, checking for a single-turn mode (CGI or
+   or library build mode).
+
+4. Expanded use of PROMPTED to library build replacing the old rep/nrep
+   mechanism.
+
+-------------------------------------------------------------------------
+
+New in 12.83
+
+1. Fixed handling of centred lines, which used to swallow the first character
+   of the line being centred.
+
+2. UTF8 support is now unconditional.
+
+3. Complete internatinalisation of player commands now feasible.
+
+4. Fixed kernel handling of player's SAY command.
+
+5. Fixed random crashes.
+
+-------------------------------------------------------------------------
+
+New in 12.82
+
+1. Fixed NEEDCMD handling.
+
+-------------------------------------------------------------------------
+New in 12.81
+
+1. Fixed game invocation when it is invoked by simple name, rather than
+   pathname. 
+
+2. Modified daeminizations of invoked browser to account for new Firefox
+   behaviour.
+
+-------------------------------------------------------------------------
+
+New in 12.80
+
+1. Fixed the DESCRIBE directive processing so that it works for 
+   places as well as for objects.
+
+-------------------------------------------------------------------------
+
+New in 12.79
+
+1. Increased maximal command length to 4K bytes. Yeah, it's a fudge.
+   Should make input buffers fully dynamic. One day, maybe...
+
+-------------------------------------------------------------------------
+
+New in 12.78
+
+1. Added support for UTF8.
+
+-------------------------------------------------------------------------
+
+New in 12.77
+
+1. Solved CGI mode not exiting after prompt if no-CGI args. (Cosmetic.)
+
+2. TEXT/HTML component in ADVLIB mode args now honoured by all initial
+   commands, except for the LIST one.
+
+3. In QT builds, LIST mode now looks in game's ~/.acode subdirectory, rather
+   than in the currect directory. 
+
+4. Fixed a bug in the Javascript build, which stopped a list of saved games
+   being offered to the player to choose from.
+
+5. Fixed player command parsing to make "and" (a.k.a. ",") work whether
+   or not the PLS.CLARIFY flag is declared.
+
+-------------------------------------------------------------------------
+
+New in 12.76
+
+1. Stopped binary junk being occasionally appended to .adl save files.
+
+2. NBSP now always converted to either &nbsp; or a blank, as appropriate.
+
+3. Tightened undo history restore game structure check.
+
+-------------------------------------------------------------------------
+
+New in 12.75
+
+1. In order to support library mode use by QT5, stripped all line feeds
+   from HTML formatted output.
+
+2. Fixed output filter to replace " with &quot; in html-formatted centred
+   text (individual lines as well as blocks).
+
+3. Fixed the browser mode problem, which occasionally caused the browser
+   to come up showing lowercase 'k' and otherwise blank window.
+
+4. Fixed odd undo/redo counts in the CGI mode.
+
+5. Stripped off line feeds from HTML output (QT WebView doesn't like them!)
+
+6. Stopped nonsense output for locations with no description of any kind.
+
+7. Removed -u command line option as unnecessary.
+
+8. Scene word matching no longer accepts abbreviations.
+ 
+9. If SEEN flag is not declared, abbreviation and approximate matching are
+   restricted by object proximity (i.e. neither INHAND, nor HERE).
+
+-------------------------------------------------------------------------
+
+New in 12.74
+
+1. Removed the no longer used shutterm() routine. Affects only OSX build.
+
+-------------------------------------------------------------------------
+
+New in 12.73
+
+1. In the ADVLIB mode, a null command results just in a prompt, instead of
+   echoing the output of the previous non-null command.
+
+-------------------------------------------------------------------------
+
+New in 12.72
+
+1. JS mode now displays a "Play again" button when the game is
+   terminated. (NB: this is not possible in the browser mode!)
+
+-------------------------------------------------------------------------
+
+New in 12.71
+
+1. In ADVLIB mode, REPEAT_PROC will now skip repeat blocks preceding
+   the one that requested player input. This means such blocks no longer
+   get executed twice!
+
+2. Main data arrays (IMAGE and image) are now forced to align on int
+   memory boundary -- this cures a nasty UNDO problems in JS and CGI modes.
+
+3. In the CGI mode, -h no longer shows options not applicable in that mode.
+
+-------------------------------------------------------------------------
+
+New in 12.70
+
+1. Eliminated all setjmp/longjmp calls!
+
+2. Replaced mode specification via the cgi variable with a more
+   transparent combination of the mode variable and distinct build
+   modes (the default CONSOLE/HTTP, CONSOLE, ADVLIB and CGI).
+
+3. In the CGI mode, the -x and -y keywords are now deprecated. 
+   Use -n instead of -x. Use -- instead of -y. For either -- or -y
+   the rest of the command line is interpreted as a command 
+   (e.g. -- GET LAMP). 
+
+4. Fixed handling of 'noise' command words.
+
+5. Modified the VOCAB directive to honour replacement test (arg 4)
+   in vocabulary initialisation aclls (arg 1 being 0).
+
+-------------------------------------------------------------------------
+
+New in 12.69
+
+1. Added support for the optional special variable ENTNAME to display
+   name of entity pointed to by this when used in the nested text
+   syntax {ENTNAME}.
+
+2. If ENTNAME defined, and if no exact match is found for a word in
+   player's command, then before proceeding with approximate matching,
+   check that word against the stored complete list of entity names
+   (translating full stops into underscores, to avoid the parser 
+   splitting entity names containing full stops).
+
+-------------------------------------------------------------------------
+
+New in 12.68
+
+1. Fixed suppression of abbreviations on initial query for game to restore.
+
+2. In pure JavaScript, ifhtml is now always true.
+
+3. Fixed end pause handling in the library mode.
+
+4. Fixed initial restore in the library mode.
+
+5. Improved OSX builds to a avoid proliferation of terminal windows.
+
+6. Fixed MSDOS builds.
+
+7. Full game initialisation is now performed on startup in all
+   circumstances, including the case of game in progress being restored.
+
+8. Added EXEC 17 and EXEC 18 to special(). The former stores in memory
+   current locations of all objects (intended to be called in an INIT
+   section); the latter returns the stored location of a given object.
+   The purpose is to simplify Adv440 (and perhaps 660 and 770)
+   implementation of dwarves, to reflect the Fortran original.
+
+9. NB: Safari 9 and MS Edge are now also known to work with the pure
+   Javascript builds of A-code games.  
+
+10. Non-ANSI C support removed.
+
+11. In the console mode, suppress leading blanks when splitting lines.
+
+------------------------------------------------------------------------
+
+New in 12.64
+
+1. Fixed calculation of block-centre offset.
+
+2. Added pure JavaScript support (via Emscripten to generate JS code).
+   This uses IndexedDB browser storage and this is currently known to
+   be compatible with Firefox (version 4 and higher), Chrome (version 11
+   and higher and IE (version 10 and higher).
+
+3. Added JS compilation symbol alongside IOS. Both imply ADVLIB.
+
+------------------------------------------------------------------------
+
+New in 12.63 version (since 12.54)
+
+1. Fixed prompt_line being undefined if NO_READLINE is specified.
+
+2. BROWSER mode no longer ignores BROWSER NONE in the config file.
+
+3. The -C command like keyword can be used with the CGI mode with
+   the result of output being plain text rather than HTML.
+
+4. Added ADVLIB mode for platforms such as iOS, which insist on being
+   in control of the main loop.
+
+5. Added emscripten support for producing a pure Javascript version.
+
+------------------------------------------------------------------------
+
+New in A-code 12.54
+
+1. Bug fix. Command line parsing no longer aborts after some of
+   the keywords.
+
+2. Bug fix. UNDO or REDO can no longer leave the game expecting 
+   a yes/no answer to a question asked just before the point
+   to which the game has reverted.
+     
+------------------------------------------------------------------------
+
+New in A-code 12.53
+
+1. Bug fix. Game no longer crashes in the console mode in response to
+   player hitting Ctrl-D when prompted for input.
+
+------------------------------------------------------------------------
+
+New in A-code 12.52
+
+1. Bug fix for MS Windows and DOS. The RESTORE command no longer causes 
+   infinite loop if there are no saved games.
+
+------------------------------------------------------------------------
+
+New in A-code 12.51 (12.40 to 12.50 never released)
+
+1. Glk support dropped. On all platforms the game executable
+   uses browser display or runs in the console window.
+
+2. Added TIMEOUT section to the config file.
+
+3. Added COLOUR SURROUND to the config file.
+
+4. When creating a config file, BROWSER section is now platform
+   sensitive, differentiating Windows and non-Windows installs.
+
+5. Readline is now linked by default, suppressed by -DNO_READLINE.
+
+6. Acode directory is now by default .acode on non-Windows platforms.
+   If this is not found, the acode one is used instead.
+
+------------------------------------------------------------------------
+
+New in A-code 12.39 (12.35 to 12.38 never released)
+
+1. Re-wrote code for locating acode.inf.
+
+2. Added macro platform definitions (LINUX, UNIX, MACOS, WINDOWS)
+   replacing the PLATFORM macro.
+
+3. Fixed some text formatting bugs.
+
+4. Fixed STYLE 1 orphan handling.
+
+5. Fixed STYLE 1 segfault in response to an unknown command word.
+
+6. Finished version 12 CGI mode.
+
+------------------------------------------------------------------------
+
+New in A-code 12.34
+
+1. Fixed logging mechanism so that the prompt line is written into the
+   log too.
+
+2. Finally got around to sorting out A-code 12 CGI mode.
+
+3. In HTML modes (CGI or browser) prompt type is signalled by the first
+   letter of the complete message, not by the last one.
+
+4. Fixed handling of texts declared as fragments part-way through
+   the text rather than in the text declaration.
+
+------------------------------------------------------------------------
+
+New in A-code 12.33
+
+1. The DEFAULT directive now differentiates between failure to
+   find any target and a failure to find a unique tagret. These outcomes
+   are signalled by AGR2 being set to 0 or AMBIGWORD respectively.
+
+------------------------------------------------------------------------
+
+New in A-code 12.32.
+
+1. Fixed the the debug mode DUMP command (implemented in show_data()).
+
+2. Fixed display width definition in browser mode.
+
+------------------------------------------------------------------------
+
+New in A-code 12.31.
+
+1. Fixed output formatting bug, which in some circumstances suppressed
+   the command prompt.
+
+2. Added "SHOW WIDTH <number>" directive to acode.conf. This specifies
+   in pixels the width of the actual display area. Default value 700. 
+
+3. Added "SURROUND <colour>" directive to acode.conf to specify the
+   colour of the window outside the display area. Defaults to dark grey.
+
+NB: the new directives will not show automatically in your acode.conf.
+You can add them manually, or remove (or rename) the existing
+acode.conf, which will result in a new one being created by the game.
+
+------------------------------------------------------------------------
+
+New in A-code 12.30.
+
+1. Worked around the problem caused by a change in xdg-open.
+
+------------------------------------------------------------------------
+
+New in A-code 12.29.
+
+1. Some changes to acdc (version 12.18) -- see the acdc README and NEWS
+   files.
+
+2. All A-code game executables now accept the -v keyword, which causes
+   the display of the game version number, the version number of the
+   acdc translator used to create the C sources, and the A-code kernel
+   version.
+
+3. Game's home is now acode/<gamename> which is, if required,
+   automatically created in the player's home directory. This is where
+   games will be saved and old saved games will be looked for. It is
+   also where log files (if any) are created by default.
+
+4. As a temporary measure in this version, on game startup other likely
+   places are checked for containing older saved games, and any saved
+   games fuond are copied into the game's home directory.
+
+5. Games now have a persistent state, so that if a game is interrupted
+   in some manner, rather than cleanly exited, it will automatically
+   restart the next time at the same point. Use the -n invocation command
+   line option to avoid restarting an interrupted game.
+
+6. On Linux/Unix/MacOS, the default game mode is to use a local browser
+   for its display. Use the -C command invocation line option to use
+   old-fashioned, console display with readline command recall and editing.
+   On windows only the "dumb" DOS prompt mode is available, unless the
+   game is built to use the Glk library.
+
+                                           Mike Arnautov
+                                           mla@mipmip.org
+
+==========================================================================
+

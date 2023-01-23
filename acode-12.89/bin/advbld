@@ -1,0 +1,357 @@
+#!/bin/bash
+# advbld: copyright Mike Arnautov 2014-2021, licensed              
+# under GPL (version 3 or later) or the Modified BSD Licence, 
+# whichever is asserted by the supplied LICENCE file.   
+#
+# Builds an A-code game from sources (A-code or derived C ones).
+#
+CC=cc     # Select the C compiler
+CPP=c++   # Only required for the Qt5 build.
+#
+! which $CC &>/dev/null && echo "$CC not found." && exit 1 
+#
+# Set ADV, BIN, ADIR, KDIR and define some functions.
+#
+. $(dirname `which $0`)/lib.sh
+#
+version=3.1
+case "$(uname -m)" in
+  *64*) arch=64 ;;
+  *) arch=32 ;;
+esac
+name=
+plain=
+mode=
+stable=0
+build=YES
+translate=YES
+xref=
+debug=
+query=YES
+wiz=NO
+flags=
+vrb=1
+type=B
+exetype='BROWSER/CONSOLE executable'
+readline=
+#-----------------------------------------------------------------------------
+#
+usage()
+{
+   cat <<EOT
+Usage: $0 [<game>] [<options>]
+
+The <game> parameter is either a pathname of the main source file
+(the .acd suffix is optional), or the name of the game to be built.
+Default <game> is the name of the current directory (less the version
+number; so if the drectory is e.g. adv770-2.20, adv770 will be built).
+If a game name is specified, it is searched for in in the current directory,
+in the directory specified by the global variable ADVDIR, if this is set, 
+and finally in directories one and two levels above this script.
+
+C sources are created in the the C subdirectory of the directory containing
+the located game source. 
+
+Options specifying general build type. Except for -W they are mutually
+exclusive, overriding any previosly specified type.
+
+  -B ........... default; build combined console/browser executable
+  -C ........... build create a console-only executable
+  -J ........... build a JavaScript version (.html)
+  -L ........... build a test executable using the library mode
+  -Q ........... build a Qt5 executable
+  -T ........... build a single turn executable
+  -W ........... include opt/debug.acd (if exists) for "wizard" in-game commands
+
+Options affecting the behaviour of this script.
+
+  -q ........... be quiet (opposite of -v)
+  -v ........... be verbose (opposite of -q)
+  -x ........... echo commands being executed
+  -h ........... print this text
+
+The rest of options are of use only to an A-code game developer. 
+
+Versions of acdc, kernel and game are deemed "unstable" if the relevant
+directories lack a version number. The script defaults to using unstable
+versions, if present, and the latest (highest version number) versions
+otherwise.
+
+  -s ........... insist on using latest stable versions
+  -u ........... insist on using unstable versions
+  -a <version> . use the specified version of acdc
+  -k <version> . use the specified version of the A-code kernel
+
+Other build options.
+
+  -g ........... create a gdb-instrumented executable
+  -gg .......... As -g but with gcc macro capability (forces CC=gcc)
+  -D <symbol> .. add a symbol to the C compilation/linking command
+  --m32 ........ on a 64 bit machine, force building 32 bit executable
+  -p ........... (plain) don't encrypt game data
+  -d ........... acdc's -debug -- echos to stderr A-code lines being executed
+  -c ........... translate A-code to C but do not buid executable
+  -b ........... build from pre-existing C sources (don't translate A-code to C)
+  -w ........... show acdc warnings (these are suppressed by default)
+  -X ........... generate cross-reference files for the A-code game source
+
+EOT
+   exit 1
+}
+#-----------------------------------------------------------------------------
+# Parse command line
+#
+set -- $(comline 'akD' $@)    # Pre-process the command line
+warn=NO                 # No acdc warnings by default
+while [ $# -gt 0 ]; do
+  case "$1" in 
+    -B) type=B; exetype='HTTP/CONSOLE executable' ;;
+    -C) type=C; exetype='CONSOLE-only executable' ;;
+    -J) ! which emcc 2>/dev/null && \
+        echo === Cannot build HTML/Javascript without emcc && exit 1
+        type=J ; query=NO ;;
+    -L) type=L; flags="$flags -DADVLIB"; query=NO;
+        exetype='ADVLIB test executable' ;;
+    -Q) type=Q; flags="$flags -DADVLIB -DQT"; query=NO
+        exetype="Qt5 executable" ;;
+    -T|-S) type=T; flags="$flags -DTURN"; query=NO; readline='-DNO_READLINE'
+        exetype='SINGLE TURN executable' ;;
+    -W) wiz=YES ;;
+    -q) vrb=0 ;;
+    -v) vrb=2 ;;
+    -x) set -x ;;
+    -h|--help) usage ;;
+    -p) plain=-plain ;;
+    -d) debug="$debug -d" ;;
+    -b) translate=NO ;;
+    -c) build=NO ;;
+    -w) warn=YES ;;
+    -X) xref=-x ;;
+    -D) [ "$2" = 'NO_READLINE' ] && readline="$1$2" || flags="$flags $1$2"
+        shift ;;
+    -s) stable=1 ;;
+    -u) stable=-1 ;;
+    -a) shift; AVER="$1"; suptype="$suptype acdc-$1," ;;
+    -k) shift; KVER="$1"; suptype="$suptype kernel-$1," ;;
+    -g) [ -n "$dbg" ] && CC=gcc && dbg="-g -gdwarf-2 -g3" || dbg=-g ;;
+    --m32) flags="$flags -m32"; arch=32; CPPFLAGS=-m32 ;;
+    --fread) mode="$mode -file-read" ;;        # Deprecated
+    --fmemory) mode="$mode -file-memory" ;;    # Deprecated
+    --fpage) mode="$mode -file-page" ;;        # Deprecated
+    --locates) flags="$flags -DLOC_STATS=2" ;; # Deprecated
+    -*) echo Unknown keyword $1. Use -h to see usage details. && exit 1;;
+    *) [ -n "$name" ] && echo Bad command line. && exit 1; name="$1" ;;
+  esac
+  shift
+done
+#
+[ "$type" = J ] && dbg= && debug=
+[ $warn = NO ] && mode="$mode -no-warnings"
+#
+[ $vrb != 0 ] && echo && echo "[A-code adventure builder, version $version]"
+
+#-----------------------------------------------------------------------------
+# Find and check the acdc and kernel versions to be used.
+#
+stb=''
+[ $stable = -1 ] && stb=' unstable'
+[ $stable = 1 ] && stb=' stable'
+[ -z "$AVER" ] && acdc=acdc || acdc=acdc-$AVER 
+ADIR=$(find_it $stable $acdc)
+[ -z "$ADIR" ] && echo Unable to find$stb translator executable. && exit 1
+[ ! -x "$ADIR/acdc" ] && (cd $ADIR; ./build)
+[ ! -x "$ADIR/acdc" ] && echo No acdc executable in $ADIR! && exit 1
+#
+[ -z "$KVER" ] && kernel=kernel || kernel=kernel-$KVER
+KDIR=$(find_it $stable $kernel)
+[ -z "$KDIR" ] && echo Unable to find$stb A-code kernel! && exit 1
+IKVER=$(kversion $KDIR)
+#-----------------------------------------------------------------------------
+# Find the game to build.
+#
+GAME=$(find_it $stable $name)
+if [ -z "$GAME" ]; then
+  [ -z "$name" ] && name=$(basename $(pwd))
+  echo Unable to find$stb A-code source file for $name. && exit 1
+fi
+#
+GDIR=$(dirname $GAME)
+srcfile=$(basename $GAME)
+[ -z "$name" ] && name=$(basename $GDIR) 
+name=${name%%.acd}    # Strip off the .acd suffix, if there
+#-----------------------------------------------------------------------------
+# Set various build mode flags and variables.
+#
+[ "$type" = C ] && flags="$flags -DCONSOLE";
+[ "$vrb" != 2 ] && mode="$mode -q"
+[ "$wiz" = YES ] && suptype=" wizard mode,"
+[ -n "$dbg" ] && suptype="$suptype gdb,"
+[ -n "$debug" ] && suptype="$suptype embedded A-code,"
+[ -n "$plain" ] && suptype="$suptype plain text,"
+suptype=${suptype:0:$(expr ${#suptype} - 1)}
+#
+[ "$stable" = 1 ] && vstate='(stable)'
+#
+[ "$type" != J ] && case $arch in
+  *32*) exetype="$exetype (32 bit)" ;;
+  *64*) exetype="$exetype (64 bit)" ;;
+  *) ;;
+esac
+[ $vrb != 0 ] && echo "Building $name $exetype $vstate"
+name=$(basename $name)
+name=`echo $name | sed s/-[0-9]*.[0-9]*//`
+#
+if [ ! -d "$GDIR" ]; then
+   echo Not found: $GDIR
+   exit 1
+fi
+cd "$GDIR"
+#-----------------------------------------------------------------------------
+# Point the the single-turn gameversion, if necessary
+#
+srcdir=.
+if [ "$query" = NO ]; then
+  [ "$name" = adv550 ] && srcfile=cgi/cgi_adv550.acd && srcdir=cgi
+  [ "$name" = adv580 ] && srcfile=cgi/cgi_adv580.acd && srcdir=cgi
+  [ "$name" = adv660 ] && srcfile=cgi/cgi_adv660.acd && srcdir=cgi
+fi
+#-----------------------------------------------------------------------------
+# If need readline, set things up appropriately.
+#
+if [ -z "$readline" ]; then
+  findlibs $arch readline ncurses ncursesw
+  case "$libs" in
+    *readline*ncurses*) readline="$libs" ;;
+    *) readline=-DNO_READLINE
+       LIBWARN='WARNING: command line editing not supported.'
+    ;;
+  esac
+fi
+#
+[ -n "$debug" ] && DEBUG='=-DDEBUG -g'
+#-----------------------------------------------------------------------------
+# Make sure build subdir exists.
+#
+if [ -d C ]; then
+  if [ $translate = YES ]; then
+    rm -rf C/*
+  fi
+else
+  mkdir C
+fi
+rm -f bld.log
+#
+[ $vrb != 0 ] && echo [A-code kernel, version $IKVER] 
+#-----------------------------------------------------------------------------
+# Translate A-code source to C, unless told not to.
+#
+if [ "$translate" == YES ]; then
+#
+# Add wizard mode if requested, otherwise ensure it is absent.
+#
+  if [ $wiz = YES ]; then
+    [ -r opt/debug.acd ] && cp opt/debug.acd $srcdir/
+  else
+    rm -f $srcdir/debug.acd
+  fi
+  ! $ADIR/acdc $srcfile -o ./C $xref $debug $plain $mode &>bld.log && \
+    ( [ $vrb != 0 ] && cat bld.log ) && exit 1
+  rm -f $srcdir/debug.acd bld.log
+#
+# Copy the kernel.
+#
+  cp $KDIR/adv0* C/
+  [ "$type" = L ] && cp $KDIR/extras/libtest.c C/
+fi
+#-----------------------------------------------------------------------------
+# Cross-reference sort (if Perl available)
+#
+if [ -n "$xref" -a -n "$(which perl)" ]; then
+  [ $srcdir != . ] && mv $srcdir/*.xrf ${name}.xrf
+  $BIN/sortxrefs $name.xrf &>bld.log
+  [ $vrb = 2 ] && cat bld.log
+  rm bld.log
+fi
+#
+[ "$build" != 'YES' ] && exit 0
+#-----------------------------------------------------------------------------
+#Time to build the game!
+#
+[ "$type" = C ] && [ "$readline" = '-DNO_READLINE' ] && \
+  exetype="$exetype without command editing"
+[ -n "$suptype" ] && [ $vrb != 0 ] && echo "Modifiers:$suptype."
+#-----------------------------------------------------------------------------
+# The JS mode is special.
+#
+if [ "$type" = J ]; then
+   [ $vrb = 0 ] || echo Creating a JAVASCRIPT/HTML build
+   cd C
+#   [ -r /opt/emsdk/emsdk_env.sh ] && . /opt/emsdk/emsdk_env.sh &>/dev/null
+   ! emcc -Os -s ASM_JS=1 -s WASM=0 -s ENVIRONMENT=web \
+     -DJS adv*.c  -Wno-parentheses-equality -lidbfs.js \
+       -s "EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap']" --memory-init-file 0 \
+         -o $name.js -s EXPORTED_FUNCTIONS="['_advturn']" &>bld.log && \
+           cat bld.log && exit 1
+   rm bld.log
+   [ $vrb != 0 ] && echo Merging $name.js into $name.html...
+# 
+# Now merge $KDIR/extras/acode.html with $name.js
+#
+   RIFS="$IFS"
+   IFS=
+   while read line; do
+     case "$line" in
+       *\%JAVASCRIPT\%*) cat $name.js ;;
+       *\%NAME\%*) echo "${line/\%NAME\%/$name}" ;;
+       *) echo "$line";;
+     esac
+   done <$KDIR/extras/acode.html >$name.html
+   IFS="$RIFS"
+   rm $name.js && mv $name.html ../
+   echo Created $name.html $vstate
+   [ $vrb != 0 ] && echo
+   exit
+fi
+#-----------------------------------------------------------------------------
+# Qt5 build is also special.
+#
+if [ $type = Q ]; then
+#
+# Check whether we have the necessary software. NB findlibs sets the
+# libs and mislibs variables.
+#
+  ! which $CPP &>/dev/null && echo Need $CPP for a QT build. && exit 1
+  ! which qmake &>/dev/null && echo Need qmake for a QT build. && exit 1
+  ! which make &>/dev/null && echo Need $make for a QT build. && exit 1
+  findlibs $arch Qt5Core Qt5Widgets Qt5Gui Qt5WebKit Qt5WebKitWidgets pthread
+  [ "$mislib" != '' ] && echo Missing $arch bit libraries: $mislib && exit 1
+  cd C
+  cp $KDIR/extras/*.{h,cpp} ../extras/advinfo.h .
+  cp $KDIR/extras/acode.pro $name.pro
+  qmake
+  ! make -j $(nproc) 2>bld.log && cat bld.log && exit 1
+  rm -f bld.log
+  strip $name
+  mv $name $GDIR/$name.qt5
+  exit 0
+fi
+#-----------------------------------------------------------------------------
+# Just a C build of some sort.
+#
+[ $vrb != 0 ] && echo "Compiling and linking $exetype"
+[ -n "$LIBWARN" ] && echo $LIBWARN  
+#echo NAME: $name
+! $CC ./C/*.c $flags $dbg $readline -I ./C -I $ADV -o $name $CFLAGS &>bld.log \
+  && cat bld.log && exit 1
+rm -f bld.log
+#
+# Get the data file, if one got created.
+#
+[ -f C/$name.dat ] && cp C/$name.dat .
+[ -z "$dbg" ] && strip $name
+echo "Created $name $vstate"
+[ $vrb != 0 ] && echo
+#-----------------------------------------------------------------------------
+exit      # All done!
+#
+############################### End of script ################################

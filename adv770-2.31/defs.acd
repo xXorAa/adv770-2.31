@@ -1,0 +1,658 @@
+# Adventure770 -- Copyleft Mike Arnautov 1984-2022.
+#
+# Define various flags and constants.
+#
+# Define true and false.
+#
+constant false
+         true
+#
+# Define context values.
+#
+constant none              # No context -- must be 1st!
+         q.input           # Skip to input -- must be 2nd!
+         q.restored        # Just restored -- normal prompt -- must be 3rd!
+         q.null.turn       # Skip all housekeepin
+         q.initial         # Initial restore?
+         q.help            # Need help?
+         q.help.cost       # Do you accept the penalty for help?
+         q.spire.drop      # Really drop stuff here?
+         q.whirlpool       # What, into whirlpool?
+         q.quit            # Really quit?
+         q.wizard          # Are you actually a wizard?
+         q.prove.it        # Prove your wizdom!
+         q.forest.out      # Do you want out of the forest?
+         q.maze.out        # Do you want out of this maze?
+         q.kill.giant      # Really kill giant?
+         q.save            # Really save?
+         q.save.what       # Save under what name?
+         q.continue        # Continue playing?
+         q.remember        # Really memory save?
+         q.recall          # Really memory restore?
+         q.into.abyss?     # Really step over the edge?
+         q.more            # Do you want me to continue?
+         q.intro           # Want intro?
+         q.forbidding      # Forbidding notice.
+         q.chalice         # Will you help?
+         q.suicide         # Really commit suicide?
+         q.oyster          # Should I read the oyster message?
+         q.reincarnate     # Do you want to be reincarnated?
+         q.dragon          # Attack dragon with bare hands?
+         q.dwarf           # Attack dwarf with bare hands?
+         q.ogre            # Attack ogre with bare hands?
+         q.sentry          # Go to tower top again?
+         q.cheat           # Really cheat?
+         q.ledge.good      # Really try that ledge?
+         q.ledge.bad       # Really try that ledge, you fool?
+         q.vocab.0         # Want to see verbs?
+         q.vocab.1         # Want to see nouns?
+         q.vocab.2         # Want to see travel options?
+         q.vocab.3         # Want to see screen layout options?
+         q.good.news.1     # More good news?
+         q.good.news.2     # Yet more good news?
+         q.bad.news        # Want the really bad news?
+         q.bad.image       # Zap bad save image?
+         q.early.restore   # Don't care about early restore penalty?
+         q.keep.image      # Want to keep this save image?
+         q.restore.what    # What game do you want to restore?
+         q.delete          # Delete pre-existing image?
+         q.waterfall       # What, into the waterfall?
+         q.really.fly?     # Is he sure he got everything?
+         q.streambed       # Really down to streambed?
+         q.wimp            # Are you a wimp?
+         q.champagne?      # Fill the chalice with champagne?
+#
+#        Bit flags set for the 'status' variable
+#
+flags variable         # STATUS
+      moved            # Set by interpreter whenever we move
+      brief.display    # Spare flag
+      terse.display    # Signals short location descriptions
+      full.display     # Force brief description, just this one time
+      SPARE..F..1      # Spare flag
+      pls.clarify      # Signals missing object or verb
+      juggled          # set by the kernel whenever we move an object
+      ticked           # The events clock has just ticked
+      light.here       # There's light here
+      SPARE..F..2      # Spare flag
+      vocab.prod       # May need prodding about the vocabulary command
+      SPARE..F..3      # Spare flag
+      desert.warn      # Just entered the desert section
+#
+# Hardwire the "noun" flag  value as one higher than the verb one.
+#
+#constant 3, noun    # It's a noun (a pseudo-object), not a verb
+#
+# Next, the flag set for places
+#
+flags place
+      lit           # Place is self-illuminated
+      been.here     # We've been here at least once
+      no.dwarf      # Dwarves can't go here
+      no.back       # Can't use BACK to go to/from this place
+      not.in.cave   # This place is not in the cave
+      hintable      # There may be a hint for this place
+      smartass      # He has refused spontaneous hint here
+      in.maze       # This room is in one of the mazes
+      one.exit      # Only one exit out of room
+      in.sewer      # A sewer location
+      damp          # The ground is damp here - either from oil or water
+      small         # Not much room here
+      in.desert     # In shifting sands desert
+      special       # Depends on the location
+      h20.here      # Water is available here
+      indoors       # Not in cave but indoors
+#
+# Current usage of 'special' place flag:
+#
+# catacombs.lobby   set if plaque read once
+# dark.forest       set if poem quoted
+# river.north       just moved here, heading east
+# cave.9            ditto
+# spire             spire top not visited yet
+# nowhere           set if complained about loitering here
+#
+# Next, the objects flag set
+#
+flags object
+      portable       # Object can be carried
+      seen           # We've seen the object
+      valued         # It's a treasure - must be left in the building
+      schizoid       # It's schizoid - in 2 places at once
+      unstable       # Unstable objects get kicked from state 0
+#                    # into state 1 the first time they're picked
+#                    # up - applies only to objects that aren't
+#                    # special-cased anywhere in the code.
+      mortal         # This is a killable entity
+      openable       # Object can be opened/unlocked
+      feature        # Object is a feature of this location
+      plural         # Object should be referred to in plural
+      freebie        # Object is effectively weightless
+      special1       # Special control bit 1
+      special2       # Special control bit 2
+      big            # Set for big objects
+      wearable       # Object can be worn - in principle!
+      heavy          # Heavy objects
+      stealable      # Potential swag
+#
+# The usage of object flags 'special1' and 'special2' is currently
+# as follows:
+#
+# dwarf   #1 set if the dwarf who just appeared hasn't
+#            thrown his first knife (which always misses) yet.  
+#         #2 set if the dwarf is angry (you tried to feed him,
+#            threw food at him, or doused him with water or oil).
+#
+# pirate  #1 set if the pirate is chasing you.
+#
+# djinn   #1 set if you released the djinn from the pentagram (he's grateful). 
+#         #2 set if he has given you a hint as a reward for doing so.
+#
+# safe    #1 set if you have successfully opened the safe at least once 
+#
+# troll   #1 set if you have stolen the eggs back from the troll.
+#
+# shadow  #1 set if player just waved; 
+#         #2 set on next move if shadow about to wave back.
+#
+# grate   #1 set if you tried to get out through the grate during closure.
+#
+# eggs    #1 set if eggs in troll's possession.
+#         #2 set if eggs gone for good.
+#
+# sunstone #1 set if black flash seen once. 
+#          #2 set if player got it off the spire.
+#
+# crown   #1 set if whispering crown just incremented.
+#         #2 set if crown worn at least once.
+#
+# rug     #1 set if rug cleaned up.
+#         #2 set if rug can fly.
+#
+# mask    #1 set if already commented on Zorro outfit.
+#
+# gates   #1 set if gates opened at least once.
+#
+# rats    #1 set if can go down into sewers.
+#         #2 set if he stinks and cannot leave the stream maze.
+#
+# cage    #1 set if bird caged once.
+#
+# birdseed  #1 dropped seed and havent' moved yet.
+#
+# mud shoes #1 wore them once before.
+#
+# vampire #1 is set if we have just arrived to the crypt and the vampire
+#            is thirsty.
+#
+# spoon   #1 spoon writing noted.
+#         #2 tried getting dung with it.
+#
+# plate   #2 tried getting dung with it.
+#
+# helmet  #2 tried getting dung with it.
+#
+# chalice #2 tried filling it with dung.
+#
+# vase    #2 tried getting dung with it.
+#
+# codex   #2 may answer yes/no to the codex offer.
+#
+# giant   #1 in quarters, set if the HUNGRY.GIANT message printed.
+#         #2 if pushed player out of ravine at least once.
+#
+# starstone #1 set if lit starstone seen at least once.
+#
+# water   #1 is used in thirst processing.
+#
+# During the end-game all special bits are cleared, except for
+#         #1 being set for any objects 'piled up' in NE repository and
+#         #2 similarly indicating SW repository and the unicorn, whose special
+#         bits are used (but only after the blast!) to time the warning in
+#         the Dark Hole.
+#
+# Define a flag set for the 'admin' variable
+#
+flags variable          # ADMIN
+      ticker            # Call 'tick' label after each move, if set
+      cameo.tried       # We have tried to do a cameo
+      nomagic           # Magic words are being suppressed
+      panicked          # He panicked during closure
+      SPARE..F..4       # Spare flag
+      ranout            # His lamp just died
+      SPARE..F..5       # Spare flag
+      fire.out          # Fire emergency cancelled
+      edison            # He has just said 'noside'
+      chalice.used      # He has drank the pure waters
+      quest.accepted    # He accepted the chalice quest
+      SPARE..F..6       # Spare flag
+      ok.to.fly         # He's been warned about flying
+#
+# Random quip flags. (Variable 'quips').
+#
+flags variable          # QUIPS
+      homer.quip        # Remarked on hexameters
+      rug.flung         # Got rug flung at us on spire top
+      fangs.worn        # He wore the fangs once
+      trusting.bird     # Bird fed and hence trusts the player
+      wand.misfired     # Wand will not misfire again
+      oryan.quip        # O'Ryan, not Orion!
+      sunstone.examined # Examined sunstone at least once
+      guybrush.quip     # Three-headed monkey is about!
+      dwarf.quip        # Dwarf insisted on his rights
+      crucifix.waved    # No need to suggest doing so
+      desert.rat        # He is wise in the ways of the desert
+      memory.cost.noted # He's been advised re costs of memory restore
+      litterbug         # He met George
+#
+# Define bit flags for special hint processing. (Variable 'hints').
+#
+flags variable        # HINTS
+      snake.pending   # The first snake hint delivered
+      statue.pending  # The first Minotaur gorge hint delivered
+      SPARE..F..7     # Spare
+      helped.him      # Gave him vanilla "HELP" message once
+      simple.rule     # Referred to 'simple rule' at Nowhere
+      death.is.simple # Advised him how to die
+      sewer.pending   # The first sewer hint delivered
+      sewer.exit      # He's clean now!
+      all.exits       # Told him to explore all exits past pit in maze
+      keys.listed     # The crown gave him at least one key
+      windrose.hinted # He was told to look for the windrose
+#
+# Context flags
+#
+flags variable        # CONTEXT
+      joke.over       # Set on solving the little joke.
+      arg2.here       # ARG2 designated pseudo object *is* here
+      arg2.distant    # ARG2 can be seen but is out of reach
+      recent.move     # Last turn was a move
+      prompted        # Player queried for input
+#
+# Recent event flags and states.
+#
+flags variable             # RECENT.EVENT
+      just.happened        # Event occured on the previous turn
+#
+state 1, demanding.dwarf   # Dwarf died making a peculiar demand
+#
+# Valuation results.
+#
+constant had.been.valuable
+         was.valuable
+         just.about.valuable
+         was.not.valuable
+         valuable.and.useful
+         not.valuable.or.useful
+#
+# Define thirst parameters.
+#
+constant 1800,  min.thirst
+          300,  base.thirst
+#
+# Define administrative control parameters
+#
+constant  5,   min.time    # # of minutes you must wait after SAVE
+         10,   hint.cost   # what each hint costs you
+       7777,   max.game    # maximum number of turns
+#
+# Define temple states
+#
+state 3, vault.magicked
+         vault.open 
+         vault.locked
+#
+# Define bottle/flask/bucket states
+#
+state in.pentagram       # flask only
+      sealed, dirtied    # flask and bucket respectively
+      emptied            # all vessels
+      full.of.water      # all vessels
+      full.of.oil        # bottle or flask only
+      full.of.champagne  # bucket only
+      full.of.dung       # bucket only
+      mostly.full        # bucket only
+      half.full          # bucket only
+      quarter.full       # bucket only
+#
+# Define chalice states
+#
+state 1, leaking
+         full
+#
+# Define lamp states
+#
+state switched.off
+      switched.on
+      getting.dim
+#
+# Define door/portcullis states
+#
+state rusty
+      oiled
+#
+# Define generic portal states
+#
+state closed, outside.view
+      opened, inside.view
+      ajar
+# 
+# Define vampire's happy states.
+#
+state thirsty
+      content 
+      asleep
+#
+# Define water states (well, player thirst states, really).
+#
+state sated
+      parched
+      desperate
+#
+# Define grate/chain/safe states.
+#
+state locked
+      unlocked
+      locked.empty, fused
+#
+# Define water quality options
+#
+constant cold.water
+         rusty.water
+         spring.water
+         volcanic.water
+         swamp.water
+         lake.water
+#
+# Define orb visions
+#
+constant vanilla.vision
+         plant.vision
+         giant.vision
+         spider.vision
+         sword.vision
+         ogre.vision
+         ring.vision
+         gorge.vision
+         statue.vision
+         skeleton.vision
+         crown.vision
+         picnic.vision
+         vampire.vision
+         dungeon.vision
+         chalice.vision
+         beanstalk.vision
+         fez.vision
+         spire.vision
+         sapling.vision
+         rug.vision
+         island.vision
+         temple.vision
+         tower.vision
+         gates.vision
+         rose.vision
+         hoard.vision
+         repository.vision
+#
+# Define orc mutters
+#
+constant chalice.mutter
+         eggs.mutter
+         lava.mutter
+         pentagram.mutter
+         orb.mutter
+         no.mutter
+         starstone.mutter
+         catacombs.mutter
+         noside.mutter
+         sword.mutter
+         keys.mutter
+         plover.mutter
+         sewers.mutter
+         scree.mutter
+         skull.mutter
+         valuers.mutter
+         unicorn.mutter
+         catacombs2.mutter
+#
+# Define special mushroom states
+#
+state 2,  eaten
+          digested
+#
+# Define dragon states
+#
+state    on.rug
+         dead.body
+      3, rotting.carcass
+#
+# Define basilisk states
+#
+state snoring
+      twitching
+      petrified
+      petrified.to.south
+#
+# Define the 'shiny' state of the plate
+#
+state 2,  shiny        # Plate "unstable" so can't use 1
+#
+# Define chasm states
+#
+state bridged
+      bridge.wrecked
+      bridge.burned
+#
+# Shoe states.
+#
+state shoes.hidden
+      shoes.noted
+      shoes.found
+#
+# Define troll states
+#
+state wants.treasure
+      bought.off
+      will.be.back
+      scared.off
+      gone.for.good
+#
+# Define starstone states
+#
+state 1,  quiescent
+          darkened
+          iridescent
+#
+# Define battery states. (Note, state 2 MUST be dummy).
+#
+state 1,  fresh
+      3,  wornout
+#
+# Define rags' "very dirty" state.
+#
+state 2,  very.dirty         # rags being "unstable", can't use 1!
+          filthy             # soaked in sewage
+#
+# Define bird states.
+#
+state freed
+      caged
+#
+# Define bear states.
+#
+state chained.ferocious
+      chained.gentle
+      unchained
+#
+# Define axe states.
+#
+state ground.state
+      by.bear
+      by.spider
+#
+# Define web states.
+#
+state with.spider
+      with.documents
+      in.shreds
+#
+# Define giant states.
+#
+state resting
+      getting.ready
+      blissful
+      puzzled
+      hurt
+      picnicking
+      watching
+#
+# Define statue states.
+#
+state solid.wall
+      wall.gone
+#
+# Define the sword 'in the stone' state.
+#
+state in.stone
+#
+# Define beanstalk states.
+#
+state stunted
+      grown
+      gigantic
+#
+# Define notice states.
+#
+state unread
+      examined
+      brilliged
+#
+# Define some of the crown states.
+#
+state 1,  dormant       # Must be same as NOT.WORN below!
+          activated
+          whispering
+      7,  incomprehensible
+      9,  speaking
+      12, chanting
+      17, roaring
+      19, killing
+#
+# Define rug states.
+#
+state rolled.up
+      hovering
+      unrolled
+      unrolled.clean
+#
+# The skull and bust have one special state
+#
+state 1, whole
+         damaged
+#
+# Define threshold for wearable objects. Note that this is set to
+# take into account "unstable" objects. Hence on removing stable
+# objects will give them state 1, which they mostly don't have.
+# Not that it matters - the highest existing description will
+# be printed in such a case.
+#
+state 1,  not.worn
+          worn
+#
+# Define dwarf sentry states.
+#
+state 1, watchful
+         welcoming.commettee
+#
+# Flagstone states,
+#
+state 1, flagstone.moved
+         flagstone.fixed
+#
+# FOREST.12 state showing the hidden path.
+#
+state 1, faint.path
+#
+# An extra state for the fertiliser packet.
+#
+state 2, stupe.gro
+#
+# Temporary variable value indicating the kind of plant food used. 
+#
+state use.dung
+      use.fertiliser    
+#
+#        Define the states for STEPS at MISTS and PIT.
+#
+state steps.present
+      steps.gone
+#
+# One non-default pine state
+#
+state standing
+      fallen
+#
+# Non-default codex reward values
+#
+state 1, available
+         awarded
+         excessive
+#
+# Define various location constants for descriptionn indexing.
+#
+constant 0, c.chapel
+            c.vestry
+            c.slab.room
+            c.giant.room
+            c.soft
+            c.misty
+            c.audience
+            c.golden.chamber
+            c.vault
+            c.toolroom
+            c.irregular.tunnel
+            c.ice
+            c.repository
+            c.dungeon
+            c.basement
+            c.storeroom
+            c.shelves
+            c.crypt
+            c.temple
+            c.abyss
+            c.platform
+#
+# Location description detail
+#
+constant short
+         default
+         long
+#
+# Define champaign sip limit.
+#
+constant 3, max.sips
+#
+# The phases of cave closure are as follows:
+#
+constant show.banner         
+         query.restore       # Initial restore query
+         little.joke         # Dusty voice
+         adventuring         # Cave open and operating normally
+         closing.soon        # All treasures are in well-house
+         exits.barred        # Cave closing soon
+         in.repository       # In repository
+         middle.of.nowhere   # At misty nowhere
+         mirror.world        # Back outside cave
+         victory!            # Wins game!
+#
+# Finally some random constants.
+#
+constant 4,  lives           # How many lives has he got
+constant 7,  high.tide       # That's when he dies!
+constant 8,  carry.limit     # Number of non-freebie objects initially allowed
+constant 6,  mushroom.effect # What the mushroom adds
+constant 14, full.value      # Full treasure credits
+constant 7,  seen.value      # Credits for only finding treasure
+constant 16, closure.credit  # Points per stage of closure
+#
+#=====================================================================

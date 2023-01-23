@@ -1,0 +1,17 @@
+                        ===========================
+                        A-code kernel version 12.89
+                        ===========================
+
+ Kernel files require no special installation. They just get compiled
+ together with derived C sources produced by the acdc translator. This is
+ done automatically by the advbld script, but if not using the script you
+ can do it &quot;manually&quot;.
+
+ For detailed information on building A-code games, please see the supplied
+ PDF A-code documentation.
+
+                                                               Mike Arnautov
+                                                              mla@mipmip.org
+                                                                 19 May 2022
+
+ ============================================================================

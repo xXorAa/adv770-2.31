@@ -1,0 +1,484 @@
+# Adventure770 -- Copyleft Mike Arnautov 1984-2022.
+#
+# Words to be ignored
+#
+noise the, that, this, !awhile
+#
+# Time we defined some verbs. 
+#
+# N.B. - the following magic words (ZORTON through BASINGSTOKE) #must#
+# be defined in reverse alphabetical order!  If new magic words
+# are added, place them in the proper sequence and modify the
+# code in the "AT NOWHERE" area!  If you don't do this right, 
+# people are going to have a hell of a time getting out of Nowhere
+# during cave-closure. One extra complication... adding magic words
+# can make the safe unresponsive to any of the 4 keys in saved games.
+# Finally, note that the '!' prefixing magic words makes them
+# non-abbreviable - the same would work for any other dictionary 
+# word too.
+#
+verb -first.magic
+verb !zorton
+verb !xyzzy
+verb !thurb
+verb !snoeze
+verb !samoht
+verb !plugh
+verb !phuggg
+verb !noside
+verb !melenkurion
+verb !knerl
+verb !klaetu
+verb !foo
+verb !foe
+verb !fie
+verb !fee
+verb !blerbi
+verb !basingstoke
+verb -last.magic
+#
+# The next block are specials, not requiring validation of ARG2.
+#
+verb -first.special        # Mark the first one
+verb again, repeat, =r
+verb save, suspend, pause
+verb restore, load
+verb rest, wait                  # In case players type REST MYGAME
+verb contemplate, meditate
+verb sorry, thanks
+verb say, =talk, sing, chant, utter, mumble, shout, speak, yell
+verb laugh, =!lol, =!rotfl, =!rofl, =hehehehehe, =hahahahaha, =hohohohoho, =heeheeheeheehee, smirk, grin, smile
+verb !length, =!line, =!width
+verb !scroll, =!screen, =!depth
+verb !margin, =!offset
+verb restart, initialise
+verb why
+verb !fuck, !piss, !pee, !screw, !shit, urinate, !wank, !bugger, !fart, !crap, defecate, !rape, !anus, !anal
+verb !undo
+verb !redo
+verb cry
+verb please
+verb data
+verb -last.special         # Mark end of special verbs
+#
+# End of verbs not requiring validation of ARG2.
+#
+# Now define directions.
+#
+verb -first.direction
+verb north, =n
+verb northeast, =ne
+verb east, =e
+verb southeast, =se
+verb south, =s
+verb southwest, =sw
+verb west, =w
+verb northwest, =nw
+verb -last.compass.point
+verb up, =u, upward, ascend
+verb down, =d, downwards, descend
+verb -last.direction
+#
+# Other movement verbs.
+#
+verb in, inward, inside, enter
+verb out, outside, outdoors, exit, leave
+verb go, walk, run, travel, proceed, explore, follow, scramble, detour
+verb forward, continue, onward
+verb back, =b, return, retreat
+verb jump, leap
+verb cross, across, over
+#
+# Now for general verbs which may require clarification
+#
+verb -first.clarify
+verb get, =g, =reach, carry, take, =t, pickup, keep, hold, catch, grab, =grip, clutch, steal, capture, tote, scoop
+verb drop, =dr, =discard, =fall, =abandon, =dump, free, =release, =let
+verb open, force
+verb unlock                 # Mostly, but not always, same as 'open'
+verb close, lock
+verb shut                   # Allow for "shut up"
+verb wear, don
+verb remove, doff
+verb listen, hear
+verb translate, interpret, decode
+verb wake, prod, disturb, stir
+verb cut, chop
+verb on
+verb off
+verb light, lights
+verb extinguish
+verb wave, =waves, shake, swing, rollers
+verb placate, calm, tame
+verb kill, =k, attack, fight, slay
+verb hit, strike, beat, bang
+verb kick
+verb blow, play
+verb pour
+verb eat, devour
+verb chew, bite
+verb drink, imbibe
+verb sip, taste, nibble
+verb rub, polish
+verb throw, =th, toss, hurl
+verb find, discover, locate    # Wizards can find remote things
+verb feed
+verb fill
+verb lift                   # Mostly, but not always, same as 'get'
+verb read, peruse, scan
+verb replace, change, exchange, swap
+verb break, shatter, smash, disable, jam, ram
+verb ride, mount, board, boards  # For 'l boards' by dinghy
+verb fix, repair
+verb scatter, sow
+verb empty
+verb give, offer, show
+verb fly, teleport
+verb pull
+verb push, move, shift, turn, press
+verb obtain, procure, fetch
+verb dip
+verb evict, banish
+verb where
+verb tear
+verb spill
+verb clean
+verb value
+verb burn, ignite
+verb flip, toggle
+verb melt
+verb -last.clarify        # Last clarifiable 'verb'
+#
+# Next lot does not require clarifications
+#
+verb introduction, instructions
+verb examine, =look, =l, =x, =ex, describe, description, consider, inspect
+verb quit, =q, =end, =stop, =finish, =bye, =logout, =cancel, =abort
+verb terse, fast
+verb normal, brief, default
+verb verbose, full
+verb history
+verb hours
+verb memorize, =remember, =memorise
+verb recall
+verb !sesame, !opensesame, !abra, !abracadabra, !shazam, !hocus, !pocus, !cadabra
+verb help, =?, hint
+verb !fum
+verb dig, excavate
+verb lost, confused
+verb info, information
+verb swim
+verb wizard
+verb sleep, doze, snooze, =nap
+verb scream
+verb swear
+verb hoot
+verb search
+verb inventory, =i, itinerary, itinery
+verb score, =sc
+verb epns
+verb blast, explode, detonate
+verb climb
+verb upstream
+verb downstream
+verb left, right
+verb use
+verb reflect, reflections
+verb scry, gaze
+verb vocabulary, =commands, dictionary
+verb yes, =y, =yup, ok, good
+verb no, =nope
+verb maybe, perhaps, possibly
+verb tanstaafl
+verb !frobozz       # Not a magic word!
+verb wash
+verb die, suicide
+verb roll, rollup
+verb unroll, spread
+verb cheat
+verb dwarvish
+verb english
+verb put, insert
+verb attach
+verb justify
+verb think
+verb point
+verb pqfo                   # "Open" in dwarvish
+verb knock
+verb count
+verb !omar, !rubayat, !rubaiyat, !khayyam, !khayam, !corelli, mandolin
+verb mutter
+verb bknrd, nodm, rgts, !m, !mn, !fn, !hm, !mv, !nts, !h, hmudmsnqx # Some Humanish
+verb credits, acknowledgements
+verb test
+verb exits
+verb .spare.verb.1          # Was 'next' -- can't just remove it!!
+verb diagnose, health
+verb tie, untie
+verb explain
+verb !with, !about, !from, !into, !to, !at, !above, !under
+#
+# Now the potential travel options.
+#
+verb -first.travel
+verb crack, cracks
+verb cave
+verb dome
+verb view, terraine
+verb surface
+verb hole, holes
+verb forest, woods
+verb entrance
+verb secret
+verb passage, passages
+verb tunnel, tunnels
+verb stream, flow, =flows, =rivers, torrent, rapids
+verb crawl
+verb hall
+verb opening, openings
+verb -last.travel
+#
+# Next come pseudo-objects -- they only exist as vocabulary words.
+#
+noun -first.pseudo
+noun catacombs
+noun cloak
+noun hat
+noun caviar
+noun goodies, sandwiches
+noun barrel
+noun fountain, basin, !fountains
+noun tombs, vaults
+noun shelf, shelves, rack, racks
+noun couch
+noun ash, ashes, fire
+noun heelprint, =print, indentation
+noun well
+noun spring
+noun bed, streambed, stream-bed, riverbed, river-bed
+noun window, windows
+noun cliff, cliffs
+noun vegetation, =greenery, =tangle, =mass, =growth, =barrier, foliage, =leaves, =canopy, =leaf
+noun berry, berries
+noun eyes, eye                             # Intercept eyeglass!
+noun monocle, =eye-glass, =eyeglass
+noun lid
+noun gully
+noun something, =thing, =red, =shiny       # Red for fire alarm, shiny for seal
+noun drawing, =drawings, fish, =fishy
+noun verbs
+noun nouns, objects
+noun crevice
+noun o'ryan, =oryan, patrick
+noun swamp, =bog, =marsh
+noun ivy
+noun wall, =walls
+noun mist, fog, wisps
+noun switch, hemisphere
+noun thumbs
+noun ramp
+noun droppings
+noun boxes
+noun monkey, ape
+noun guybrush, threepwood
+noun jerry, cornelius
+noun elric, melnibone
+noun plug
+noun plughole
+noun tooth
+noun sea, ocean
+noun tower
+noun slits
+noun mug, =pewter, mugs, dish, dishes, jug, =earthenware, jugs
+noun sand, grit
+noun stool
+noun sewage
+noun carcass, body
+noun mountain, mountains, =range, =peaks
+noun rattle
+noun columns, =column, pillars, =pillar
+noun horses, shape, shapes, ironwork
+noun pool, whirlpool
+noun pergola
+noun bench
+noun cupid
+noun doorway, portal
+noun corner
+noun around, area
+noun ceiling, vault
+noun bricks, brickwork, =brick-work
+noun maple, =maples, oak, =oaks
+noun birch, =birches
+noun bushes, bush, shrubs, gorse, undergrowth, elder, blackthorn, scrub, rosebushes, spruce
+noun fir, =firs, conifer, =conifers
+noun grass, soil, patch
+noun weeds
+noun sun
+noun stars, star
+noun moon, moons
+noun bottom
+noun shaft
+noun supports
+noun surround
+noun chalk
+noun thicket
+noun haze
+noun concrete
+noun dirt
+noun brambles
+noun nettles
+noun ferns
+noun dust
+noun planks, wood
+noun leg
+noun legs, hands, heads, ankles
+noun bank, banks
+noun phalanx
+noun flowers
+noun coral
+noun horizon
+noun slope, slopes, shoulder
+noun shore, shores, coast
+noun outcrop, outcrops
+noun stem
+noun structure
+noun me, self, myself
+noun you, yourself
+noun sygil
+noun crabs, =crab
+noun edge, edges
+noun marble
+noun periphery
+noun trail
+noun shade
+noun fold, folds
+noun torch, torches
+noun bend
+noun words
+noun cairn
+noun spiral
+noun rib, ribs
+noun lava, basalt
+noun minerals
+noun formations
+noun remnants
+noun blockage, cavein, cave-in, rockfall, rock-fall
+noun swag, loot
+noun label
+noun aurora
+noun clouds
+word .spare.verb.2      # Was 'reflections' -- can't just remove it!
+noun alabaster
+noun geyser, steam
+noun shadows, apparitions
+noun runes, scripts
+noun counterweights, mechanism
+noun crag, crags
+noun seam, seams
+noun heap, heaps, pile, piles
+noun feet, foot
+noun dais
+noun granite
+noun blood
+noun onyx, bloodstone
+noun stanchions
+noun balustrade
+noun gravel
+noun thorns
+noun snow
+noun meadows
+noun space
+noun daylight
+noun carving
+noun arch, archway
+noun timber, props
+noun crystals
+noun rust
+noun marks
+noun mould
+noun fracture
+noun pipe, pipes
+noun liquid
+noun membrane
+noun foam, flecks
+noun void
+noun tablecloth, cloth
+noun footholds, handholds
+noun insects
+noun bat, bats
+noun hollows
+noun top
+noun dune, dunes, desert
+noun vista, landscape, scene
+noun spray
+noun overhang
+noun map
+noun room, chamber
+noun rose
+noun roses
+noun sign
+noun butterflies, butterfly
+noun iron
+noun gold
+noun silver
+noun quartz
+noun bronze
+noun iridium
+noun platinum
+noun turquoise
+noun mithril
+noun jade
+noun ivory
+noun amethyst
+noun metal
+noun paper
+noun brass
+noun thataway
+noun threads
+noun hoofs
+noun mane
+noun handle, pommel
+noun strips
+noun tray
+noun slot
+noun recess
+noun -first.sculpture.fake
+noun !pig
+noun !eel
+noun !emu 
+noun !elf 
+noun squirrel 
+noun vulture 
+noun rabbit 
+noun elephant
+noun snail
+noun condor
+noun lizard
+noun ibex 
+noun frog 
+noun tiger 
+noun mule 
+noun moose 
+noun !dog
+noun phoenix
+noun nymph
+noun -last.sculpture.fake
+noun carpet
+#
+noun -first.general
+noun imperfections
+noun rock, =rocks, chunk, chunks, fragments
+noun stone, =stones
+noun boulder, =boulders
+noun block
+noun bundle, !rods
+noun !plurals, !oysters, !birds, !lamps, !cages, !pillows, !bottles, !snakes, !plants, !beanstalks, !nursery, !row
+noun sky
+noun floor, ground
+noun -last.pseudo
+#
+# Except/but is in a category of its own!
+#
+word except, but
+#
+#=====================================================================

@@ -1,0 +1,1079 @@
+# Adventure770 -- Copyleft Mike Arnautov 1984-2022.
+#
+# Time to do some run-time initialisation.
+#
+#=====================================================================
+#
+init
+   local junk
+   local state
+#
+# Initialize portability of some objects.
+#
+   flag keys, portable
+   flag lamp, portable
+   flag cage, portable
+   flag rod, portable
+   flag dynamite, portable
+   flag bird, portable
+   flag pillow, portable
+   flag clam, portable
+   flag oyster, portable
+   flag magazines, portable
+   flag knife, portable       # Not really, since it does not exist!
+   flag food, portable
+   flag bottle, portable
+   flag axe, portable
+   flag bear, portable
+   flag batteries, portable
+   flag nugget, portable
+   flag diamonds, portable
+   flag bars, portable
+   flag jewelry, portable
+   flag coins, portable
+   flag chest, portable
+   flag nest, portable
+   flag trident, portable
+   flag vase, portable
+   flag pottery, portable
+   flag emerald, portable
+   flag pyramid, portable
+   flag pearl, portable
+   flag rug, portable
+   flag spices, portable
+   flag chain, portable
+   flag ring, portable
+   flag spyglass, portable
+   flag bag, portable
+   flag helmet, portable
+   flag teeth, portable
+   flag vial, portable
+   flag mushroom, portable
+   flag sculpture, portable
+   flag bracelet, portable
+   flag casket, portable
+   flag sword, portable
+   flag crown, portable
+   flag sceptre, portable
+   flag yacht, portable
+   flag flask, portable
+   flag plate, portable
+   flag beads, portable
+   flag orb, portable
+   flag crucifix, portable
+   flag spoon, portable
+   flag tusk, portable
+   flag owl, portable     # He can try, anyway...
+   flag chalice, portable
+   flag documents, portable
+   flag horn, portable
+   flag sapphire, portable
+   flag dung, portable
+   flag starstone, portable
+   flag sunstone, portable
+   flag windrose, portable
+   flag skull, portable
+   flag fangs, portable
+   flag rosebowl, portable
+   flag thurible, portable
+   flag seal, portable
+   flag bust, portable
+   flag flower, portable
+   flag packet, portable
+   flag wrapper, portable
+   flag drachma, portable
+   flag obolus, portable
+   flag rags, portable
+   flag bucket, portable
+   flag beater, portable
+   flag box, portable
+   flag mask, portable
+   flag seed, portable
+   flag shoes, portable
+#
+# Set 'freebie' objects.
+#
+   flag bird, freebie
+   flag bear, freebie
+   flag drachma, freebie
+   flag obolus, freebie
+   flag ring, freebie
+   flag pearl, freebie
+   flag mask, freebie
+   flag fangs, freebie
+   flag seed, freebie
+   flag wrapper, freebie
+   flag keys, freebie
+   flag packet, freebie
+   flag mushroom, freebie
+   flag batteries, freebie
+   flag sapphire, freebie
+   flag spoon, freebie
+   flag seal, freebie
+   flag beads, freebie
+#
+# Now for the heavies.
+#
+   flag clam, heavy
+   flag oyster, heavy
+   flag chest, heavy
+   flag nest, heavy
+   flag trident, heavy
+   flag pyramid, heavy
+   flag rug, heavy
+   flag bag, heavy
+   flag helmet, heavy
+   flag sword, heavy
+   flag crown, heavy
+   flag casket, heavy
+   flag yacht, heavy
+   flag sceptre, heavy
+   flag orb, heavy
+   flag tusk, heavy
+   flag skull, heavy
+   flag rosebowl, heavy   
+   flag bust, heavy
+#
+# Above ground locations are lit, not in the cave and ordinary dwarves
+# are not allowed.
+#
+   itplace place.ptr, road, cobbles
+      flag place.ptr, lit
+      flag place.ptr, not.in.cave
+      flag place.ptr, no.dwarf
+   fin
+   unflag cobbles, not.in.cave
+   itplace place.ptr, rock.shelf, beanstalk.top
+      flag place.ptr, lit
+      flag place.ptr, not.in.cave
+      flag place.ptr, no.dwarf
+   fin
+   itplace place.ptr, end.of.valley, shed
+      flag place.ptr, lit
+      flag place.ptr, not.in.cave
+      flag place.ptr, no.dwarf
+   fin
+   itplace place.ptr, tower.base, garden.se
+      flag place.ptr, lit
+      flag place.ptr, not.in.cave
+      flag place.ptr, no.dwarf
+   fin
+   itplace place.ptr, catacombs.entrance, catacombs.exit
+      flag place.ptr, no.dwarf
+   fin
+   itplace place.ptr, cave.2, cave.8
+      flag place.ptr, no.dwarf
+   fin
+   itplace place.ptr, above.abyss, above.volcano
+      flag place.ptr, lit
+      flag place.ptr, no.dwarf
+   fin
+   itplace place.ptr, imaze.01, imaze.book
+      flag place.ptr, no.dwarf, lit
+   fin
+   flag outcrop.1, not.in.cave
+   flag outcrop.2, not.in.cave
+   unflag storeroom, lit
+   unflag shelves.west, lit
+   unflag shelves.east, lit
+   flag nowhere, lit
+   flag nowhere, not.in.cave
+   flag nowhere, no.dwarf
+   flag nowhere, indoors
+   flag building, indoors
+   flag shed, indoors
+   flag temple, indoors
+   itplace place.ptr, tower.base, dwarves.quarters
+      flag place.ptr, hintable
+      flag place.ptr, indoors
+   fin
+   unflag tower.roof, indoors
+   flag well.bottom, lit
+   flag well.bottom, not.in.cave
+   flag well.bottom, no.dwarf
+   itplace place.ptr, north.of.spire, cave.1
+      flag place.ptr, lit
+      flag place.ptr, not.in.cave
+      flag place.ptr, no.dwarf
+   fin
+   itplace place.ptr, island, waterfall
+      flag place.ptr, lit
+      flag place.ptr, not.in.cave
+      flag place.ptr, no.dwarf
+   fin
+   flag above.sea, lit
+   flag above.sea, not.in.cave
+   flag above.sea, no.dwarf
+   flag basalt.shelf, lit
+   flag basalt.shelf, not.in.cave
+   flag basalt.shelf, no.dwarf
+#
+# There are a few other spontaneously lit locations.
+#
+   flag quarters, lit
+   flag dungeon, lit
+   flag plover, lit
+   flag breathtaker, lit
+   flag lair, lit
+   flag ice.cave.30, lit
+   flag plain.2, lit
+   flag plain.3, lit
+   flag faces, lit
+   flag by.figure, lit
+   flag audience, lit
+   flag audience.east, lit
+   flag translucent, lit
+   flag platform, lit
+   flag balcony, lit
+   flag sea.view, lit
+   flag tall.e/w.canyon, lit
+   flag valuers, lit
+   flag ne.repository, lit
+   flag blasted.repository, lit
+   flag sw.repository, lit
+   flag wrong.venue, lit
+   flag mine.exit, lit
+   flag inside.well, lit
+   flag dwarves.quarters, lit
+   flag dwarves.quarters, indoors
+   flag outcrop.1, lit
+   flag outcrop.2, lit
+#
+# Set dwarf-inhibits for appropriate places within the cave.
+#
+   flag cobbles, no.dwarf
+   flag alcove, no.dwarf
+   flag sw.of.chasm, no.dwarf
+   flag ne.of.chasm, no.dwarf
+   flag corridor, no.dwarf
+   flag plover, no.dwarf
+   flag dark, no.dwarf
+   flag fork, no.dwarf
+   flag warmjunctn, no.dwarf
+   flag breathtaker, no.dwarf
+   flag boulder.chamber, no.dwarf
+   flag limestone, no.dwarf
+   flag barren, no.dwarf
+   flag bear.room, no.dwarf
+   flag mazea.114, no.dwarf
+   flag east.pit, no.dwarf
+   flag west.pit, no.dwarf
+   flag streampit, no.dwarf
+   flag faces, no.dwarf
+   flag by.figure, no.dwarf
+   flag plain.1, no.dwarf
+   flag plain.2, no.dwarf
+   flag plain.3, no.dwarf
+   flag nondescript, no.dwarf
+   flag pentagram, no.dwarf
+   flag chimney, no.dwarf
+   flag tube, no.dwarf
+   flag tube.slide, no.dwarf
+   flag north.of.basilisk, no.dwarf
+   flag basilisk.den, no.dwarf
+   flag south.of.basilisk, no.dwarf
+   flag peelgrunt, no.dwarf
+   flag on.steps, no.dwarf
+   flag steps.exit, no.dwarf
+   flag storage, no.dwarf
+   flag fake.y2, no.dwarf
+   flag fake.jumble, no.dwarf
+   itplace place.ptr, catacombs.lobby, catacombs.exit
+      flag place.ptr, no.dwarf
+   fin
+   flag audience, no.dwarf
+   flag audience.east, no.dwarf
+   flag loopy.passage, no.dwarf
+   flag golden.chamber, no.dwarf
+   flag arabesque, no.dwarf
+   flag translucent, no.dwarf
+   flag reservoir.north, no.dwarf
+   flag chamber, no.dwarf
+   flag balcony, no.dwarf
+   flag insafe, no.dwarf
+   flag glassy, no.dwarf
+   flag cellar, no.dwarf
+   flag web.maze.4, no.dwarf
+   flag dank.cave, no.dwarf
+   flag quarters, no.dwarf
+   flag dungeon, no.dwarf
+   flag dungeon.exit, no.dwarf
+   flag swirling.mist, no.dwarf
+   flag culvert, no.dwarf
+   flag culvert.south, no.dwarf
+   flag sea.view, no.dwarf
+   flag sewer.1, no.dwarf
+   flag sewer.2, no.dwarf
+   flag sewer.3, no.dwarf
+   flag sewer.4, no.dwarf
+   flag sewer.5, no.dwarf
+   flag in.shaft, no.dwarf
+   flag phoney.shaft, no.dwarf
+   flag bones.room, no.dwarf
+   flag low.room, no.dwarf
+   flag vestry, no.dwarf
+   flag sword.place, no.dwarf
+   flag limbo, no.dwarf
+   flag ylem, no.dwarf
+   flag debris, no.dwarf
+   flag canyon, no.dwarf
+   flag bird.chamber, no.dwarf
+   flag pit, no.dwarf
+   flag den, no.dwarf
+   flag new.den, no.dwarf
+   flag beams, no.dwarf
+   flag platform, no.dwarf
+   flag stream.maze.entrance, no.dwarf
+   flag stream.maze, no.dwarf
+   flag crypt, no.dwarf
+   flag wrong.venue, no.dwarf
+   flag valuers, no.dwarf
+   flag small.chamber, no.dwarf
+   flag storeroom, no.dwarf     # So that nicked objects do not get nicked.
+   flag hidey.hole, no.dwarf    # Ditto for things lost in the mist.
+#
+# Specify rooms with only 1 exit.
+#
+   flag nugget.room, one.exit
+   flag cellar.view, one.exit
+   flag east.window, one.exit
+   flag west.window, one.exit
+   flag mazea.46, one.exit
+   flag mazea.47, one.exit
+   flag mazea.48, one.exit
+   flag mazea.49, one.exit
+   flag mazea.54, one.exit
+   flag mazea.56, one.exit
+   flag mazea.58, one.exit
+   flag dead.end.1, one.exit
+   flag dead.end.2, one.exit
+   flag dead.end.3, one.exit
+   flag mazea.81, one.exit
+   flag mazea.82, one.exit
+   flag mazea.85, one.exit
+   flag mazea.86, one.exit
+   flag culdesac, one.exit
+   flag balcony, one.exit
+   flag mazed.140, one.exit
+   flag insafe, one.exit
+   flag toolroom, one.exit
+   flag spherical, one.exit
+   flag ice.cave.1a, one.exit
+   flag ice.cave.3a, one.exit
+   flag ice.cave.7, one.exit
+   flag ice.cave.8, one.exit
+   flag ice.cave.13, one.exit
+   flag ice.cave.14, one.exit
+   flag ice.cave.30, one.exit
+   flag small.chamber, one.exit
+   flag den, one.exit
+   flag new.den, one.exit
+   flag crypt, one.exit
+   flag vestry, one.exit
+   flag dank.cave, one.exit
+   flag valuers, one.exit
+   flag mine.dead.end.1, one.exit
+   flag mine.dead.end.2, one.exit
+#
+# Define maze locations and their properties.
+#
+   itplace place.ptr, mazea.42, mazea.by.pit
+      flag place.ptr, in.maze
+      flag place.ptr, hintable
+      ifflag place.ptr, one.exit
+      else
+         flag place.ptr, no.back
+      fin
+   fin
+   unflag mazea.42, no.back
+   itplace place.ptr, mazed.107, mazed.140
+      flag place.ptr, in.maze
+      flag place.ptr, no.back
+      flag place.ptr, hintable
+   fin
+   unflag mazed.107, no.back
+   itplace place.ptr, web.maze.1, web.maze.6
+      flag place.ptr, in.maze
+      flag place.ptr, no.dwarf
+      ifflag place.ptr, one.exit
+      else
+         flag place.ptr, no.back
+      fin
+   fin
+   itplace place.ptr, ice.cave.1, ice.cave.30
+      flag place.ptr, in.maze
+      flag place.ptr, hintable
+      flag place.ptr, no.dwarf
+      ifflag place.ptr, one.exit
+      else
+         flag place.ptr, no.back
+      fin
+   fin
+   itplace place.ptr, catacombs.portal, catacombs.exit
+      flag place.ptr, in.maze
+      flag place.ptr, hintable
+      flag place.ptr, no.dwarf
+      ifflag place.ptr, one.exit
+      else
+         flag place.ptr, no.back
+      fin
+   fin
+   itplace place.ptr, north.of.spire, west.of.spire
+      flag place.ptr, in.desert
+      flag place.ptr, hintable
+   fin
+   itplace place.ptr, desert.1, desert.last
+      flag place.ptr, in.maze
+      flag place.ptr, in.desert
+      flag place.ptr, hintable
+      ifflag place.ptr, one.exit
+      else
+         flag place.ptr, no.back
+      fin
+   fin
+   itplace place.ptr, mine, mine.exit
+      flag place.ptr, no.dwarf
+   fin
+   unflag rocky.desert, in.desert
+   unflag outcrop.1, in.desert
+   unflag outcrop.2, in.desert
+#
+# Some non-maze places also disallow "back".
+#
+   flag mazea.by.pit, no.back
+   flag shell, no.back
+   flag arched.corridor.1, no.back
+   flag arched.corridor.2, no.back
+   flag reservoir.north, no.back
+   flag incline, no.back
+   flag top.of.stalactite, no.back
+   flag sw.of.chasm, no.back
+   flag ne.of.chasm, no.back
+   flag witts.end, no.back
+   flag alcove, no.back
+   flag plover, no.back
+   flag wide.n/s.canyon, no.back
+   flag slide, no.back
+   flag ice, no.back
+   flag faces, no.back
+   flag plain.2, no.back
+   flag nowhere, no.back
+   flag platform, no.back
+   flag stream.maze, no.back
+   flag cellar, no.back
+   flag swirling.mist, no.back
+   flag jumble, no.back
+   flag fake.jumble, no.back
+   flag dark.forest, no.back
+   flag above.sea, no.back
+#
+# Define small locations.
+#
+   flag building, small
+   flag in.cave, small
+   flag east.pit, small
+   flag west.pit,small
+   flag streampit, small
+   flag pantry, small
+   flag alcove, small
+   flag balcony, small
+   flag steps.exit, small
+   flag rest.area, small
+   flag boulder.chamber, small
+   flag sandstone,small
+   flag ice.cave.30, small
+   flag small.chamber, small
+   flag cellar.view, small
+   flag well.bottom, small
+   flag platform, small
+   flag basalt.shelf, small
+   flag basalt.shelf.2, small
+   flag chimney, small
+   flag north.of.basilisk, small
+   flag crack.entry, small
+   flag crack.south, small
+   flag spire.part.up, small
+   flag spire.nearly.up, small
+   flag viewpoint, small
+   flag rest.area, small
+#
+# Specify openable objects.
+#
+   flag grate, openable
+   flag door, openable
+   flag door1, openable
+   flag door2, openable
+   flag door3, openable
+   flag door4, openable
+   flag cage, openable
+   flag clam, openable
+   flag oyster, openable
+   flag flask, openable
+   flag chain, openable
+   flag safe, openable
+   flag vial, openable
+   flag chest, openable
+   flag curtains, openable
+   flag gates, openable
+   flag coffin, openable
+   flag trapdoor, openable
+#
+# Specify non-object objects.
+#
+   flag poster, feature
+   flag alarm, feature
+   flag oil, feature
+   flag water, feature
+   flag champagne, feature
+   flag steps, feature
+   flag curtains, feature
+   flag fissure, feature
+   flag mirror, feature
+   flag shadow, feature
+   flag stalactites, feature
+   flag pirate, feature
+   flag volcano, feature
+   flag quicksand, feature
+   flag throne, feature
+   flag moss, feature
+   flag dwarf, feature
+   flag statue, feature
+   flag knife, feature
+   flag plant2, feature
+   flag beanstalk2, feature
+   flag giant, feature
+   flag rope, feature
+   flag plaque, feature
+   flag owl, feature
+   flag rats, feature
+   flag trees, feature
+   flag blob, feature
+   flag bridge, feature
+   flag gates, feature
+   flag bell-pull, feature
+   flag trapdoor, feature
+   flag door, feature
+   flag door1, feature
+   flag door2, feature
+   flag door3, feature
+   flag door4, feature
+   flag ladder, feature
+   flag mud, feature
+   flag glow, feature
+   flag tablet, feature
+   flag note, feature
+   flag orion, feature
+   flag flagstones, feature
+   flag grill, feature
+   flag bones, feature
+   flag knife, feature
+   flag coconuts, feature
+   flag gorge, feature
+   flag pattern, feature
+#
+# Set hint-exists bits.
+#
+   flag bird.chamber, hintable
+   flag depression, hintable
+   flag mtking, hintable
+   flag east.window, hintable
+   flag west.window, hintable
+   flag witts.end, hintable
+   flag plover, hintable
+   flag alcove, hintable
+   flag dark, hintable
+   flag slide, hintable
+   flag plain.2, hintable
+   flag reservoir, hintable
+   flag sword.place, hintable
+   flag breathtaker, hintable
+   flag by.figure, hintable
+   flag glassy, hintable
+   flag pentagram, hintable
+   flag vault, hintable
+   flag peelgrunt, hintable
+   flag basilisk.den, hintable
+   flag phoney.shaft, hintable
+   flag stream.maze.entrance, hintable
+   flag stream.maze, hintable
+   flag beanstalk.bottom, hintable
+   flag basalt.shelf, hintable
+   flag dungeon, hintable
+   flag cave.5, hintable
+   flag beanstalk.bottom, hintable
+   flag beanstalk.middle, hintable
+   flag island.05, hintable
+   flag ridge, hintable
+   flag abyss, hintable
+   flag nowhere, hintable
+   flag spire, hintable
+   flag garden.n, hintable
+   flag waterfall, hintable
+   flag arched.corridor.1, hintable
+#
+# Declare water-holes.
+#
+   flag building, h20.here
+   flag road, h20.here
+   flag valley, h20.here
+   flag slit, h20.here
+   flag streampit, h20.here
+   flag cavern, h20.here
+   flag reservoir, h20.here
+   flag reservoir.north, h20.here
+   flag pantry, h20.here
+   flag stream.maze.entrance, h20.here
+   flag stream.maze, h20.here
+   flag rest.area, h20.here
+   flag cave.4, h20.here
+   flag cave.5, h20.here
+   flag cave.9, h20.here
+   flag cave.8, h20.here
+   flag river, h20.here
+   flag river.north, h20.here
+   flag island.ne, h20.here
+   flag by.stream.1, h20.here
+   flag by.stream.2, h20.here
+   flag bog.edge, h20.here
+#   flag caldera, h20.here
+   flag by.waterfall, h20.here
+   flag waterfall, h20.here
+   flag garden.se, h20.here
+   flag wrong.venue, h20.here
+#
+# Declare objects to be referred to in plural.
+#
+   flag keys, plural
+   flag coins, plural
+   flag magazines, plural
+   flag batteries, plural
+   flag diamonds, plural
+   flag spices, plural
+   flag beads, plural
+   flag documents, plural
+   flag rags, plural
+   flag teeth, plural
+   flag fangs, plural
+   flag shoes, plural
+#
+# Declare the treasures.
+# Note that both the tusk and the rug start off as non-valued.
+# We still set them as such here, for clarity.
+#
+   flag bag, valued
+   flag crown, valued
+   flag nugget, valued
+   flag diamonds, valued
+   flag bars, valued
+   flag jewelry, valued
+   flag coins, valued
+   flag chest, valued
+   flag nest, valued
+   flag trident, valued
+   flag helmet, valued
+   flag vase, valued
+   flag emerald, valued
+   flag sceptre, valued
+   flag yacht, valued
+   flag pyramid, valued
+   flag pearl, valued
+   unflag rug, valued
+   flag spices, valued
+   flag beads, valued
+   flag chain, valued
+   flag ring, valued
+   flag spyglass, valued
+   flag sculpture, valued
+   flag bracelet, valued
+   flag casket, valued
+   flag orb, valued
+   unflag tusk, valued
+   flag chalice, valued
+   flag sapphire, valued
+   flag crucifix, valued
+   flag starstone, valued
+   flag sunstone, valued
+   flag windrose, valued
+   flag skull, valued
+   flag fangs, valued
+   flag rosebowl, valued
+   flag thurible, valued
+   flag bust, valued
+   flag seal, valued
+   flag flower, valued
+#
+# Declare unstable objects.
+#
+   flag jewelry, unstable
+   flag chest, unstable
+   flag sculpture, unstable
+   flag cage, unstable
+   flag casket, unstable
+   flag mushroom, unstable
+   flag bag, unstable
+   flag crown, unstable
+   flag pillow, unstable
+   flag yacht, unstable
+   flag plate, unstable
+   flag beads, unstable
+   flag crucifix, unstable
+   flag bottle, unstable
+   flag starstone, unstable
+   flag batteries, unstable
+   flag rags, unstable
+   flag drachma, unstable
+   flag beater, unstable
+   flag box, unstable
+   flag mask, unstable
+   flag windrose, unstable
+   flag skull, unstable
+   flag packet, unstable
+   flag shoes, unstable
+   flag bust, unstable
+   flag seal, unstable
+   flag thurible, unstable
+   flag flower, unstable
+   flag rosebowl, unstable
+   flag helmet, unstable
+#
+# Declare mortal (killable) things.
+#
+   flag troll, mortal
+   flag dwarf, mortal
+   flag dragon, mortal
+   flag snake, mortal
+   flag blob, mortal
+   flag bear, mortal
+   flag clam, mortal
+   flag oyster, mortal
+   flag ogre, mortal
+   flag bird, mortal
+   flag djinn, mortal
+   flag darwin, mortal
+   flag goblins, mortal
+   flag basilisk, mortal
+   flag giant, mortal
+   flag unicorn, mortal
+   flag spider, mortal
+   flag rats, mortal
+   flag vampire, mortal
+   flag imp, mortal
+   flag anteater, mortal
+#
+# Mark wearable objects.
+#
+   flag crown, wearable
+   flag beads, wearable
+   flag bracelet, wearable
+   flag ring, wearable
+   flag jewels, wearable
+   flag helmet, wearable
+   flag mask, wearable
+   flag fangs, wearable
+   flag shoes, wearable
+#
+# Mark bulky objects. The first lot is only declared as big
+# so that dwarves do not nick any of it.
+#
+   flag bear, big
+   flag owl, big
+   flag dung, big
+   flag documents, big
+   flag bird, big
+#
+# Now for genuinly large objects.
+#
+   flag shoes, big
+   flag rosebowl, big
+   flag skull, big
+   flag clam, big
+   flag oyster, big
+   flag cage, big
+   flag pillow, big
+   flag chest, big
+   flag nest, big
+   flag trident, big
+   flag vase, big
+   flag rug, big
+   flag helmet, big
+   flag casket, big
+   flag sword, big
+   flag crown, big
+   flag sceptre, big
+   flag yacht, big
+   flag plate, big
+   flag orb, big
+   flag chalice, big
+   flag tusk, big
+   flag bucket, big
+   flag bust, big
+#
+   flag dark.forest, been.here  # Force short description
+   flag nowhere, been.here      # Ditto
+   flag spire, special          # Haven't been to the top yet
+   flag ledge, been.here        # So that word 'ledge' is recognised
+#
+# Define sewer locations for tide management and objects
+# being thrown or dropped.
+#
+   flag culvert, in.sewer
+   flag culvert.south, in.sewer
+   flag sewer.1, in.sewer
+   flag sewer.2, in.sewer
+   flag sewer.3, in.sewer
+   flag sewer.4, in.sewer
+   flag sewer.5, in.sewer
+#
+   flag well.bottom, damp
+#
+# Now for some less generic initialisations...
+#
+   lda here, limbo                # Initialise place (j.skeet fix)
+   set swag.count, 1              # Note that horn is carried by dwarves
+   lda last.owl, chapel           # Initialise owl's last location
+   choose mutter.time, 150, 300   # Initialise mutter time
+   choose swag.time, 15, 30       # Set time for 1st thief raid
+   choose thirst.time, 700, 900   # Randomise thirst factor
+   choose forest.trap, 120, 160   # Initialise the forest trap
+   set forest.block, -1           # No block to start with
+   set sip.count, 0               # No champagne sipped yet
+#
+# Initialise alien view, for the benefit of teleporting wizards!
+#
+   randomise basalt.shelf, 0
+   set tube, basalt.shelf
+   ifgt tube, 0
+      flag tube, lit
+   fin
+#
+# Declare schizoid objects.
+#
+   flag grate, schizoid
+   flag steps, schizoid
+   flag fissure, schizoid
+   flag plant2, schizoid
+   flag shadow, schizoid
+   flag dragon, schizoid
+   flag chasm, schizoid
+   flag troll, schizoid
+   flag troll2, schizoid
+   flag quicksand, schizoid
+   flag safe, schizoid
+   flag volcano, schizoid
+   flag basilisk, schizoid
+   flag rope, schizoid
+   flag starstone, schizoid     # Another weird case!
+   flag portcullis, schizoid
+   flag door1, schizoid
+   flag door2, schizoid
+   flag door3, schizoid
+   flag door4, schizoid
+   flag gates, schizoid
+   flag ladder, schizoid
+   flag trapdoor, schizoid
+#
+# Move objects to their starting places.
+#
+   itobj obj.ptr
+      apport obj.ptr, limbo
+      random junk, 100              # Kick random number generator
+   fin
+   apport keys, building
+   apport lamp, building
+   apport grate, depression
+   apport cage, cobbles
+   apport rod, debris
+   apport steps, pit
+   apport bird, bird.chamber
+   apport door, immense.n/s.passages
+   apport door1, waterfall
+   apport pillow, soft
+   apport snake, mtking
+   apport fissure, east.of.fissure
+   apport clam, shell
+   apport magazines, anteroom
+   apport food, limbo
+   apport bottle, stupendous.view
+   apport plant, west.pit
+   apport plant2, west.pit.end
+   apport stalactites, top.of.stalactite
+   apport shadow, east.window
+   apport dragon, secret.n/e.canyon.1
+   apport chasm, sw.of.chasm
+   apport troll2, sw.of.chasm
+   apport bear, bear.room
+   apport volcano, breathtaker
+   apport machine, mazed.140
+   apport moss, soft
+   apport nugget, nugget.room
+   apport diamonds, west.of.fissure
+   apport bars, low.n/s.passage
+   apport jewelry, new.den
+   apport coins, west.side.chamber
+   apport nest, giant.room
+   apport trident, cavern
+   apport vase, oriental
+   apport emerald, plover
+   apport pyramid, dark
+   apport tablet, dark
+   apport spices, boulder.chamber
+   apport chain, bear.room
+   apport spyglass, in.jonah
+   apport bag, rocky.beach
+   apport dinghy, rocky.beach
+   apport helmet, morion
+   apport vial, spherical
+   apport mushroom, dank.cave
+   apport sculpture, ice.cave.14
+   apport casket, small.chamber
+   apport safe, vault
+   apport quicksand, arched.corridor.1
+   apport slime, crack.north
+   apport sword, sword.place
+   apport inscription, sword.place
+   apport ogre, glassy
+   apport throne, audience.east
+   apport skeleton, audience.east
+   apport sceptre, audience.east
+   apport crown, insafe
+   apport statue, by.figure
+   apport yacht, reservoir
+   apport bracelet, translucent
+   apport flask, arabesque
+   apport basilisk, north.of.basilisk
+   apport plate, storage
+   apport beads, balcony
+   apport gong, reservoir.north
+   apport orb, cellar
+   apport fake.orb, cellar.view
+   apport web, web.maze.4
+   apport spider, web.maze.4
+   apport crucifix, vestry
+   apport spoon, sea.view
+   apport rats, culvert.south
+   apport giant, quarters
+   apport tusk, bones.room
+   apport owl, vestry
+   apport chalice, beams
+   apport rope, chapel
+   apport grill, sea.view
+   apport drain, cellar
+   apport plaque, sandstone
+   apport notice, stupendous.view
+   apport horn, storeroom
+   apport starstone, starstone.start
+   apport sunstone, spire
+   apport pedestal, spire
+   apport portcullis, cellar
+   apport notice, stupendous.view
+   apport gates, outside.gates
+   apport rags, toolroom
+   apport goblins, limbo
+   apport oil, east.pit
+   apport beanstalk, beanstalk.bottom
+   apport beanstalk2, stupendous.view
+   apport sapling, ledge
+   apport beater, ledge
+   apport mask, new.den
+   apport windrose, rocky.desert
+   apport skull, cave.7
+   apport bust, shelves.west
+   apport seal, den
+   apport flower, mine.dead.end.2
+   apport coffin, crypt
+   apport feeder, east.of.building
+   apport packet, shed
+   apport rosebowl, garden.nw
+   apport knocker, dwarves.quarters
+   apport pine, island.05
+   apport niche, valuers
+   apport ladder, storeroom
+   apport door2, tower.upper.landing
+   apport door3, tower.top.landing
+   apport door4, clearing
+   apport trapdoor, shelves.east
+   apport mud, below.ridge
+   apport imp, cave.8
+   apport glow, plain.2
+   apport poster, building
+   apport codex, imaze.book
+   apport mirror, mirror.canyon
+#
+# Now a few special tricks...
+#
+   set flask, sealed
+   set bucket, emptied
+   set backlash, 35         # Normal "dwarves not vengeful"
+   set fleetfoot, 25        # Not running but didn't just attack
+   flag status, vocab.prod  # Assume the worst!
+   set escape, 0
+   lda ok, ok!
+   choose clock, 15, 25
+   choose lamplife, 440, 460
+   choose dwarfcount, 4, 8
+   chance 90
+      apport anteater, ylem         # Anteaters are rare!
+   fin
+   chance 75
+      flag admin, cameo.tried       # No cameo in this game
+   fin
+   chance 50
+      flag quips, wand.misfired     # No wand trouble in this game
+   fin
+   set chain, locked
+   set invct, 0
+   set strength, 8
+# 
+# Some locations require special values to generate correct
+# descriptions.
+#
+   set dark.path.1, 1
+   set dark.path.2, 2
+   set state, 0
+   iterate place.ptr, island, island.ne
+      deposit place.ptr, state
+      add state, 1
+   fin
+   set state, 0
+   iterate place.ptr, mazed.107, mazed.140
+      deposit place.ptr, state
+      add state, 1
+   fin
+   set giant.will.watch, -1
+   set scree.2, 1
+   set scree.3, 2
+   set river, 1
+   chance 10
+      flag quips, guybrush.quip
+   fin
+   set outcrop.2, 1
+#
+   flag all, seen      # In case he mistypes it!
+   flag door, seen     # In case door1 or door2 is encountered first!
+   flag bridge, seen   # For similar (but different) reasons.
+   flag water, seen    # Allow references to water and oil
+   flag oil, seen
+   flag food, seen     # Food and bottle used to be in the house
+   flag bottle, seen   # so allow references to them too
+   flag rope, seen
+   flag notice, seen
+   flag tree, seen  
+   flag pine, seen
+   flag book,seen
+#
+   exec 17             # Remember initial locations of objects
+   ifgt stage, show.banner
+      proceed          # Restoring game in progress
+   fin
+#
+# Randomise some of the cycling texts.
+#
+   call randomise.texts
+#
+# Wake up user and greet him.
+#
+   set stage, query.restore
+   flag status, brief.display
+   say hi.there
+#
+#=====================================================================

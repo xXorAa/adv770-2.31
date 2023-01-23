@@ -1,0 +1,23 @@
+# Adventure770 -- Copyleft Mike Arnautov 1984-2022.
+#
+Name     Adv770
+Version  2.31
+Date     12 May 2022
+Author   Mike Arnautov
+Style    12
+#
+include  defs.acd
+include  vars.acd
+include  words.acd
+include  text.acd
+include  places.acd
+include  objects.acd
+include  moretext.acd
+include? debug.acd   # Conditional include
+include  at.acd
+include  procs.acd
+include  actions.acd
+include  init.acd
+include  repeat.acd
+#
+############# That's it, folks! #############

@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# NB: this is NOT the build script distributed with A-code source. 
+# That one os a one-liner, created on the fly by advpack.
+#
+case "$1" in
+  -d|--d*) d=-DDEBUG  ;;
+  *) ;;
+esac
+which cc >/dev/null 2>&1
+[ $? != 0 ] && echo Cannot find the C compiler. && exit 1
+list=$(ls -1 *.c | grep -v -e bad -e good)
+cc $list $d -g -gdwarf-2 -g3 -o acdc

@@ -1,0 +1,2710 @@
+# Adventure770 -- Copyleft Mike Arnautov 1984-2022.
+#
+# And here, at long last, is the main program!
+#
+#=====================================================================
+#
+# First REPEAT section deals with game initialisation.
+#
+repeat
+   local count
+
+   call tie.them      # Force initialisation of ties in all circumstances!! 
+   ifeq status, -1    # This signals game restore (we actually have 2 args!)
+      set status, 2   # Restore the arg count
+      say restoring.game, arg2
+      call restore
+   fin
+   ifeq status -2     # Just start, ignoring saved games
+      set status, 0
+      call set.it.up
+      proceed
+   fin
+   ifeq context q.restored
+      say save.the.image
+      set context, q.keep.image
+   fin
+   ifgt stage, little.joke
+      or
+   ifgt context, none
+      proceed
+   fin
+   ifle stage, query.restore
+#
+# Need to initialise in CGI mode, because we are restoring from file
+# and the game might have been upgraded under our feet. This way we
+# set even those values which didn't exist when the game was saved.
+#
+      ifcgi            # Are we running in the cloud mode?
+         call set.it.up
+      fin
+      set context q.initial
+      call which.to.restore?
+      set count, 0
+      exec 34, count
+      ifgt count, 0
+         set status, no.match    # Suppress all vocab matching for this loop
+         set context, q.restore.what
+         quip game.to.restore
+      fin
+      call set.it.up
+   fin
+#
+#=====================================================================
+#
+# This REPEAT section handles some of the house keeping.
+#
+repeat
+   local obj.ptr
+   local temp.val
+   local event.flag
+   local island.event
+#
+# Skip this section if we have a pending context (i.e. the player command
+# is an answer to a specific question).
+#
+   ifgt context, none
+      proceed
+   fin
+#
+# Also skip if in a single-turn mode and have already executed this
+# repeat section on this turn, before asking an external entity for
+# player command.
+#
+   ifturn
+      and
+   ifflag context, prompted
+      proceed
+   fin
+#
+# Make sure dwarves do not drop objects which are no longer in the store room.
+#
+   ifgt swag.to.drop, 0
+      and
+      not
+   ifloc swag.to.drop, storeroom
+      set swag.to.drop, 0
+   fin
+#
+# What's gone for good must not remain schizoid!
+# 
+   itobj obj.ptr, schizoid, ylem
+      ifloc obj.ptr, limbo
+      else
+         unflag obj.ptr, schizoid   # It must not appear INHAND!
+      fin
+   fin
+#
+# Are we ready to allow spontaneous events?
+#
+   ifne recent.event, none
+      ifflag recent.event, just.happened
+         set recent.event, none
+         unflag recent.event, just.happened
+      else
+         flag recent.event, just.happened
+      fin
+   fin
+#
+# Make choice of floor/ground as appropriate.
+#
+   ifflag here, not.in.cave
+      and
+      not
+   ifflag here, indoors
+      or
+   ifat sea.view
+      set floor?, 1
+   else
+      set floor?, 0
+   fin
+#
+   random   temp.val, 100    # Kick the random number generator
+   call is.it.dark?
+   ifat island.09
+      ifnear anteater
+         ifeq anteater, 3
+           ifkey look
+              and
+           ifeq status, 1
+           else
+              say anteater
+           fin
+         fin
+         ifgt anteater, 2
+            apport anteater, ylem
+         fin
+      fin
+      chance 50
+         and
+      ifloc anteater, limbo
+         apport anteater here
+         ifflag status, moved
+         else
+            say anteater
+         fin
+         flag anteater, seen
+      fin
+   fin
+   ifat above.sea
+      ifkey look
+         and
+      ifeq status, 1
+      else
+         say blank
+      fin
+      ifeq above.sea, 0
+         flag palms, seen
+         smove island, arriving.on.island
+      fin
+   otherwise
+   ifeq rug, hovering
+      and
+      not
+   ifhere rug
+      set rug, unrolled.clean
+   fin
+   ifflag here, in.desert
+      call desert.stuff
+   fin
+   ifflag status, juggled
+      and
+   ifat cellar
+      ifany drop, throw
+         call wizard.evicts
+      fin
+   fin
+   chance 4
+      and
+   ifeq stage, adventuring
+      call make.a.dwarf?    # Makes more food too, if necessary
+   fin
+   ifeq stage, in.repository
+      call stop.cheating    # Return fake object to where it belongs
+   fin
+   ifat east.of.building
+      flag seed, seen
+   fin
+   ifat wrong.venue
+      and
+   ifeq wrong.venue, 2
+      say alternate.venue
+      add wrong.venue, 1
+   fin
+   ifat mists
+      ifeq nugget.room, 0
+         and
+         not
+      ifhave nugget
+         set mists, steps.present
+      else
+         set mists, steps.gone
+      fin
+   fin
+   ifflag status, moved
+      set nobody.answers, 0
+      set somebody.home, 0
+      unflag seed, special1
+      flag water, special1
+      ifnear vampire, thirsty
+         flag vampire, special1
+      fin
+      flag giant, big        # Only matters when he is picnicking
+      add moves, 1
+      ifat mtking
+         set snake.exit, there
+      fin
+      ifinrange here, forest.1, dark.forest
+         or
+      ifat track, outside.gates
+         apport tree, here
+      fin
+      ifgt dwarf, 0
+         ifflag here, not.in.cave
+            or
+         ifflag here, no.dwarf
+            unflag dwarf, big     # Clearly not blocking!
+            chance 15
+               sub dwarf, 1       # Make dwarves give up gradually
+               ifeq dwarf, 0
+                  apport dwarf, limbo
+               fin
+            fin
+         else
+            ifloc dwarf, here
+               or
+            ifloc dwarf, there
+            else
+               set dwarf, 0         # Have shaken the buggars off
+               apport dwarf, limbo
+            fin
+         fin
+      fin
+      ifflag pirate, special1          # Is he chasing us?
+         and
+      ifflag here, not.in.cave         # Shake him off
+         unflag pirate, special1
+      fin
+      ifat swirling.mist, stream.maze, plain.2, dark.forest
+         call plant.things
+      fin
+   fin
+   ifflag admin, ticker
+      call tick
+   fin
+   ifflag status, moved
+      ifnear starstone
+         and
+      ifgt starstone, quiescent
+         ifloc starstone, here
+            set starstone, iridescent
+         else
+            set starstone, darkened
+         fin
+      fin
+      ifflag there, one.exit
+         and
+      ifloc dwarf, there
+         chance 97            # Let him through occasionally
+            goto there
+            unflag status, moved
+            say dwarf.blocks
+            flag dwarf, big   # Note the blocking
+            proceed
+         else
+            call sneaks.die
+         fin
+      fin
+   else
+      ifnear dwarf
+         and
+      chance backlash         # Is dwarf particularly vengeful?
+         call dwarf.attack
+      fin
+      proceed
+   fin
+   ifflag status moved
+      flag context, recent.move
+#      unflag status, moved
+   else
+      unflag context, recent.move
+   fin
+   lda foof, foof.random
+   chance 1
+      add foof, 1             # The odd foof
+   fin
+   ifnear lamp
+      ifeq lamp, switched.on
+         and
+         not
+      ifat plain.2            # Don't let it run out in the fog!
+         sub lamplife, 1
+         ifeq lamplife, 40
+            or
+         ifeq lamplife, 0
+            call lamprey
+         fin
+      fin
+   fin
+   ifnear owl
+      and
+   ifflag status, light.here
+      call owl.flies.off
+   fin
+   ifloc goblins, limbo       # Resting place
+      or
+   ifloc goblins, ylem        # Gone for good
+   else
+      apport goblins, here
+      ifgt goblins, 0
+         ifflag status, light.here
+            say goblin.chase
+         fin
+      fin
+   fin
+   ifflag status, light.here
+      say here
+      ifat top.of.chapel
+         call fishy.stuff
+      fin
+      ifis there, dark.forest
+         and
+         not
+      ifis here, dark.forest
+         and
+      ifany north, ne, east, se, south, sw, west, nw
+         say once.is.enough
+      fin
+      call special.view
+      ifflag here, been.here
+         set temp.val, 2
+      else
+         set temp.val, 3
+      fin
+      ifflag here, not.in.cave
+      else
+         sub clock, temp.val           # Tick the clock by 2 or 3
+      fin
+      flag here, been.here
+      iflt dwarf, 1
+         unflag dwarf, big             # Absent dwarves don't block
+      else
+         ifflag here, not.in.cave
+            or
+         ifflag here, no.dwarf
+         else
+            apport dwarf, here
+         fin
+      fin
+      call here.you.can.see
+      ifnear dwarf
+         and
+         not
+      ifeq swag.to.drop, 0
+         and
+      chance 67
+         ifeq dwarf, 1
+            say bulging.coat, 0
+         else
+            say bulging.coat, 1
+         fin
+      fin
+      ifhave bear
+         say bear.follows
+      fin
+   else
+      ifinrange here, above.abyss, imaze.book
+         or
+      ifat abyss
+         ifat above.abyss.2, above.abyss.3, above.abyss.6, above.abyss.7
+            or
+         ifinrange here, imaze.09, imaze.13
+            or
+         ifinrange here, imaze.03, imaze.05
+            or
+         ifat imaze.16
+            or
+         ifat imaze.02, imaze.03, imaze.06, imaze.07, imaze.08
+            say stars.like.dust
+         otherwise
+         ifat above.glow
+            say volcanic.glow
+         else
+            call too.dark.for.safety, 0
+         fin
+      fin
+      ifflag there, lit
+         or 
+      ifnear chasm, 1
+      else
+         ifloc lamp, there
+            and
+         ifeq lamp, switched.on
+         else
+            ifloc starstone, there
+               and
+               not
+            ifeq starstone, quiescent
+            else
+               ifhave pyramid
+                  or
+               chance 25
+                  and
+                  not
+               ifflag admin, ranout
+                  and
+               iflt stage, in.repository
+                  ifnear chasm
+                     and
+                  ifgt chasm, 0
+                  else
+                     ifflag here, not.in.cave
+                        say crunch, 0
+                     else
+                        say crunch, 1
+                        call coroner
+                     fin
+                  fin
+               fin
+            fin
+         fin
+      fin
+      call too.dark.for.safety, 0
+   fin
+   unflag admin, ranout      # Clear "lamp just died"
+#
+# Is it cameo time??
+#
+   chance 1        # Cameos are rare even in the 25%
+      and          # of the games in which they can occur
+   chance 5
+      and
+   iflt stage, in.repository
+      and
+   ifgt turns, 250
+      and
+      not
+   ifflag  here, lit
+      call do.cameo
+   fin
+#
+# Litter police!
+#
+   call litter.check
+#
+# Warn him about thirst in desert?
+#
+   ifinrange here, scree, scree.3
+      and
+   ifflag status, desert.warn
+      and
+      not
+   ifflag quips, desert.rat
+      unflag status, desert.warn
+      call find.water, false
+      ifeq vessel, none
+         ifhave bucket
+           say use.bucket, 0
+         else
+            say use.bucket, 1
+         fin
+      otherwise
+      ifis vessel, flask
+         say use.bucket, 1
+      otherwise
+      ifis vessel, bucket
+         and
+      ifeq bucket, quarter.full
+         or
+      ifis vessel, bottle
+         say use.bucket, 2
+      otherwise
+      ifis vessel, bucket
+         ifgt bucket, full.of.water
+            say use.bucket, 3
+         fin
+         flag quips, desert.rat
+      fin
+   fin
+#
+# Warn him off seeing the imp!
+#
+   ifat river.north, cave.9
+      and
+   ifflag here, special
+      unflag here, special
+      ifat river.north
+         say no.gain.there.1
+      else
+         say no.gain.there.2
+      fin
+   fin
+#
+# Warn him to explore more outdoors.
+#
+   ifgt cave.entered, 0
+      set cave.entered, 0
+      ifflag stupendous.view, been.here
+         or
+      ifflag sapphire, seen
+         and
+      ifflag feeder, seen
+      else
+         ifflag stupendous.view, been.here
+            or
+         ifflag feeder, seen
+            say explore.more.outdoors
+         else
+            say explore.outdoors
+         fin
+      fin
+   fin   
+#
+# Invoke the hollow voice.
+#
+   ifat  y2
+      chance 35
+         say hollow.voice
+      fin
+   fin
+#
+# Check for random island events.
+#
+   ifinrange here, island.se, island.n
+      chance 3
+         ifflag quips, guybrush.quip
+            quip three.heads
+            unflag quips, guybrush.quip
+         else
+            choose island.event, first.island.event, last.island.event
+            set event.flag, island.event
+            lda temp.val, first.island.event
+            sub event.flag, temp.val
+            ifflag island.quips, event.flag
+            else
+               flag island.quips, event.flag
+               say blank
+               say island.event
+            fin
+         fin
+      fin
+   fin
+#
+# Is he chased by goblins?
+#
+   call goblin.check
+#
+# Other events...
+#
+   ifflag here, not.in.cave
+      or
+   ifgt stage, exits.barred
+      call mask.stuff
+   else
+      iflt clock, 1
+         call events
+      else
+         unflag status, ticked
+         sub swag.time, 1
+         ifeq swag.time, 0
+            choose swag.time, 10, 20
+            call get.swag
+         else
+            call mask.stuff
+         fin
+      fin
+   fin
+#
+# Check for attacking dwarves.
+#
+   ifnear dwarf
+      set fleetfoot, 50      # Added 1 to dwarf in the events routine
+      call dwarf.attack
+   fin
+#
+# Has he lost the lamp?
+#
+   ifloc lamp, ylem
+      and
+   ifat  road
+      and
+   iflt stage, middle.of.nowhere   # Lamp vanishes during end-game
+      say call.it.a.day
+      call finis
+   fin
+#
+# Is it time to meet a dwarf willy-nilly?
+#
+   ifflag axe, seen
+      or
+      not
+   ifflag status, light.here
+      or
+   iflt moves, 150
+      or
+      not
+   ifflag spider, seen
+   else
+      call dwarf.encounter, 0
+   fin
+#
+# Is it time to meet the pirate willy-nilly?
+#
+   ifflag pirate, seen
+      or
+      not
+   ifflag status, light.here
+      or
+   iflt moves, 200
+   else
+      call pirate.encounter, 0
+   fin
+#
+#=====================================================================
+#
+# More house keeping.
+#
+repeat
+   local same.hint.loc
+   local fangs.disposal
+   local query.allowed
+   ifturn
+      and
+   ifflag context, prompted
+      proceed
+   fin
+   ifgt context, none
+      proceed
+   fin
+   ifgt alarm, 1
+      call alarm.stuff
+   fin
+   ifflag here, hintable
+      or
+   ifnear unicorn
+      ifeq last.hintable, 0
+         set last.hintable, here
+         set hint.time, 0
+      fin
+      ifeq last.hintable, here
+         and
+         not
+      ifdoall
+         add hint.time, 1
+         ifgt hint.time, 10
+            and
+         ifneedcmd          # Don't offer help if more commands pending
+            call hint.logic
+         fin
+      else
+         set same.hint.loc, 0
+         ifflag here, been.here
+            ifinrange here, mazea.42, mazea.by.pit
+               and
+            ifinrange last.hintable, mazea.42, mazea.by.pit
+               set same.hint.loc, 1
+            otherwise
+            ifinrange here, mazed.107, mazed.140
+               and
+            ifinrange last.hintable, mazed.107, mazed.140
+               set same.hint.loc, 1
+            otherwise
+            ifinrange here, ice.cave.1, ice.cave.30
+               and
+            ifinrange last.hintable, ice.cave.1, ice.cave.30
+               set same.hint.loc, 1
+            otherwise
+            ifinrange here, catacombs.portal, catacombs.exit
+               and
+            ifinrange last.hintable, catacombs.portal, catacombs.exit
+               set same.hint.loc, 1
+            otherwise
+            ifflag here, in.desert
+               and
+            ifinrange last.hintable, desert.1, desert.last
+               set same.hint.loc, 1
+            fin
+         fin
+         ifeq same.hint.loc, 0
+            set hint.time, 0
+            set last.hintable, here
+         fin
+      fin
+   fin
+   ifnear rats
+      add rats, 1
+      say rats.here
+      ifgt rats, 5
+         goto sea.view
+         ifhave food
+            apport food, limbo
+         fin
+         set rats, 0
+         call coroner
+      fin
+   fin
+   ifflag here, in.sewer
+      call prod.tide
+   fin
+   ifgt giant.time, 0
+      sub giant.time, 1
+   fin
+   ifnear giant
+      call giant.stuff, 0
+   fin
+   ifgt giant, resting
+      and
+   iflt giant, picnicking
+      and
+   iflt giant.time, 1
+      ifeq giant, blissful
+         set giant, hurt
+         unflag giant, seen
+         choose giant.time, 4, 7
+      else
+         ifflag giant, seen
+            set giant, resting
+         fin
+      fin
+   fin
+   call mutter.stuff
+   ifat pantry
+      and
+      not
+   ifflag mouse, seen
+      and
+   chance 3
+      call all.quiet?
+      ifeq result, 0
+         say tiny.mouse
+         flag mouse, seen
+         set mouse.hole, 1       # In case it is still zero.
+      fin
+   fin
+   ifat dungeon
+      call dungeon.stuff
+   fin
+   ifflag status, juggled        # Did we pick up/drop/move anything?
+      unflag status, juggled
+      set invct, 0
+      itobj obj.ptr
+         ifhave obj.ptr
+            and
+            not
+         ifflag obj.ptr, freebie
+            add invct, 1
+         fin
+      fin
+   fin
+   ifat nowhere
+   else
+      call thirst.factor
+   fin
+   set fleetfoot, 25                # Not running, didn't just attack
+   set backlash, 35                 # Dwarves not vengeful
+   ifge chalice, leaking            # Any water in it?
+      ifeq chalice, full
+         set chalice, leaking       # It'll be empty soon!
+      else
+         flag here, damp
+         set chalice, 0             # Empty it
+         say blank
+         say chalice.now.empty, 1   # Say it is now empty
+      fin
+   fin
+   ifflag shadow, special2          # This rigmarole with two bits is
+      ifnear shadow                 # required to avoid a variety of
+         say figure.waves           # unpleasant problems with clearing
+      fin                           # arg1 on errors
+      unflag shadow, special2
+   fin
+   ifflag shadow, special1
+      flag shadow, special2
+      unflag shadow, special1
+   fin
+   ifflag admin, edison
+      and
+      not
+   ifkey noside
+      unflag admin, edison
+   fin
+#
+   iflt turns, max.game
+   else
+      say wizard.ends, max.game
+      call finis
+   fin
+   unflag crown, special1
+   ifat breathtaker, faces, warmjunctn
+      or
+   iflt crown, activated
+      or
+   ifeq status, 0
+      or
+   ifflag status, pls.clarify
+   else
+      ifhave crown
+         ifgt crown, activated
+            lda text.ptr, voices
+            add text.ptr, crown
+            sub text.ptr, activated
+            say text.ptr
+         fin
+         iflt crown, speaking
+         else
+            flag orc.mutter, keys.mutter
+         fin
+         flag status, ticked
+         chance 40
+            or
+         ifgt crown, speaking
+            or
+         ifeq crown, activated
+            and
+            not
+         ifeq crown, incomprehensible
+            or
+         ifkey listen
+            or
+         chance crown.chance
+            add crown, 1
+            iflt crown, incomprehensible
+               set crown.chance, 0
+            else
+               add crown.chance, 1
+            fin
+            ifeq crown, chanting
+               flag hints, keys.listed
+            fin
+            ifgt crown, killing
+               call coroner
+            fin
+            flag crown, special1
+         fin
+      else
+         ifgt crown dormant
+            ifge crown, speaking
+               say voices
+            fin
+            set crown, dormant
+         fin
+      fin
+   fin
+   ifflag status, ticked
+   else
+      ifgt fangs, not.worn
+         sub fangs, 1
+         ifeq fangs, not.worn
+            iflt invct, strength
+               set fangs.disposal, 0
+            else
+               set fangs.disposal, 1
+            fin
+            say fangs.removed, fangs.disposal
+         fin
+      fin
+   fin
+   ifat nowhere
+      and
+   ifeq stage, little.joke
+      and
+      not
+   ifany help, think, rest
+      and
+   ifgt turns, 4
+      and
+      not
+   ifflag here, special
+      flag here, special
+      say stuck.in.nowhere
+   fin
+   ifnear vampire, thirsty
+      and
+   ifflag vampire, special1
+      and
+   chance 20
+      and
+      not
+   ifat limbo
+      and
+   ifflag status, light.here
+      and
+      not
+   ifkey give
+      unflag vampire, special1
+      say vampire.still.thirsty
+   fin
+   ifat temple
+      and
+   ifeq temple, vault.magicked
+      say blank
+      call temple.magic, 1
+   fin
+#
+#=====================================================================
+#
+# This REPEAT scetion gets player input and handles CONTEXT responses
+# to queries.
+#
+repeat
+   local context.value
+#
+# Call the stub routine, which is only of use in the wizard (debug) mode
+#
+   call wiz.reports
+#
+   unflag context, arg2.here
+   unflag context, arg2.distant
+   ifeq context, q.null.turn
+      set context, none
+      sub turns, 1
+   fin
+   ifeq context, none
+      ifnear door1
+         and
+      ifeq waterfall, opened
+         and
+      ifeq dwarven, 0
+         say blank
+         call close.mine.door
+      fin
+      iflt stage, adventuring
+         set status, no.amatch   # No approximate matching during the "joke"
+      fin
+      input
+      ifflag context, prompted
+         lda ok, ok!
+         lda nuffink, nothing
+      fin
+      unflag context, prompted  # Matters in the CGI mode!!
+      add turns, 1
+      proceed
+   fin
+   input
+   unflag context, prompted
+   ifeq context, q.input
+      set context, none
+   fin
+   ifeq context, none
+      add turns, 1
+      proceed
+   fin
+#
+# Got some pending context that needs handling.
+#
+   ifeq context, q.help
+      or
+   ifeq context, q.help.cost
+      call hint.action
+   otherwise
+#
+   ifeq context, q.spire.drop
+      call do.spire.drop
+   otherwise
+#
+   ifeq context, q.whirlpool
+      call whirlpool.dive
+   otherwise
+#
+   ifeq context, q.quit
+      ifeq status, 0
+         or
+      ifany yes, quit
+         call finis
+      fin
+      ifany quit, no, n
+         set context, none
+         quip ok!
+      fin
+      ifkey maybe
+         set context, none
+         quip indecisions
+      fin
+      say yes.or.no?
+      quip want.to.quit?
+   otherwise
+#
+   ifeq context, q.wizard
+      or
+   ifeq context, q.prove.it
+      call positive.vetting
+   otherwise
+#
+   ifeq context, q.forest.out
+      set context, none
+      ifeq status, 0
+         or
+      ifkey yes
+         add penalties, hint.cost
+         smove road, foof
+      fin
+      respond quit, no, n, ok!
+      respond maybe, indecisions
+      set context, q.forest.out
+      say yes.or.no?
+      quip want.out?
+   otherwise
+#
+   ifeq context, q.maze.out
+      call maze.escape
+   otherwise
+#
+   ifeq context, q.kill.giant
+      set context, none
+      ifeq status, 0
+         or
+      ifkey yes
+         quip very.funny
+      fin
+      ifany quit, no, n
+         say use.a.weapon, attack
+         quip kill.the.whatever, arg2
+      fin
+      quip lets.be.prudent, 0
+   otherwise
+#
+   ifeq context, q.save.what
+      ifeq status, 0
+         set context, none
+         quip u.turn
+      fin
+      ifeq status, 1
+         exec 11
+         call save.this
+      fin
+   otherwise
+#
+   ifeq context, q.delete
+      ifeq status, 0
+         or
+      ifkey yes
+         restore command, text.ptr
+         exec 3
+         call save.this
+      fin
+      set context, none
+      respond no, n, as.you.wish
+      quip lets.be.prudent, 0
+   otherwise
+#
+   ifeq context, q.save
+      or
+   ifeq context, q.continue
+      call save.it
+   otherwise
+#
+   ifeq context, q.remember
+      or
+   ifeq context, q.recall
+      call art.of.memory
+   otherwise
+#
+   ifeq context, q.more
+      ifkey maybe
+         set status, 0
+      fin
+      ifeq status, 0
+         or
+      ifkey yes
+         call keep.talking, talk.next, talk.end
+      fin
+      ifany quit, no, n
+         set context, none
+         ifflag here, been.here
+            say ok!
+         fin
+         quit
+      fin
+      say yes.or.no?
+      quip more?
+   otherwise
+#
+   ifeq context, q.intro
+      set stage, adventuring
+      flag status, moved
+      ifkey maybe
+         set status, 0
+         say lets.be.prudent, 1
+         say blank
+      fin
+      ifeq status, 0
+         or
+      ifkey yes
+         set context, none
+         call do.introduction
+         quip blank
+      fin
+      ifany quit, no, n
+         set context, none
+         ifflag context, joke.over
+            say as.i.was.saying
+         fin
+         unflag context, prompted
+         quit
+      fin
+      say yes.or.no?
+      quip instructions?
+   otherwise
+#
+   ifeq context, q.forbidding
+      set context, none
+      ifkey yes
+         quip moebius.gates
+      fin
+      respond no, n, just.as.well
+      quip lets.be.prudent, 0
+   otherwise
+#
+   ifeq context q.chalice
+      ifkey yes
+         flag admin, quest.accepted
+         apport unicorn, here
+         flag unicorn, seen
+         set context, none
+         chance 20
+            quip gosh.unicorn!, 1  # Give him the "land war in Asia" quip
+         else
+            quip gosh.unicorn!, 0
+         fin
+      fin
+      ifany quit, no, n
+         set context, none
+         quip hollow.laugh
+      fin
+      say yes.or.no?
+      quip chalice.query, 1
+   otherwise
+#
+   ifeq context, q.suicide
+      set context, none
+      ifeq status, 0
+         or
+      ifkey yes
+         flag hints, death.is.simple
+         quip walk.without.light
+      fin
+      respond quit, no, n, things.could.be.worse
+      respond maybe, lets.be.prudent, 0
+      set context, q.suicide
+      say yes.or.no?
+      quip really.suicide?
+   otherwise
+#
+   ifeq context, q.oyster
+      set context, none
+      ifeq status, 0
+         or
+      ifkey yes
+         flag oyster, big     # Mark as read
+         add penalties, hint.cost
+         quip oyster.memo
+      fin
+      respond quit, no, n, as.you.wish
+      respond maybe, indecisions
+      set context, q.oyster
+      say yes.or.no?
+      quip read.oyster?
+   otherwise
+#
+   ifeq context, q.reincarnate
+      call resurrection.shuffle
+   otherwise
+#
+   ifeq context, q.dragon
+      call dragon.slayer
+   otherwise
+#
+   ifeq context, q.dwarf
+      call dwarf.slayer
+   otherwise
+#
+   ifeq context, q.ogre
+      call ogre.slayer
+   otherwise
+#
+   ifeq context, q.sentry
+      set context, none
+      ifkey yes
+         call sentry.kills
+      fin
+      respond quit, no, n, just.as.well
+      quip lets.be.prudent, 0
+   otherwise
+#
+   ifeq context, q.cheat
+      ifeq status, 0
+         or
+      ifkey yes
+         set context, none
+         add penalties, hint.cost
+         itplace place.ptr, mazea.42, mazea.by.pit
+            deposit place.ptr, 1
+         fin
+         quip you.are.now.cheating
+      fin
+      ifany quit, no, n
+         set context, none
+         quip i.am.glad
+      fin
+      say yes.or.no?
+      quip really.cheat?
+   otherwise
+#
+   ifeq context, q.ledge.bad
+      or
+   ifeq context, q.ledge.good
+      set context.value, context
+      set context, none
+      ifkey yes
+         ifeq context.value, q.ledge.bad
+            say ledge.too.narrow
+            goto beanstalk.bottom
+            call coroner
+         else
+            ifeq sunstone, 8
+               quip sunstone.stops.you, north
+            fin
+            unflag here, hintable
+            smove ledge, sunstone.helps
+         fin
+      fin
+      respond quit, no, n, need.sunstone
+      quip lets.be.prudent, 0
+   otherwise
+#
+   ifeq context, q.vocab.1
+      call show.nouns
+   otherwise
+#
+   ifeq context, q.vocab.0
+      or
+   ifeq context, q.vocab.2
+      or
+   ifeq context, q.vocab.3
+      ifany quit, no, n
+         set context, none
+         quip as.you.wish
+      fin
+      ifeq context, q.vocab.0
+         set context, q.vocab.1
+         say vocab.verbs
+         quip more?
+      otherwise
+      ifeq context, q.vocab.2
+         say vocab.travel
+         ifhtml       # Don't list screen handling commands in CGI mode!
+            say blank
+         else
+            set context q.vocab.3
+            quip more?
+         fin
+      else
+         say vocab.screen
+      fin
+      set context, none
+      quit
+   otherwise
+#
+   ifeq context, q.good.news.1
+      or
+   ifeq context, q.good.news.2
+      ifeq status, 0
+         or
+      ifkey yes
+      else
+         set context.value, q.good.news.2
+         sub context.value, context
+         say have.it.anyway, context.value
+      fin
+      ifeq context, q.good.news.1
+         set context, q.good.news.2
+         say treasure.2
+         quip more.good.news?
+      fin
+      ifeq scorex, 770
+         say treasure.4
+      otherwise
+      ifgt scorex, 770
+         ifeq scorex, result
+            set treasure.5, 1
+         fin
+         say treasure.5
+      else
+         say treasure.3
+      fin
+      call finis                 # End the game in triumph
+   otherwise
+#
+   ifeq context, q.bad.news
+      ifeq status, 0
+         or
+      ifkey yes
+      else
+         say too.late
+      fin
+      say cave.2.destroyed
+      say blank
+      stop
+   otherwise
+#
+   ifeq context, q.bad.image
+      set context, none
+      ifeq status, 0
+         or
+      ifkey yes
+         restore command
+         exec 3                 # Delete the save file
+      otherwise
+      ifany no, n
+      else
+         quip lets.be.prudent, 0
+      fin
+      quip ok!
+   otherwise
+#
+   ifeq context, q.keep.image
+      or
+   ifeq context, q.restored
+      call restored
+   otherwise
+#
+   ifeq context q.early.restore
+      call early.restore
+   otherwise
+#
+   ifeq context, q.restore.what
+      set context, none
+      ifeq status, 0
+         ifeq stage, query.restore
+            call set.it.up
+         fin
+         quip u.turn
+      fin
+      exec 11
+      call restore
+   otherwise
+#
+   ifeq context, q.initial
+      ifeq status, 0
+         call set.it.up
+      else
+         exec 11
+         call restore
+      fin
+   otherwise
+#
+   ifeq context, q.waterfall
+      set context, none
+      ifeq status, 0
+         or
+      ifkey yes
+         smove waterfall, through.waterfall
+      fin
+      ifany no, n
+         quip if.not.not
+      fin
+      quip lets.be.prudent, 0
+   otherwise
+#
+   ifeq context, q.really.fly?
+      set context, none
+      ifkey yes
+         flag admin, ok.to.fly
+         call fly
+      fin
+      ifany no, n
+         quip if.not.not
+      fin
+      quip lets.be.prudent, 0
+   otherwise
+#
+   ifeq context, q.into.abyss?
+      set context, none
+      ifeq status, 0
+         or
+      ifkey yes
+         smove above.abyss, over.abyss
+      fin
+      respond n, no, if.not.not
+      quip lets.be.prudent, 0
+   otherwise
+#
+   ifeq context, q.streambed
+      set context, none
+      ifkey yes
+         say on.streambed
+         goto ylem
+         call coroner
+      fin
+      ifany n, no
+         quip very.sensible
+      fin
+      quip lets.be.prudent, 0
+   otherwise
+#
+   ifeq context, q.wimp
+      set context, none
+      ifkey yes
+         say you.r.a.wimp
+         flag undo.status, undo.info
+         restore command
+         ifkey on
+            quit           
+         fin
+         call undo
+      fin
+      respond n, no, very.wise
+      quip lets.be.prudent, 0
+   otherwise
+#
+   ifeq context, q.champagne?
+      set context, none
+      ifkey yes
+         ifhave chalice
+            set context.value, 0
+         else
+            set context.value, 1
+         fin
+         apport chalice, ylem
+         flag here, damp
+         quip poof.goes.chalice
+      fin
+      respond n, no, if.not.not
+      quip lets.be.prudent, 0
+   fin
+#
+#=====================================================================
+#
+# General post-player-input code.
+#
+repeat
+   local the.it
+   local typo.check
+   local stone.check
+   local temp.val
+#
+   ifeq status, badsyntax
+      flush
+      ifkey put
+         call put
+      fin
+      respond again, no.understand
+      ifkey say
+        quip pre.say
+        quit
+      fin
+      quip bad.syntax
+   fin
+   iftyped dumpdata
+##      iflt arg1, 0
+##         set arg1, 0
+##      fin
+      set arg2, 0
+   fin
+#
+# If necessary, remind the player to keep commands simple -- no
+# with, about, into, from, to, at, on, above or under!
+#
+  respond with, keep.it.simple
+#
+# We may need to re-order the command words.
+#
+  ifgt status, 1
+     and
+  ifinrange arg2, first.special, first.pseudo
+     and
+     not
+  ifinrange arg1, first.special, first.pseudo
+     exec 29      # Swap the verb and the object.
+  fin
+#
+# Rude words override everything else! (Well, nearly.)
+#
+   ifat west.pit
+      or
+   ifat beanstalk.bottom
+      respond fuck, no.piss.plant
+   else
+      respond fuck, no.fucking
+   fin
+#
+# Save and restore override any other vocabulary processing
+#
+   ifis arg1, save
+      or
+   ifis arg1, restore
+      call arg1
+      quit
+   fin
+#
+# Cater for SHUT UP
+#
+   ifkey shut
+      respond up, no.shut.up
+      fakecom shut, close
+   fin
+#
+# We generally ignore "room"
+#
+   ifkey room
+      ifeq status, 1
+         ifflag here, not.in.cave
+            and
+            not
+         ifflag here, indoors
+            quip room.enough, 2
+         otherwise
+         ifflag here, small
+            quip room.enough, 0
+         else
+            quip room.enough, 1
+         fin
+      fin
+      ifis arg1, room
+         exec 29           # Swap arg1 and arg2.
+      fin
+      set arg2, none
+      set status, 1
+   fin
+#
+# "Sign" is really a notice synonym, but we need to declare it
+# separately to be able to include the word "sign" in messages.
+#
+   fakearg sign, notice
+#
+# Handle 'it'.
+#
+   ifgt it, 0
+      set last.it, it
+      ifis arg1, it
+         or
+      ifis arg2, it
+         set the.it, it
+         ifis the.it, plant2
+            lda the.it, plant
+         otherwise
+         ifis the.it, troll2
+            lda the.it, troll
+         otherwise
+         ifis the.it, fake.orb
+            lda the.it, orb
+         otherwise
+         ifis the.it, beanstalk2
+            lda the.it, beanstalk
+         otherwise
+         ifis the.it, door1
+            or
+         ifis the.it, door2
+            or
+         ifis the.it, door3
+            or
+         ifis the.it, door4
+            lda the.it, door
+         otherwise
+         ifis the.it, dynamite
+            ifkey drop
+               and
+            ifhave rod
+               or
+            ifeq dynamite, 0
+               lda the.it, rod
+            fin
+         fin
+         fakecom it, the.it
+      fin
+   fin
+#
+# Have to cater for style 12 as well as 11 - hence the complicated if.
+#
+   ifdoall
+#      or
+#   ifkey all
+   else
+      ifeq status, 2
+         and
+         not
+      ifeq arg2, badword
+         and
+         not
+      ifeq arg2, badsyntax
+         and
+         not
+      ifeq arg2, ambigtypo
+         and
+         not
+      ifeq arg2, ambigword
+         set it, arg2
+      otherwise
+      ifflag arg1, object
+         or
+      ifinrange arg1, first.pseudo, last.pseudo
+         set it, arg1
+      fin
+   fin
+#
+# "Switch" is both a verb and an object, so check it out before doing a
+# general verb processing.
+#
+   ifkey switch
+      call switch
+   fin
+#
+# Handle "around"
+#
+   ifkey around
+      ifkey look
+         ifis arg1, around
+            exec 29
+         fin
+         set status, 1
+      otherwise
+      ifkey walk
+         quip how.to.go.around
+      else
+         quip no.understand
+      fin
+   fin
+#
+# Check for an obvious dummy
+#
+   ifeq status, 1
+      and
+   ifkey walk
+      call walk
+   fin
+#
+# Handle "handle"
+#
+   ifkey handle
+      ifnear sword
+         respond read, look, pommel.inlay
+         fakecom handle, sword
+      otherwise
+      ifnear spoon
+         ifany read, look
+            flag spoon, special1
+            quip spoon.quip
+         fin
+         fakecom handle, spoon
+      otherwise
+      ifnear thurible
+         respond read, look, nothing.special, handle
+         fakecom handle, thurible
+      otherwise
+      ifis arg1, handle
+         and
+         not
+      ifis arg2, handle
+         quip use.too.vague, handle
+      else
+         quip i.dont.see, handle
+      fin
+   fin
+#
+# Handle "thataway"
+#
+   ifkey thataway
+      ifany in, out, go, forward, back, jump, cross
+         or
+      ifeq status, 1
+         quip which.way.thataway?
+      else
+         quip pardon?
+      fin
+   fin
+#
+# Handle various materials
+#
+   call do.materials
+#
+# DETOUR BUSHES is a special.
+#
+   ifkey detour, bushes
+      set status, 1
+   fin
+#
+# Let's be kind. R is REPEAT (or AGAIN), but players type R BIRD
+# meaning RELEASE BIRD (as per adv550/660). So the kernel does not
+# intercept REPEAT if R <ANYTHING> gets typed. We handle it here instead.
+#
+   ifkey again
+      and
+   ifgt status, 1
+      fakecom again, drop
+   fin
+#
+# Now for the rest of it...
+#
+   respond search, cant.search
+#
+# Can we see anything?
+#
+   ifkey read
+      and
+      not
+   ifflag status, light.here
+      quip its.too.dark
+   fin
+   ifkey look
+      ifkey fog
+         and
+      ifinrange here, plain.1, plain.3
+         quip pea.souper
+      fin
+      ifkey darkness
+         ifinrange here, above.abyss.2, above.abyss.7
+            or
+         ifinrange here, imaze.01, imaze.17
+            ifhave lamp, switched.on
+               quip darkness.too.dark, 1
+            else
+               quip darkness.too.dark, 0
+            fin
+         fin
+         ifflag here, lit
+            quip pardon?
+         otherwise
+         ifflag status, light.here
+            quip darkness.too.dark, 1
+         else
+            quip darkness.too.dark, 0
+         fin
+      otherwise
+      ifflag status, light.here
+      else
+         chance 5
+            quip its.too.dark
+         fin
+         quip no.light.here
+      fin
+   fin
+#
+# Handle oil noun as a special if no oil but have the vial.
+#
+   ifgt status, 1
+      and
+   ifis arg2, oil
+      and
+      not
+   ifany where, fetch, find
+      call find.oil, false
+      ifeq vessel, none
+         and
+         not
+      ifnear oil
+         say i.dont.see, oil
+         ifnear vial
+            append this.is.not.oil
+         fin
+         quit
+      fin
+   fin
+#
+# Handle liquid.
+#
+   ifkey liquid
+      ifinrange here, phoney.shaft, sewer.5
+         fakecom liquid, sewage
+      otherwise
+      ifflag here, h20.here
+         or
+      ifinrange here, island, island.ne
+         or
+      ifinrange here, rocky.beach, beach.end
+         or
+      ifat below.ridge, caldera
+         fakecom liquid, water
+      otherwise
+      ifat east.pit
+         fakecom liquid, oil
+      otherwise
+      ifnear vial
+         fakecom liquid, vial
+      else
+         call find.water, false
+         ifne vessel, none
+            fakecom liquid, water
+         otherwise
+         ifnear bucket, full.of.champagne
+            fakecom liquid, champagne
+         otherwise
+         ifnear bottle, full.of.oil
+            or
+         ifnear flask, full.of.oil
+            fakecom liquid, oil
+         fin
+      fin
+   fin      
+   ifkey champagne
+      ifnear bucket, full.of.champagne
+         flag context, arg2.here
+      otherwise
+      ifnear giant
+         and
+      ifge giant, picnicking
+         quip hands.off
+      fin
+   fin
+   ifkey pattern
+      ifnear gong
+         or
+      ifnear thurible
+         flag context, arg2.here
+      fin
+   fin
+   ifkey dung 
+      and
+   ifnear bucket, full.of.dung
+      flag context, arg2.here
+   fin
+#
+# Handle all teeth references.
+#
+   ifkey tooth
+      call tooth.stuff
+   fin
+#
+# Handle "view" as a verb
+#
+   ifgt status, 1
+      and
+   ifis arg1, view
+      fakearg view, examine
+   fin
+#
+# Handle sun(s)/sunstone
+#
+   ifkey sunstone
+      and
+   ifat basalt.shelf
+      and
+      not
+   ifnear sunstone
+      and
+      not
+   ifany up, find, fetch
+      fakearg sunstone, sun
+   fin
+#
+# Handle star(s)/starstone
+#
+   ifkey stars
+      and
+   ifflag starstone, seen
+      ifinrange here, above.abyss.2, above.abyss.7
+         or
+      ifinrange here, imaze.01, imaze.13
+         or
+      ifat imaze.16
+         and
+         not
+      ifany drop, throw
+      else
+         ifnear rod
+            and
+            not
+         ifnear starstone
+         else
+            fakearg star, starstone
+         fin
+      fin
+   fin
+   ifkey star
+      ifnear rod
+         or
+      ifat ne.repository
+         ifnear rod
+            respond look, rusty.star, 0
+         else
+            respond look, rusty.star, 1
+         fin
+         say rusty.one
+         respond get, remove, break, value, no.point.in.that
+         respond rub, nothing
+         ifgt status, 1
+            quip hah!
+         fin
+      fin
+   fin
+   ifkey starstone
+      and
+      not
+   ifhave starstone
+      and
+   ifinrange here, above.abyss.2, above.abyss.7
+      or
+   ifinrange here, imaze.01, imaze.13
+      or
+   ifat imaze.16
+      fakecom starstone, stars
+   fin
+#
+# Handle fragments
+#
+   ifkey fragments
+      and
+   ifnear shards
+      fakearg fragments, shards
+   fin   
+#
+# Arsonists not wanted!
+#
+   ifkey light, fire
+      quip no.fires
+   fin
+#
+# Handle roses.
+#
+   ifkey rose
+      ifinrange here, garden.n, garden.se
+         fakearg rose, roses
+      otherwise
+      ifnear windrose
+         fakecom rose, windrose
+      else
+         quip i.dont.see, roses
+      fin
+   fin
+#
+# Handle please
+#
+   respond please, please.not
+#
+# Handle packet/wrapper.
+#
+   ifkey packet
+      and
+   ifnear wrapper
+      respond open, pour, empty, torn.packet
+      ifany plant, beanstalk
+         or
+      ifat beanstalk.bottom
+      else
+         fakecom packet, wrapper
+      fin
+   fin
+#
+# Handle mud/mudshoes
+#
+   ifkey mud
+      and 
+   ifnear shoes
+      fakecom mud, shoes
+   fin
+#
+# Handle tube (as in lava tube) and tube (as in rolled rug)
+#
+   ifkey tube
+      and
+      not
+   ifat basalt.shelf, tube, tube.slide
+      and
+   ifnear rug, rolled.up
+      fakecom tube, rug
+   fin
+#
+# Equate steps and stairs, except at mists.
+#
+   ifkey stairs
+      and
+      not
+   ifat mists
+      fakearg stairs, steps
+   fin
+#
+# Pretend there is a combination lock on the chest.
+#
+   ifis arg2, lock
+      ifat depression, in.cave
+         or
+      ifnear chest
+         ifany open, break, look, hit
+            ifat depression, in.cave
+               quip its.a.lock, 0
+            otherwise
+            ifnear chest
+               quip its.a.lock, 1
+            fin
+         otherwise
+         ifis arg1, close
+         else
+            quip hah!
+         fin
+      else
+         respond look, i.dont.see, arg2
+      fin
+   fin
+#
+# Shut the mine door, if speaking English.
+#
+   ifnear door1
+      and
+   ifeq waterfall, opened
+      and
+   ifeq dwarven, 0
+      call close.mine.door
+      say blank
+   fin
+#
+# Make sure "dynamite" is not revealed by "get all"!
+#
+   ifeq stage, in.repository
+      set dynamite, 0
+      ifkey dynamite
+         ifdoall               # Are we in a do-all loop?
+         else                  # No.
+            set dynamite, 1    # He actually said "dynamite"!
+         fin
+      fin
+   fin
+#
+# Intercept a reference to the label on the box of Turkish delight.
+#
+   ifkey label
+      and
+   ifnear box
+      fakecom label, box
+   fin
+#
+# Handle AXE as a verb.
+# 
+   ifgt status, 1
+      and
+   ifis arg1, axe
+      and
+   ifhave axe
+      fakecom axe, cut
+   fin
+#
+# Handle non-specific get/drop cases.
+#
+   ifeq status, 1
+      ifkey get
+         default here, portable
+      otherwise
+      ifkey drop
+         default inhand
+      fin
+   otherwise
+   ifkey all
+      call shadow.shutup
+      ifeq arg3, badsyntax
+         quip no.except, arg3
+      fin
+      ifeq arg3, ambigword
+         quip tell.me.more, arg3
+      fin
+      ifeq arg3, badword
+         flush
+         quip nocomprende.object, arg3
+      fin
+      ifeq arg3, ambigtypo
+         quip is.it.a.typo? arg3
+      fin
+      ifany drop, down
+         call except.check
+         call drop.check, 0
+         doall inhand
+      otherwise
+      ifkey get
+         ifat east.of.building
+            and
+            not
+         ifnear seed
+            apport seed, here
+         fin
+         ifflag status, light.here
+            call except.check
+            doall here, portable
+         else
+            quip cant.see.anything, 1
+         fin
+      fin
+   fin
+#
+# Handle treasure.
+#
+   ifkey treasure
+      and
+      not
+   ifany say, where
+      ifany drop, down
+         call except.check
+         call drop.check, 1
+         doall inhand, valued
+      otherwise
+      ifkey get
+         call except.check
+         doall here, valued
+      else
+         quip one.at.a.time
+      fin
+   fin
+#
+# Handle "follow me"
+#
+   ifkey follow, me
+      quip no.follow.you
+   fin
+#
+#  Threepwood quips
+#
+   ifany guybrush, monkey
+      respond monkey, no.monkeys
+      quip wrong.game
+   fin
+#
+# A few house-keeping oddments...
+#
+   ifany fee, fie foe foo, fum
+   else
+      set foobar, 0
+   fin
+
+   ifge foobar, 0
+      sub foobar, 1
+   fin
+   ifeq turns, 20
+      unflag status, vocab.prod
+   fin
+#
+# Hmmm... Don't recall why we need to check for SAVE here.
+# Safer to leave it. (Might be a remnant from before the time
+# when I introduced the range of verbs not requiring noun-checking.)
+#
+   ifkey save
+      call save
+      quit
+   fin
+#
+# Ignore null commands.
+#
+   ifeq status, 0
+      quit
+   fin
+#
+# Verb not understood. Try to explain.
+#
+   ifeq arg1, badword
+      or
+   ifeq arg1, ambigword
+      or
+   ifeq arg1, ambigtypo
+      ifeq arg1, badword
+         flush
+         ifgt status, 1
+            chance 33
+               say nocomprende, arg1
+            else
+               say nocomprende.verb, arg1
+            fin
+         else
+            say nocomprende, arg1
+         fin
+         ifflag status, vocab.prod
+            say use.vocabulary
+            unflag status, vocab.prod
+         fin
+      otherwise
+      ifeq arg1, ambigword
+         say tell.me.more, arg1
+      else
+         say is.it.a.typo?, arg1
+         ifflag status, vocab.prod
+            say use.vocabulary
+            unflag status, vocab.prod
+         fin
+      fin
+      call shadow.shutup
+      quit
+   fin
+#
+# Saying magic words is special (and handled via 'actions').
+#
+   ifkey say
+      ifinrange arg2, first.magic, last.magic
+      else
+         call say
+      fin
+   fin
+#
+# Handle "all".
+#
+   ifkey all
+      and
+      not
+   ifkey say
+      call check.all
+   fin
+#
+# If noun not understood, try to respond appropriately.
+#
+   ifgt status, 1
+      ifeq arg2, badword
+         or
+      ifeq arg2, ambigword
+         or
+      ifeq arg2, ambigtypo
+         or
+      ifeq arg2, sceneword
+         ifinrange arg1, first.special, last.special
+         else
+            ifeq arg2, ambigword
+               say tell.me.more, arg2
+            otherwise
+            ifeq arg2, badword
+               flush
+               say nocomprende.object, arg2
+               ifflag status, vocab.prod
+                  say use.vocabulary
+                  unflag status, vocab.prod
+               fin
+            otherwise
+            ifeq arg2, sceneword
+               and
+            ifgt stage, little.joke
+               quip just.scenery, arg2
+            else
+               say is.it.a.typo?, arg2
+               ifflag status, vocab.prod
+                  say use.vocabulary
+                  unflag status, vocab.prod
+               fin
+            fin
+            call shadow.shutup
+            quit
+         fin
+      fin
+   fin
+#
+# Initialise some default values for this round.
+#
+   set drop.here, here       # Default location for dropping things
+   set throw.here, here      # Default location for throwing things
+   set drop.text, none
+   set throw.text, none
+   set throw.it, false
+   set vessel, none          # Just a safety net
+   set silence, false        # Ditto
+#
+# Do some command faking...
+#
+# To players, beanstalks are plants and v.v.
+#
+   ifkey beanstalk
+      ifnear plant
+         or
+      ifnear plant2          # Fudge the plant to be a beanstalk!
+         fakearg beanstalk, plant
+      fin
+   fin
+   ifkey plant
+      ifnear beanstalk2    # Fudge beanstalk to be a plant!
+         and 
+      ifeq beanstalk, gigantic
+         or
+      ifnear beanstalk
+         fakearg plant, beanstalk
+      fin
+   fin
+#
+# Both obolus and drachma are coins, OK?
+#
+   ifkey coins
+      ifnear drachma
+         fakecom coins, drachma
+      otherwise
+      ifnear obolus
+         fakecom coins, obolus
+      fin
+   fin
+#
+# A seal might be referred to as "something" (but so can the alarm!)
+#
+   ifkey something
+      and
+   ifnear seal
+      and
+      not
+   ifat top.of.chapel
+      fakearg something, seal
+   fin
+#
+# A thurible might be mistaken for a rattle.
+#
+   ifkey rattle
+      and 
+   ifnear thurible
+      iflt not.a.rattle, 3
+         say not.a.rattle
+      fin
+      ifeq not.a.rattle, 1
+         quit
+      fin 
+      fakecom rattle, thurible
+   fin
+#
+# Fiddle doorway to mean doors, if near doors.
+#
+   ifkey doorway
+      ifnear door
+         or
+      ifnear door1
+         or
+      ifnear door2
+         or
+      ifnear door3
+         fakecom doorway, door
+      fin
+   fin
+#
+# Fiddle the spire in the desert being referred to as a column.
+#
+   ifkey column
+      ifat basalt.shelf
+         and
+      ifinrange basalt.shelf, 1, 2
+         or
+      ifinrange here, desert.12, desert.last
+         or
+      ifinrange here, north.of.spire, spire
+         or
+      ifat basalt.shelf.2
+         fakearg, column, spire
+      fin
+   fin
+#
+# Sigh... CAGE BIRD
+#
+   ifkey cage, bird
+      fakecom cage, catch
+   fin
+#
+#
+# Remind him that he need not keep saying 'go'.
+#
+   ifkey west, walk
+      add west.count, 1
+      ifeq west.count, 5
+         ifis arg1, walk
+            say west.will.do, arg1
+         else
+            say west.will.do, arg2
+         fin
+      fin
+   fin
+   ifeq stage, mirror.world
+      call swap.directions
+   fin
+#
+# The sculpture changes it's shape and hence name.
+#
+   ifgt status, 1
+      and
+   ifinrange arg2, first.sculpture.fake, last.sculpture.fake
+      call sculpture.stuff
+   fin
+#
+# Trap generic references to catacombs.
+#
+   ifkey catacombs
+      and
+   ifany go, in
+      ifinrange here, catacombs.portal, catacombs.exit
+         quip you.are.there
+      otherwise
+      ifat catacombs.lobby, rest.area, audience, audience.east
+         quip enter.catacombs
+      else
+         quip dont.know.the.way
+      fin
+   fin
+#
+# Travel by magic words is special, but otherwise we may need
+# to check the sunstone!
+#
+   ifkey say          # Must avoid shout jump and suchlike at window
+      and             # and other places; we do this by only doing
+   ifgt status, 1     # at processing if verb is not say or the word
+      and             # said is magic
+      not
+   ifinrange arg2, first.magic, last.magic
+   else
+      set direction, 0
+      ifat ledge
+         fakearg back, south
+      fin
+      ifflag here, not.in.cave
+         and
+         not
+      ifflag here, indoors
+         and
+      ifhave sunstone
+         and
+         not
+      ifkey look
+         ifinrange arg1, first.direction, last.compass.point
+            set direction, arg1
+         else
+            ifgt status, 1
+               and
+            ifinrange arg2, first.direction, last.compass.point
+               set direction, arg2
+            fin
+         fin
+         ifgt direction, 0
+            call consult.sunstone, direction
+         fin
+      fin
+#
+# Cater for a variety of foresty things.
+#
+      ifinrange here, forest.1, path
+         call in.forest.actions
+      fin
+#
+# At the soft room, carpet and rug are two distinct objects.
+#
+      ifkey carpet
+         ifat soft
+            ifany drop, throw
+               and
+            ifhave rug
+               fakecom carpet, rug
+            otherwise
+            ifany roll, unroll, get
+               and
+            ifhere rug
+               fakecom carpet, rug
+            fin
+         else
+            fakecom carpet, rug
+         fin
+      fin
+
+# Finally handle all place-specific stuff.
+#
+      call here
+   fin
+#
+# Handle stone (sun or star)
+#
+   ifkey stone
+      ifnear sunstone
+         and
+      ifnear starstone
+         set stone.check, 0
+         ifhave sunstone
+             set stone.check, 1
+         fin
+         ifhave starstone
+             add stone.check, 1
+         fin
+         ifeq stone.check, 1
+            ifkey get
+               ifhere sunstone
+                  fakecom stone, sunstone
+               else
+                  fakecom stone, starstone
+               fin
+            otherwise
+            ifany drop, throw
+               ifhave sunstone
+                  fakecom stone, sunstone
+               else
+                  fakecom stone, starstone
+               fin
+            fin
+         else
+            quip which.stone?
+         fin
+      otherwise
+      ifnear sunstone
+         fakecom stone, sunstone
+      otherwise
+      ifnear starstone
+         fakecom stone, starstone
+      fin
+   fin
+#
+# Handle null jumps.
+#
+   ifkey jump
+      and
+   ifeq status, 2
+      ifany off, across, down
+      else
+         quip you.jump
+      fin
+   fin      
+#
+# Fiddle the directions, if necessary
+#
+   ifeq stage, mirror.world
+      call swap.directions
+   fin
+#
+# Handle references to place names
+#
+   ifflag arg1, place
+      ifat  arg1
+         quip you.are.there
+      else
+         quip dont.know.the.way
+      fin
+   fin
+#
+# Some objects are, yet are not present in the repository.
+#
+   ifeq stage, in.repository
+      and
+   ifgt status, 1
+      call start.cheating    # Kludge up dummy objects in repository
+      ifany rod, bundle
+         call rod.special.stuff
+      fin
+      respond bundle, plurals, pile, no.plural.please
+   fin
+# 
+# Curtains do not really exists, nor do bundles (except in the repsitory).
+#
+   ifkey curtains
+      ifat soft, curtain.entrance, bare.cavern
+         apport curtains, here
+         flag curtains, seen
+      fin
+   fin
+   respond bundle, plurals, pardon?
+#
+# Some other minor quipperies...
+#
+   respond left, forward, need.a.direction
+   ifkey debris
+      call debris.quip
+      quit
+   fin
+#
+# Do we mean Orion or O'Ryan?
+#
+   ifkey orion
+      ifflag quips, oryan.quip
+         quip orion.quip, 1
+      fin
+      quip orion.quip, 0
+   fin
+   ifkey oryan
+      ifeq temple, vault.locked
+         quip pat.oryan, 0
+      fin
+      quip pat.oryan,1
+   fin
+#
+# Handle map references
+#
+   ifkey map
+      ifeq status, 1
+         or
+      ifany get, find, read, look
+         quip no.map
+      fin
+   fin
+#
+# Handle references to the illusory Zorro outfit.
+#
+   ifany hat, cloak
+      ifflag mask, seen
+         ifkey hat
+            lda obj.ptr, hat
+         else
+            lda obj.ptr, cloak
+         fin
+         ifhave mask, worn
+            quip just.an.illusion, obj.ptr
+         fin
+         quip i.dont.see, obj.ptr
+      else
+         quip pardon?
+      fin
+   fin
+#
+# Handle "spoon dung"
+#
+   ifkey spoon, dung
+      and
+   ifnear spoon
+      and
+   ifnear dung
+      ifflag spoon, special2
+         quip again.no.ruin.it
+      fin
+      ifflag beanstalk, seen
+         flag spoon, special2
+         say spoon.no.dung
+         quip blank
+      fin
+      quip bleah
+   fin
+#
+# Handle butterflies (sheer frippery!)
+#
+   ifkey butterfly
+      ifinrange here, rock.shelf, ledge
+         quip no.butterflies, 0
+      otherwise
+      ifinrange here, island, island.ne
+         quip no.butterflies, 1
+      otherwise
+      ifat beanstalk.top, stupendous.view
+         quip no.see.butterfly
+      fin
+      quip i.dont.see, butterfly
+   fin
+#
+# Some special responses for the sewers.
+#
+   ifflag here, in.sewer
+      or
+   ifat sea.view     
+      ifkey sewage
+         ifkey get
+            and
+         ifflag beanstalk, seen
+            quip sewage.h20.bad, 1
+         otherwise
+         ifkey look
+            quip no.look.sewage
+         else
+            describe dung
+            quit
+         fin
+      fin
+      ifkey get, water
+         or
+      ifkey fill
+         ifflag beanstalk, seen
+            quip sewage.h20.bad, 1
+         else
+            quip sewage.h20.bad, 0
+         fin
+      fin
+   fin
+#
+# Handle flask seal
+#
+   ifkey seal
+      and
+   ifnear flask, sealed
+      ifis last.it, flask
+         or
+         not
+      ifnear seal
+         set it, last.it
+         respond look, solomons.seal
+         ifkey break
+            fakearg seal, flask
+            call open
+         fin
+      fin
+      flag context, arg2.here
+   fin
+#
+# Time to see whether the verb-specific code can handle player's command.
+#
+   call arg1
+#
+# Only come here if verb fails to deal
+#
+   call shadow.shutup
+   flush
+   ifflag arg1, object
+      set vessel, none
+      ifis arg1, water
+         call find.water, false
+         ifeq vessel, none
+            and
+         ifflag here, h20.here
+            set vessel, 1  # Just to show we have water
+         fin
+      fin
+      ifkey water
+         and
+      ifgt vessel, 0
+         or
+      ifnear arg1
+      else
+         ifflag arg1, seen
+            quip i.dont.see, arg1
+         else
+            quip pardon?
+         fin
+      fin
+   fin
+   call bail.out
+   quit
+#
+#=====================================================================
+#
+repeat # Dummy. Just stops translator grizzling about unused symbols.
+   respond  crabs, eyes, pardon?
+#
+#=====================================================================

@@ -1,0 +1,47 @@
+____________________________________________________________________________
+
+                                   Adv770
+                                Version 2.31
+
+ This directory contains the source of my 770 points version of Adventure.
+ The game, generally known as Adv770, is licenced under GPL3 (or later) (see
+ the accompanying LICENCE file) and may be freely distributed and archived.
+
+ Included are both the A-code sources of the game (the *.acd files). If all
+ you want to do is to look at the game's source, just ignore everything
+ else.
+
+ For your convenience, the sub-directory C contains ANSI C source derived by
+ the acdc translator from the supplied A-code source, plus the three A-code
+ kernel source files (adv00.c, adv01.c and adv0.h). You can build a basic
+ game executable simply by compiling and linking these C sources using any
+ ANSI C compiler: 'cc *.c -o adv770 -lreadline' or, if you don't have the
+ readline library installed, 'cc *.c -o adv770 -DNO_READLINE'. By default
+ the executable will use your default browser, but you can use the -C
+ command line option to force basic console display instead.
+
+ Also included is A-code documentation and sources of A-code utilities I use
+ on Linux, Unix or MacOS to build adv770 executable in various modes.
+
+ Please see HTML documentation in the doc sub-directory for general
+ information on building A-code game executables, as well as full A-code
+ language documentation.
+
+ To save you the trouble, https://mipmip.org/adv770/ offers pre-built
+ bundles for Linux, Mac, MSDOS and Windows, as well as an HTML/JavaScript
+ version which runs under any HTML5 compliant browser.
+
+ If you do find any bugs, however small, please consult the Adv770 bug list
+ https://www.mipmip.org/adv770/bugs.html and if appropriate, report the bug
+ to me at mla@mipmip.org. For more A-code information, please visit my
+ web-site:
+
+                            https://mipmip.org/
+
+ Hope you enjoy the game!
+
+                                                               Mike Arnautov
+                                                              mla@mipmip.org
+                                                                 19 May 2022
+
+____________________________________________________________________________

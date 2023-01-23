@@ -1,0 +1,227 @@
+-------------------------------------------------------------------------
+
+New in version 12.46
+
+1. Reverted UTF8 support to being conditional on the UTF8 major directive.
+   No reason other than efficiency, even though UTF8 overheads are 
+   insignificant.
+
+-------------------------------------------------------------------------
+
+New in version 12.46
+
+1. The -d (or -debug) option now mandates the ENTNAME variable,
+   making all entity names available to the kernel. This information
+   is used by the kernel to dump the comlpete current state of the game
+   in response to the DUMP minor directive.
+
+2. The same option now also causes the game to show on stderr at runtime
+   A-code source lines being executed.
+
+-------------------------------------------------------------------------
+
+New in version 12.45
+
+1. Additional game output caused by -debug acdc option now goes to
+   stderr instead of stdout, thereby avoiding output buffering and
+   helping to diagnose game crashes.
+
+-------------------------------------------------------------------------
+
+New in version 12.44
+
+1. Added the IFTURN conditional, checking for CGI or library build mode.
+
+2. Removed obsolete special handling of REPEAT sections in the library
+   build.
+
+-------------------------------------------------------------------------
+
+New in version 12.43
+
+1. Added definition of NOWORD constant (-1) to adv1.h.
+
+-------------------------------------------------------------------------
+
+New in version 12.43
+
+1. Fixed end of line immediately following a nested text.
+2. Allowed mixed case text multi-word fragments as object and place
+   name synonyms (for echoing command words).
+3. UTF8 support is now unconditional.
+4. Added "barred" names to enable full internationalisation. Not
+   documented as yet. This removes as unnecessary the COMMA, SEMICOLON
+   and PARSER major directives (never documented), which implemented 
+   my first stab at full internationalisation.
+
+-------------------------------------------------------------------------
+
+New in version 12.42
+
+1. Added the IFNEEDCMD minor directive.
+
+-------------------------------------------------------------------------
+
+New in version 12.41
+
+1. Added UTF8 support for A-code games.
+2. Default style is now set to the current kernel style (DEFAULT_STYLE)
+   rather than to 1. Legacy games which do not specify style number are
+   now given an A-code wrapper which sets the appropriate style value.
+
+-------------------------------------------------------------------------
+
+New in version 12.40
+
+1. Fixed use of embedded Dwarvish tag ('%').
+2. Added USEQUERY to adv1.h in anticipation of resolving the QUERY issue
+   in games not using the CONTEXT mechanism.
+3. Added check for dangling OTHERWISE.
+4. Added deprecated major directives CIF and CENDIF to support Adv580.
+   Also switched off text morphing in style 2, for the same reason.
+
+-------------------------------------------------------------------------
+
+New in version 12.39
+
+1. An object name excluded from game's vocabulary (by the '-' prefix)
+   no longer causes acdc to ignore any names following the excluded one.
+2. -q now suppresses the "Translating: ..." information message too.
+
+-------------------------------------------------------------------------
+
+New in version 12.38
+
+1. Minor directives HAVE, HERE and NEAR now officially deprecated.
+2. Added the -outdir command line option.
+3. Non-morphed in-line texts are no longer a problem for upward
+   compatibility of saved games.
+4. Added simplified DICT syntax.
+5. Fixed in-line texts with text holders.
+6. Added default declarations of NO.MATCH and NO.AMATCH constants.
+7. Bug fix: STOP now QUITs immediately.
+8. MS-style line endings are now allowed.
+9. If SEEN flag declared, add it to symbols known to the kernel.
+
+-------------------------------------------------------------------------
+
+New in version 12.37
+
+1. The APPEND directive should not QUIT!
+
+-------------------------------------------------------------------------
+
+New in version 12.36
+
+1. Adding a pointer to a value now results in a pointer, just like when
+   adding a value to a pointer.
+
+-------------------------------------------------------------------------
+
+New in version 12.35
+
+1. Fixed the IFAT directive, which got broken in version 12.33.
+2. In style 1 (i.e. when processing Platt's A-code source of Adv550), handle
+   words split across two lines by hyphenation.
+
+-------------------------------------------------------------------------
+
+New in version 12.34
+
+1. Fixed a bug in in-line texts, which caused non-compiling C to be 
+   generated if such a text contained a text holder (the '#' character).
+2. ADVLIB mode handling improved.
+
+-------------------------------------------------------------------------
+
+New in version 12.33
+
+1. Modified handling of all conditionals to support future work on
+   making QUERY work in all modes.
+
+-------------------------------------------------------------------------
+
+New in version 12.32
+
+1. Eliminated setjmp/longjmp dependency of game executables!
+2. Fixed ITERATE to make the iterating variable a pointer if
+   the lower iteration bound is a pointer.
+3. Fixed a bug in EVAL. If the evaluated variable points to a pointer,
+   the result is now also a pointer.
+
+-------------------------------------------------------------------------
+
+New in version 12.31
+
+1. Style value evaluation rationalised.
+2. Fixed a bug in DEPOSIT. Now works correctly when second argument
+   is a local pointer.
+3. Added ENTNAME support.
+
+-------------------------------------------------------------------------
+
+New in version 12.30
+
+1. Any trailing, obsolete adv<nn>.c files resulting from some previous 
+   run of acdc created in the same directory, are now automatically
+   cleared and te fact reported.
+2. Added SELECT minor directive.
+3. Removed non-ANSI C support.
+4. Shortened auto-text names to permit more than 10 of them!
+
+-------------------------------------------------------------------------
+
+New in version 12.29
+
+1. Now builds under Mac OSX (using Xcode command line tools).
+2. Relaxed a lot of style restriction. E.g. in-line texts are now
+   available in all styles.
+3. Fixed cross-reference spacing for LOC entries.
+4. A sensible GAME_ID is now generated in all styles.
+5. A-code source now can be again specified by pathname. (This
+   got broken in transition from A-code version 11 to 12.)
+6. Added more sanity checking for null code blocks and non-terminated
+   source lines.
+
+-------------------------------------------------------------------------
+
+New in version 12.22
+
+1. Fixed automatic naming of in-line texts so that the result is a legal
+   text name.
+
+-------------------------------------------------------------------------
+
+New in version 12.21
+
+1. Added the -version command line keyword.
+
+-------------------------------------------------------------------------
+
+New in version 12.20
+
+1. Restored ITLOC as a synonym of the minor directive ITPLACE.
+2. Added minor directive RESAY. Acts like SAY but first zaps all
+   text accumulated so far.
+
+-------------------------------------------------------------------------
+
+New in version 12.18
+
+1. Changed command-line keywords to acdc. Use "acdc -help" for info.
+2. Default game mode is now -preload, so that no .dat file is created -
+   just the game executable.
+3. The -nw acdc command line keyword (was -nowarn) now actually works.
+4. The acdc translator now operates in two passes. The first pass
+   attends to declarations, while the second pass processes game code.
+   As the result, forward references are now allowed.
+5. A-code now permits in-line texts. A text delimited by unescaped 
+   double quotes is accepted wherever a text name would be accepted.
+   Such texts can span multiple line and obey exactly the same rules
+   as named texts do. It is even possible to specify their
+   transformation  method. A text starting with i:, r: or c: is treated
+   espectively as incrementing, random or cyclic. Obviously, the 
+   two-letter tag specifying the method is not itself deemed to be a 
+   part of the text.
+
+========================================================================

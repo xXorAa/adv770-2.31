@@ -1,0 +1,24 @@
+                     =================================
+                                    acdc
+                        A-code to ANSI C translator
+                               Version 12.47
+                     =================================
+
+ Because the acdc translator does nothing more then read some files and
+ write some files, it has no special dependencies and can be built using any
+ ANSI C compiler (e.g. gcc or clang) simply by compiling and linking all
+ supplied sources.
+
+ On a Unix-like system (Unix, Linux, MacOS) this can be done by the single
+ command
+
+                               cc -o acdc *.c
+
+ If using the advbld script, if the executable is absent, it is built
+ automatically.
+
+                                                               Mike Arnautov
+                                                              mla@mipmip.org
+                                                                 23 Mar 2022
+
+ ============================================================================

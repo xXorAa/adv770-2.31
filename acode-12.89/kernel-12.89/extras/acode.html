@@ -1,0 +1,293 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script>
+%JAVASCRIPT%
+var moveLimit = 200;
+var compact = 0;
+var rType = 0;
+var turn = 0;
+var hpos = 0
+var hsiz = 0;
+var hcom = [];
+var conbot = 0;
+var advtext = 0;
+var advcom = 0;
+var started = 0;
+var gameInfo;
+
+var advTurn = Module.cwrap('advturn', 'string', ['string']);
+
+function gid(id)
+  { return document.getElementById(id) }
+function scrollit()
+  { window.scrollTo(0, conbot.offsetTop) }
+function writeit(text)
+  { var newDiv = document.createElement('div'); newDiv.id = 'chunk';
+    newDiv.setAttribute('name', 'chunk'); newDiv.innerHTML = text;
+    gid('advtext').insertBefore(newDiv, null); scrollit() }
+   
+function zapit()
+  { gid('comform').innerHTML = '' }
+function shutit(text)
+{
+  zapit();
+  gid('resume').style.display='none';
+  writeit(text + '<form><div class=centered>' +
+     '<input style="color:red;font-size:110%" onclick="location.reload()"' +
+     'type="button" value="Play again" /><br>or<br>' +
+     '<input class="custom-button" onclick="self.close()" ' +
+     'type="button" value="Close this tab/window" /><br>' +
+     '<span class="red">This button will only work if your ' +
+     ' browser<br> is not being paranoid about security.</span></p>' +
+     '</div></form>');
+}
+function init()
+{
+  FS.mkdir('/%NAME%');
+  FS.mount(IDBFS, {}, '/%NAME%');
+  FS.chdir('/%NAME%');
+  FS.syncfs(true, init2);
+}
+function init2(err)
+{
+  if (err)
+    { alert("IDBFS error: " + err) }
+  else
+  {
+    gid('startit').style.display = '';
+    gid('gameview').style.display = 'none';
+    conbot = gid('conbot');
+    advtext = gid('advtext');
+    advcom = gid('advcom');
+    gameInfo = advTurn('_INFO_HTML_').split('|');
+    document.title = gameInfo[0];
+    gid('gameid').innerHTML = gameInfo[1];
+    var gameList = advTurn('_LIST_').split('|');
+    var savedGames = gid('saved');
+    var count = 0;
+    var first = 1;
+    if (gameList.length > 0)
+    {
+      for (var i = 0; i < gameList.length; i++)
+      {
+        if (!gameList[i]) continue;
+        gid('youcan').style.display = '';
+        if (gameList[i].charAt(0) == '.')
+        { 
+          gid('resume').style.display = '';
+        }
+        else if (gameInfo[0].trim() != 'Adv770' && gameInfo[0].trim() != 'Cloak')
+        {
+          if (first)
+          {
+            first = 0;
+            savedGames.innerHTML += '<br>&nbsp<br>"' + gameInfo[0] +
+              '" does not support loading a saved game at start, but you ' +
+                'have the following saved games, which can be loaded ' +
+                  'from within the game:';
+          }
+          savedGames.innerHTML += 
+            (count == 0 ? '<br>' : '&nbsp;&nbsp') + 
+              '<b>' + gameList[i] + '</b>';
+          if (++count == 5)
+            count = 0;
+          if (i < gameList.length - 1)
+            savedGames.innerHTML += ', ';
+        }
+        else
+        {
+          if (first)
+          {
+            first = 0; 
+            savedGames.innerHTML += '<br>or load a saved game:';
+          }
+          savedGames.innerHTML += 
+            (count == 0 ? '<br>' : '&nbsp;&nbsp') +
+            '<input type=button class=query ' +
+            "value='" + gameList[i] + "' " + 'onclick="startit(' + 
+            "'_LOAD_" + gameList[i] + "'" + ')">';
+          if (++count == 5)
+            count = 0;
+        }
+      }
+    }
+  }
+}
+function keyDown(ev)
+{
+  var e = ev;
+  var code = (e.charCode || e.keyCode);
+  if (code == 16)
+    return false;
+  if (code == 13)
+  {
+    doit('');
+    return false;
+  }
+  if (code == 38 || code == 187 || code == 107) 
+    code = 1;
+  else if (code == 40 || code == 189 || code == 109)
+    code = -1;
+  else
+    code = 0;
+  if (code != 0)
+    hist(code);
+  return false;
+}
+function hist(step)
+{
+  var h = 2 * hpos;
+  hcom[h] = advcom.value;
+  hpos += step;
+  if (hpos < 0) hpos = 0;
+  if (hpos > hsiz) hpos = hsiz;
+  h = 2 * hpos;
+  if (! hcom[h + 1])
+    hcom[h + 1] = hcom[h];
+  advcom.value = hcom[h];
+  advcom.focus();
+  return;
+}
+function showit(text)
+{
+  var type = text.substr(0, 1);
+  if (type != 'k')
+  {
+    rType = type;
+    writeit(text.substr(1));
+    if (type == 'f')
+      shutit('');
+    else if (started)
+      advcom.focus();
+      FS.syncfs(function(error) {
+        if (error)
+          alert("Error while syncing" +  error);
+      });
+   }
+}
+function doit(cmd)
+{
+  var com = advcom.value;
+  var pars;
+  turn++;
+  hcom[0] = com;
+  var prompt = gid('prompt');
+  if (prompt)
+  {
+    var el = document.createElement('span');
+    var tx = (rType == 'q' || rType == 'm' ||
+              rType == 'r' || rType == 's') ?
+                prompt.innerHTML : '?';
+    if (rType == 'c') tx = '<br>?';
+    el.className = 'query';
+    el.innerHTML = tx + ' ' + com +
+      (rType == 't' ? '<br>&nbsp<br>' : '');
+    prompt.parentNode.replaceChild(el, prompt);
+    el = null;
+  }
+  advcom.value = '';
+  if (com && ! com.match(/^_/))
+  {
+    var i;
+    for (i = 1; i < hcom.length; i += 2)
+    {
+      if (hcom[i])
+      {
+         hcom[i - 1] = hcom[i];
+         hcom[i] = '';
+      }
+    }
+    if (hcom[0] == hcom[2])
+      hcom[0] = '';
+    else
+    {
+      hcom.unshift('');
+      hcom.unshift('');
+      hsiz++;
+    }
+  }
+  hpos = 0;
+  if (cmd) com = cmd
+  else if (started == 0)
+    com = '_START_';
+  showit(advTurn(com));
+  started = 1;
+  var kids = document.getElementsByName('chunk');
+  if (kids.length > moveLimit)
+  {
+    kids[0].parentNode.removeChild(kids[0]);
+    hcom.pop();
+    hcom.pop();
+    hsiz--;
+  }
+}
+function startit(what)
+{
+  gid('startit').style.display = 'none';
+  gid('gameview').style.display = '';
+  gid('advcom').focus();
+  advcom.value = what;
+  doit(what);
+}
+</script>
+<style>
+div.main{max-width:20cm;width:98%; margin:auto}
+.centered{text-align:center}
+.query{color:red}
+.debug{color:blue}
+div.control{position:sticky;position:-webkit-sticky;bottom:0}
+div{background-color:#d0e0ff}
+input.advcom{width:60%;border: 1px inset #666}
+</style>
+</head>
+<body onload="init();" bgcolor="#444">
+<div class=main style='padding:16px 16px 0 16px'>
+<div id=startit style='padding: 0 0 16px 0'>
+<h2 class=centered id=gameid></h2>
+<p>The game can be played entirely from the keyboard, as long as the
+command input field remains in focus. Commands can be submitted by
+pressing the ENTER key (a.k.a. RETURN or GO). Up and down arrow keys
+allow recalling/selecting previous commands. If you wish to stop
+playing and to continue at some other time, it is not necessary to use
+the save command &ndash; just open this page again and you will be offered
+the option of continuing the current game, if there is one. The game runs
+locally on your machine &ndash; there is no network access. All data
+storage relies on your browser's sand-boxed data store.</p>
+</p><p class=centered><span id=youcan style="display:none">You can<br></span>
+<span id=resume style="display:none">
+<input value="Continue your game" class=query
+onclick="startit('_RESUME_')" type="button"> or </span>
+<input id=playit value="Start a new game" class="query" 
+onclick="startit('_START_')" type="button">
+<span id=saved></span>
+</p>
+<p>If you have any problems getting the game working or with the game
+itself, please feel free to drop me a line at <i><b>mla@mipmip.org</b></i>.</p>
+<p class=centered>This JavaScript version of the game is made possible by
+the magic of <b>Emscripten</b><br>
+(<a href="http://kripken.github.io/emscripten-site/"><i>http://kripken.github.io/emscripten-site/</i></a>).
+</div>
+<div id=gameview style='display:none'>
+<div id=advtext></div>
+<div id="conbot"></div>
+  <div class=control>
+    <div style='height:1px;width:100%;background-color:#444'></div>
+    <div style='height:8px;width:100%'></div>
+    <div id=comform style='margin:0;padding:0 0 10px 0'>
+        <span class=query>?&nbsp;</span>
+        <span><input class=advcom id=advcom maxlength=160 type=text
+          onkeydown="keyDown(event)">&nbsp;&nbsp;
+          <input type=button onclick="doit('')" value=Submit>&nbsp;
+          <input type=button onclick="hist(1)" value='&#8593'>&nbsp;
+          <input type=button onclick="hist(-1)" value='&#8595'>
+        </span>
+    </div>
+  </div>
+</div>
+</body></html>

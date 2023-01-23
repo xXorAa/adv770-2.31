@@ -1,0 +1,982 @@
+# Adventure770 -- Copyleft Mike Arnautov 1984-2022.
+#
+# Spill-over random texts. (Only necessary because I made the mistake of
+# mixing some active texts with places and objects definitions. :-(
+#
+TEXT increment VARIOUS.SAPLINGS
+    [The birch saplings look a bit sickly, but the ash ones are clearly
+    thriving. Must be something about the soil../There's not much
+    to say about the saplings. One day they may grow into large 
+    and picturesque trees, but for the moment, they are just saplings/
+    Saplings are juvenile trees. As such they are of even less interest
+    then generic trees are].
+#
+TEXT increment NO.LITTER.PLEASE
+
+    [/A distant voice angrily exclaims: "We do not accept! No, no..."
+    Oh dear, that sounds like George to me!/Ah... Here we go...
+    Into the view marches a short, well muscled, well tanned man of
+    indeterminate age. He is wearing a T-shirt and longish shorts, which
+    show off his tree-like legs, and he is brandishing the torn
+    fertilizer wrapper:
+
+    "We don't do that here! No. Not at all! And how do we deal? We
+    educate! That's five points please. You think I am joking? I
+    am not joking. No!.."
+
+    With that he stuffs the wrapper into a pocket of his shorts, 
+    and stomps off.
+
+    Your bad luck in running into old George there -- he really doesn't
+    like litterbugs. Well, consider yourself educated, and count the
+    experience cheap at the price. Not everybody is so favoured.]
+
+#
+TEXT increment KNOCKER.FIXED
+    [The knocker is firmly fixed to the wall in some manner, and won't
+    come off./Nothing doing. It's firmly attached to a solid stone 
+    wall./You've already tried that!][/// Blockhead!/]
+#
+TEXT increment KNOCKER.RING
+    [The ring is an integral part of the knocker and it doesn't look
+    like it is meant to come out of the lion's mouth/Can't be done, 
+    sorry].
+#
+TEXT STONE.WALL
+    Tower walls are made of massive stone blocks.
+#
+TEXT DRINK.UP
+
+    The giant casts a glance at the bucket and booms: "DRINK UP! HAVE MORE!"
+#
+TEXT NO.MOVE.PEDESTALS
+    The pedestals are too heavy for you to move.
+#
+TEXT FORGET.GRATE
+    _And this time there are no keys or dynamite handy, so forget the grate.
+#
+TEXT NO.HOLD.CLIFF
+    The cliff face is too smooth to provide any useful hand-holds.[/ Not
+    that you need any anyway...]
+#
+TEXT increment WELLHOUSE.NO.DOOR
+    [The building doesn't actually have a door - merely a doorway, that
+    is an opening for entering and exiting. But no door. Nohow.
+    Contrariwise/Look again - there's still no door here, just a 
+    doorway/You forget. No door].
+#
+FRAGMENT cycle NOTHING.DOING.1
+    [# is not something you/You may have some theory on how to 
+    "#/Perhaps I am being simple-minded, but I can't see how the verb
+     #/For all I know, to # a/Well now, let's see... Do I know how to
+     # a/#]
+#
+TEXT cycle NOTHING.DOING.2
+    [ can #. Not in this game anyway/ #", but such an action is beyond 
+    my humble comprehension/ and the object # might go together in a
+    meaningful command/ # may be a splendid idea, in a generic sort of 
+    way, but it is not what you are supposed to be doing/ #? Hmmmm...
+    Nope. Sorry/ #? Nah... Wrong - try something else..].
+
+#
+TEXT cycle NO.VIOLENCE
+    [Please save your destructive impulses for more appropriate
+    occasions!/Smashing things for no good reason is not something we 
+    do around here./If you want mayhem and destruction, please go and
+    play some other game./If somebody told you that it was the done
+    thing for adventurers to smash things, they lied./Do try to conduct
+    yourself in a slightly more civilised manner, please!/Whatever 
+    for?/I have no intention of following gratuitously destructive
+    orders - from you or from anybody else!/You should be ashamed of
+    yourself for even suggesting it.]
+#
+TEXT increment ITS.YOU
+    [Come to think of it, there *is* some resemblance... Maybe it is
+    you, over there./Yes, the figure does look rather like you.]
+#
+TEXT increment NO.FEED.HORSES
+    [Er... May I point out that the horses are merely life-like, not
+    actually alive./There's no point trying to # wrought iron horse
+    cut-outs!/Please get it into your head that the horses are *not*
+    actually alive!/Sigh... Don't even bother to try...]
+#
+TEXT TOWER.THROUGH.GATES
+    The white tower rises over the garden at the end of a path, which
+    runs south from the gates.
+#
+TEXT PATH.THROUGH.GATES
+    The gravel path runs south from the gates, towards the white tower.
+    Two smaller paths disappear into rose bushes to SE and SW.    
+#
+TEXT TOO.FAR.OFF
+    Not from here you don't! And you are probably being silly anyway.
+#
+TEXT FILL.IT.YOU.DUMMY
+    If you are trying to fill the #, why not just say so?
+#
+TEXT NO.GET.SOIL
+    The soil is here simply for the #'s benefit, so don't
+    waste your time on it.
+#
+FRAGMENT SPOON.NO.DUNG
+    Nice to see an inventive adventurer for once! But let's face
+    it, ferrying this heap to the beanstalk one teaspoon at a time,
+    would take ages! Besides, unicorn dung is notoriously corrosive
+    and would eat up the spoon in no time flat.
+#
+FRAGMENT HELMET.NO.DUNG
+    Ingenious. Definitely ingenious. Unfortunately unicorn dung is
+    extremely corrosive. It would simply ruin the helmet. 
+    Better find something else for carrying the dung.
+#
+FRAGMENT CHALICE.NO.DUNG
+    Surely you wouldn't expect anything quite so obvious! For your
+    information, unicorn dung is famously corrosive, and you don't want
+    to spoil that rather nice chalice, cracked as it is.
+#
+TEXT increment NO.RUIN.IT
+    _And if you had in mind using the #, we've already established that
+    it doesn't work.
+#
+TEXT AGAIN.NO.RUIN.IT
+    You tried that already, remember? You'll need to find something
+    else for transporting the dung.
+#
+TEXT increment NO.TRANSLATE.EPNS
+    There is nothing to translate[!/.] The letters EPNS on the spoon 
+    stand for Electro-Plated Nickel Silver[, meaning the spoon is
+    just about worthless. I thought *everybody* knew what EPNS meant!/.]
+#
+FRAGMENT PLATE.NO.DUNG
+    Hmmm... That's not too silly an idea for once, but unicorn dung
+    is mightily corrosive, and as likely as not would eat even through
+    that plate before you manage to navigate all the twisting passages
+    on the way to the beanstalk. So let's not get messy even trying to 
+    get it onto the plate.
+#
+TEXT increment SAFE.KEYS
+    Nothing happens[, which is not entirely surprising. That's one of
+    the safe "skeleton keys". Nothing to do with the gates!/. Surprise!]
+#
+TEXT NO.CHANGE
+    _Just as it did before.
+#
+FRAGMENT VASE.NO.DUNG
+    That's just plain silly. The vase would never survive your attempt
+    to scoop the dung with it.
+#
+TEXT DUNG.INGENUITY
+    _Or did you have in mind using the [helmet? {HELMET.NO.DUNG}/
+    spoon? {SPOON.NO.DUNG}/chalice? {CHALICE.NO.DUNG}/vase?
+    {VASE.NO.DUNG}/plate? {PLATE.NO.DUNG}]
+#
+FRAGMENT increment RUSTY.ONE
+    [I take it you mean the rusty star on the rod.../The rod's star?]_
+#
+TEXT NO.WASH.SEA
+    Better not. Sea water around here may be a bit unhygienic.
+#
+TEXT increment SKULL.NICHE
+    The shallow niche in the rock is quite unremarkable[, now that it
+    no longer holds the skull/].[/ Ignore it.]
+#
+TEXT cycle NOT.DROPPABLE
+    [Eh.../Um.../Pardon me, but/Don't be silly -/Surely,] # is not
+    something one could carry!
+#
+TEXT cycle VERY.SENSIBLE
+   A very [sensible/prudent/commendable] decision, if I may say so.
+#
+TEXT RIGHT.NEXT.TO.YOU
+   The # is right next to you!
+#
+TEXT NO.FERTILISING
+   There's nothing here worth fertilising![/ And you have no fertiliser
+   anyway.]
+#
+TEXT increment RUG.TOO.DIRTY
+   At the sound of the word, the rug twitches its corners and 
+   then[ suddenly/] rolls itself up into a tight tube. Perhaps [it is too 
+   ashamed of being so dirty. Y/y]ou should clean it up a bit, before
+   asking it to fly.
+#
+TEXT increment YOU.PLAYED.BEFORE
+   [I see you have played this game before. Or looked the word up on the
+   Net somewhere. Well, OK...
+
+  //]
+#
+TEXT NO.READ.RUG
+   I don't see anything on the[ rolled up/] rug that one could read.
+#
+TEXT NO.DRINK.FLYING
+    "NO, NO," booms the giant. "NO DRINK AND FLY!"
+#
+FRAGMENT STARSTONE.BOUNCES
+    The starstone becomes curiously unfocused as it falls. It
+#
+TEXT increment ASHES.GONE
+    [There is no sign of that old fire-place here any more. The giant
+    must have tidied it up./I already told you - there's no fire-place
+    with the ashes and the indentation to be seen here any more./Get
+    it into your head, that the fire-place is gone. OK?]
+#
+TEXT cycle NO.SEED
+    The table is empty - there['s/ is really/ is honestly] no bird seed 
+    here[././!]
+#
+TEXT increment NO.DUNES.HERE
+    [Recalling your death-defying stunt in the desert, you confidently
+    leap over the edge of the roof. The tower is much lower than the
+    black spire, so the fall is quite short, and you don't have much
+    time to contemplate the unfortunate absence of deep piles of soft 
+    sand at the base of the tower/You foolishly leap over the roof's 
+    edge, presumably trusting in the truth of the saying "if at first
+    you don't succeed, try and try again!"].
+#
+TEXT STILL.DRY
+    The words on the flask still say "London Dry".
+#
+TEXT STILL.ON.OFF
+   The lettering is pretty fancy, but its message isn't - it simply
+   says "on/off", indicating the intended function of the switch.
+#
+TEXT BEANSTALK.DOWN.THERE
+    The beanstalk is down there, and you are up here. I don't quite see how
+    you are proposing to climb it from here.
+#
+TEXT increment NO.UPSET.GIANT
+    [Better not. The giant could get upset by such disrespect for his
+    hospitality./I strongly advise against offending a giant!]
+#
+TEXT increment ANNOYED.GIANT
+    [That would not be too smart. The giant is quite friendly at the
+    moment, but that's unlikely to last if he decides that you are
+    trying to attack him with the #./Let's not provoke the giant. He
+    could easily squash you, # or no #.]
+#
+TEXT NO.BREAK.ALARM
+    [Oi! Careful with that #!/No.] You might break the alarm[, and you
+    really, but really don't want to do that!/, and I can guarantee you'd
+    regret it later./.]
+#
+TEXT DARK.PLACE
+    It is now quite dark[ - you can't see anything except for some
+    distant dim light to the west/. A small amount of dim light filters
+    in from a passage to the west, but it is too meagre to be of any
+    practical use/, despite some very weak, diffuse light filtering in from
+    the east/ except for a dim glimmer of light to north-west].
+    {DARK.WARNING}
+#
+TEXT CANT.DO.THAT
+    You can't # that!
+#
+TEXT JUST.PATTERN
+    The pattern on the # is just that -- a pattern with no deeper 
+    significance.
+#
+TEXT NO.WORD.PATTERN
+    There are no words to read in the patterns on the #.
+#
+TEXT increment NO.KILL.VAMPIRE
+    [Killing vampires is a complex and chancy business, which requires
+    some specialised equipment - wooden stakes, silver bullets and such
+    like, which in your case you have not got. So let's not waste time
+    on trying/Don't even bother to try. Vampires are notoriously
+    averse to dying].
+#
+TEXT USE.VERBOSE
+
+    By the way, do remember that you can use the VERBOSE command, if
+    you prefer me to describe locations in full every time.
+#
+TEXT increment NO.BURN.THINGS
+    Sorry, [we don't allow adventurers to burn things. It's against
+    fire regulations/burning things is not permitted around here.
+    Besides, you have no source of fire/no burning of things - and
+    that's final].
+
+#
+TEXT increment STARSTONE.NO.IGNITE
+    [Ah, you've heard of people igniting the starstone? Well, for your
+    information, it is not necessary to do so. If you want to do it
+    anyway, you'll have to work out for yourself the where and the how. 
+    It is not my job to advise you on such inessentials!/
+    If you insist on lighting up the starstone, you'll have to figure it
+    out for yourself. Sorry.]
+#
+TEXT YOU.KNOW.HOW
+    You should know by now how to do that!
+#
+TEXT increment NO.TYING
+    [You'll be tied up quite enough in this game, without having to tie
+    or untie things/Tying or untying things is not required in this
+    game][././, honest!/.]
+#
+TEXT increment DANK.WATER
+    [Ugh... Well, if you insist. It doesn't look exactly dignified,
+    but you manage to lick some water from that/Abandoning all
+    pretense of dignity, y/Y][/ou slurp a bit of nasty tasting water
+    from the] trickle on the floor.[ It tastes a bit nasty, but it 
+    probably won't kill you./]
+#
+TEXT increment LEAVE.ALARM.ALONE
+    [Perhaps you should consider the possibility that Ralph Witt had a 
+    purpose in mind, when replacing that red herring that used to adorn 
+    the doorway, with a fire alarm. Damaging it might not be a very smart
+    move/Interfering with such health and safety equipment as fire alarms,
+    is not something I would ever contemplate. And neither should you/I
+    tell you three times: you don't want to damage that fire alarm. And
+    as you should know, what I tell you three times, is true/I thought I'd
+    made myself clear enough. The answer is "NO"].
+#
+TEXT OH.THAT.ALARM
+    Alarm?... Oh, that fire alarm over the door... Er, yes...
+
+#
+TEXT increment GOOD.RUG.IDEA
+    _[Were you hoping to unroll the rug over the quicksand and then
+    dash over it? Unfortunately the rug is too small, and that patch
+    of smooth sand is too large, so it's no go - but it was a good 
+    idea, I'll give you that/And it still does you no good].
+#
+FRAGMENT QUICKSAND.HINT
+    Do you need help with that patch of quicksand?_
+#
+TEXT
+    If I may state the obvious, you need to cross that quicksand. A
+    bridge over it would be handy, wouldn't it? Now, don't take me too
+    literally. I am just trying to suggest an idea. Nobody expects you
+    to start chopping trees in the forest, lugging logs here and 
+    concocting some engineering impossibility of a bridge. You'd be
+    on a completely wrong track there.
+#
+TEXT increment NO.SEE.BUTTERFLY
+    [They should be somewhere here, those blue butterflies, but what
+    with being blue, they would be hard to spot against all that blue
+    sea and sky/You strain your eyes in search of the blue butterflies
+    allegedly wheeling over the cliff tops, but they don't seem
+    to be around at the moment/Nope, no butterflies to be seen. Sorry].
+#
+TEXT NO.BUTTERFLIES
+    [The blue butterflies might be somewhere up there over the cliff
+    tops. You certainly wouldn't be able to see them from down 
+    here!/There may well be some butterflies in all that vegetation,
+    but none to be seen right now.]    
+#
+TEXT RIGHT.NEXT.TO.IT
+    You are right next to it.
+#
+TEXT NO.WASH.PLATE
+    Cleaning up the plate might be a sensible idea, but water is
+    unlikely to help with that greasy grime.
+#
+TEXT cycle TROLL.ZORRO
+    The troll pokes his head from under the bridge, [scowls at the sight
+    of you/gives you a sour grin/mutters something under his breath/spits
+    into the chasm/rolls his eyes], and disappears again.
+
+#
+TEXT increment TOO.PUBLIC
+     [There is not much point in trying to disguise yourself quite
+     so publicly! /]Better find a quiet, private place [for it/for
+     disguising yourself].
+#
+TEXT NO.APPROACH.EDGE
+     [The sapling can be only seen from the edge of the cliff, and t/T]ry as
+     you might to approach the edge[/ of the cliff], the sunstone is
+     refusing to allow movement in that direction.
+#
+TEXT WATERFALL.WALL
+     The wall is just rough rock, except for that door inset in it.
+#
+FRAGMENT cycle IT.WOULD.SEEM
+     [Let's see.../As far as I can see,/It would seem that/I think/It
+     would appear that/I believe] [Y/y/=/=/=/=]ou
+#
+FRAGMENT SAVED.GAMES
+     {IT.WOULD.SEEM} [don't have any saved games. //have ][/just one
+     saved game: /{COUNT.THEM} saved games:_]
+#
+FRAGMENT DESERT.OUTCROP
+    / To the [NW/SW], some kind of low basalt outcrop breaks the monotony of
+     dunes.
+#
+TEXT increment RUG.IS.FLYING
+     [In case you haven't noticed, the rug is flying all by itself.
+     There is no call for you to flap you arms like that./What exactly
+     do you think you *are* doing right now? Just sit quietly, please,
+     and admire my descriptive prose!/That's very kind of you, 
+     trying to help out like that, but please don't bother. All that arm
+     flapping is not doing any good, and you might fall off the rug, if
+     you aren't careful./Sigh... You *ARE* flying, OK?/Yes, yes... If
+     you don't mind, we'll continue just as we are.]
+#
+TEXT increment NO.STEER.RUG
+     [Since neither of us has any idea how to control the flight of
+     a magic rug,/We don't know how to steer the rug, remember? So/][ I
+     suggest you just sit tight, enjoy the view, and hope for the
+     best./=/Just don't bother, OK?]
+#
+TEXT WALL.CORNERS
+     [The corner is formed by the garden wall meeting the wall of the tower.
+     Neither of these looks like offering any chance of climbing/As is 
+     customary, the ][/wall/house][/ corner is formed by two walls meeting
+     each other at an angle. The right angle in this particular case. Hope
+     this satisfies your curiosity].
+#
+TEXT NOOKS.AND.CRANNIES
+     There are plenty of corners, nooks and crannies all over this
+     blessed place. None of them are in themselves of importance to you.
+#
+FRAGMENT WINDROSE.HELP
+     I think you've missed one treasure. Would you like a hint
+     where to look for it?_
+#
+TEXT
+     Desert view from the top of the black spire could be of interest.
+#
+TEXT increment NO.DOWNSTREAM
+     [The water doesn't seem to be flowing anywhere. I expect it must 
+     be draining somehow from this place, but it isn't at all clear
+     where. On the other hand, maybe it isn't draining... Now there's
+     a worrying thought! I suggest we get out of here without undue
+     delay./There is no obvious downstream here to follow. I respectfully
+     suggest we stop piddling about, and get out before the water gets
+     any higher./There ain't no downstream here, matey. And it's best to
+     be getting out of here!/NO DOWNSTREAM HERE. COMPRENDE?/Forget it...]
+#
+TEXT cycle CAUGHT.CLIMBING
+     As you carefully lower yourself over the edge of the roof, several 
+     burly dwarves erupt out of the open trapdoor. [In your haste to
+     duck out of sight, you lose your hold and find yourself falling,
+     falling... and it's a long way down!.../With a triumphant yell of
+     "%Told ya!..%", the one in front swings his axe through the air and
+     let's go. A really professional throw, if you don't mind me saying so.
+     It gets you neatly between the eyes./They waste no time in assessing
+     the situation, and before you have any chance to get out of reach, 
+     they are upon you, yelling loudly and swinging their gleaming axes.]
+
+FRAGMENT SHAFT.HINT
+     Are you trying to avoid drowning in that yuck down there?_
+TEXT
+     The smell, a pungent mixture of sewage and sea water, might
+     offer a clue. Think about it and don't be too hasty in jumping to
+     conclusions.
+#
+TEXT increment NO.GOOD.WAITING
+     [You # for a while/=/=/Don't bother][, enjoying the splendid
+     view while you are at it/], [but nothing much happens, and you soon
+     get pretty bored/and just as before, nothing happens/but soon
+     conclude that it really isn't getting you anywhere/you'd be just
+     wasting a turn].
+#
+TEXT increment NO.SHUT.UP
+     [Shut up? Me? That's not a very polite suggestion! If you are really
+     tired of my company, just say QUIT and be done with it/You are
+     just trying to provoke me, so I'll ignore your lack of manners].
+#
+TEXT increment NOT.DREAMING
+     [Are you perhaps under the impression that you are asleep? I have
+     news for you. You are not./But you are not asleep!]
+#
+TEXT CHEATER
+     You have worked your way up to the elevated rank of a Perfect Cheater.
+
+     Congratulations!
+#
+TEXT IMPERFECT.CHEATER
+     You now have the dubious distinction of being classified as an
+     Imperfect Cheater. Must try harder!
+#
+TEXT YOU.ARE.A.CHEATER
+     That's not a very sporting attitude! You clearly have no regard
+     for the problems this could cause to our scoring system! 
+
+     Sigh... Some people are just plain greedy... Dear oh dear me,
+     I feel in my bones that I'll be in trouble for this...
+     Well, I suppose since you insist, I'll have have to stick to the 
+     standard rules and allow you the usual for finding a run-of-the-mill
+     treasure, so forget any notions of infinite riches. 
+
+     Not that I am very happy about it, you understand. It could land me
+     in some pretty hot water, and no mistake. But as for taking the
+     book with you, that's right out!
+#
+TEXT increment STILL.NO.GET.BOOK
+     I thought I made it quite clear: the book stays here![ Just be
+     content with your selfish reward for finding it!/]
+#
+FRAGMENT CHEATED
+     (?!)
+#
+TEXT assigned TREASURE.5
+     Crowds of dwarves are seated at long tables, set out for a hearty feast.
+     At one end of the chamber, the pointy-tail gentleman is somewhat 
+     unsteadily attempting to conduct a choir of small song-birds, but his
+     efforts are entirely drowned by the dwarves, who bang their beer
+     mugs on the tables and cheer the all-conquering hero.
+
+     [Well, I'll leave you to enjoy yourself. Just a word to the wise: a
+     bit of prideful boasting is just fine with dwarves, but hubris is
+     something else, so I wouldn't be dwelling on your actual score, if
+     I were you.
+
+     Speaking of which/
+     Hello! Here's your lady-friend again, advancing upon you
+     with a radiant smile, the unicorn trailing a short distance behind
+     her. Well, I guess you are going to be otherwise occupied now, so I'll
+     leave you to the merry-making. A word to the wise, though:
+     them unicorns can have a fearful temper, so better watch yourself,
+     if you know what I mean.
+
+     Ah, yes, before I forget]...
+#
+TEXT cycle CANNOT.DO.NONE
+     [There are no commands to #!/OK, I've #ne zero steps by doing nothing
+     at all. Good, eh?/There's nothing left to #./There are no commands
+     to #!/Nothing doing - there's nothing to #.]
+#  
+TEXT NOT.A.VALUE
+     If you want to specify a number of steps to #, then please supply a
+     number!
+#
+FRAGMENT cycle NOTHING.TO.UNDO
+     [That's not possible./No can do -/Sorry,/Can't be 
+     done -] [T/t/=/=]here's nothing left to undo.
+#
+TEXT NOTHING.TO.REDO
+     There's nothing to re-do!
+#
+FRAGMENT FIDDLE.LESS
+     You can't go [back/forward] that far -
+#
+TEXT FIDDLE.VALUE
+    / [/one/$] command[//s] is the best I can do for you!
+
+#
+FRAGMENT cycle FIDDLE.IGNORE
+     [ignore your/pretend that you never issued the/forget the]
+#
+FRAGMENT cycle FIDDLE.OK
+     [Right/Fine/OK/By all means/Very well/Hokey-dokey/Right you are boss]
+#
+TEXT FIDDLE.UNDO
+     {FIDDLE.OK}, let's {FIDDLE.IGNORE} last [//$ ]command[//s].
+
+#
+TEXT FIDDLE.REDO
+     {FIDDLE.OK}. I've reinstated your next [//$ ]command[//s].
+
+#
+TEXT RESULT.IS
+     [/You have relocated//You have relocated][//Y/ and y][//our 
+     possessions have changed/=].
+
+#
+TEXT cycle WE.HAVE.LIGHT
+     [We have light/It is no longer dark/There's light here again]!
+#
+FRAGMENT increment WIMPS.R.US
+     [UNDO is for wimps! *Real* adventurers use SAVE\/RESTORE, or at a
+     pinch, REMEMBER\/RECALL. /]
+#
+TEXT UNDO.TERMS
+    /  1. Penalties remain, even if you UNDO their causes.
+    /  2. Turns counter keeps ticking on, regardless of any UNDOs.
+    /  3. You cannot UNDO beyond a game restore.
+    /  4. Undoing a game save does not get rid of the saved game.
+    /  5. You may specify the number of commands to UNDO.
+    /  6. You can undo an UNDO by typing UNDO UNDO immediately afterwards.
+    /  7. You can REDO a specific number of commands imediately after an UNDO.
+#
+TEXT UNDO.CONDITIONS
+   Before you decide on being a wimp, consider the following:
+
+   {UNDO.TERMS}
+#
+TEXT DOUBTFUL.CASE
+   Hmm... A doubtful case this one. But you know what? I feel like being
+   generous for some reason.
+
+   OK.
+#
+TEXT ANOTHER.DOUBTFUL.CASE
+   Well, that's another doubtful case, but [so be it/I've really had it with
+   arguments over PLOVER being or not being a magic word. I say in *this*
+   game it's allowed]!
+
+   OK.
+#
+FRAGMENT ARE.YOU.A.WIMP?
+   Do you really wish to use UNDO and be considered a wimp?_
+#
+TEXT YOU.R.A.WIMP
+   OK, you are a wimp.
+#
+TEXT UNDO.ALREADY.ON
+   UNDO is already avaliable. No need to switch it on.
+#
+TEXT UNDO.STAYS.ON
+   Just don't use UNDO if you don't want to!
+#
+TEXT increment SKY.ABOVE
+   [You are outdoors. As the song says, "above you only sky" - yes?/
+   Nothing to be seen above, except for the sky.]
+#
+TEXT YOU.DO.IT
+   You {ARG1} the {ARG2}.
+#
+TEXT SHALLOW.STREAMBED
+   To the north, the streambed is filled with the stream, which
+   disappears down the slit with a merry gurgle. To the south it is
+   shallow and quite dry.
+#
+TEXT increment DRY.STREAMBED
+   The dry streambed is mostly dirt, with some protruding bits of
+   rock.[ There used to be some water-worn pebbles in it too, but they
+   got all pinched for souvenirs by passing adventurers./]
+#
+TEXT cycle NO.KICK.IT
+   Kicking #s is [plain silly/liable to cause injury/not going
+   to achieve anything/pretty pointless/not likely to get you very 
+   far/of course a traditional, though quite ineffectual, method of
+   demonstrating the falsity of solipsistic theories of the world, but 
+   I fail to see its relevance to the simple task of exploring a cave 
+   and collecting some treasure].
+#
+TEXT ANCIENT.RIVERBED
+   The ancient river-bed [stretches away/=/] to 
+   the [east/west/south/north][. It/=/ of you] is [partially filled
+   with fine black sand. A few black boulders are scattered around,
+   their smooth, worn surfaces etched by the blowing
+   sands/mostly dark, matt basalt, surprisingly free of sand].
+#
+TEXT NO.GOLD.HERE
+   The walls only look golden. That doesn't make them *made* of
+   gold.[ A visiting geologist once told me that the colour was due to a
+   high content of pyrites in the rock. And no, I don't know what it 
+   means either, and I think it don't signify anyway./]
+#
+TEXT INFINITE.WALL
+   The wall stretches into the darkness, with no visible limits.
+#
+FRAGMENT increment SEWER.EXIT.HINT
+   [What's the problem? You are presentable enough now!
+
+   Or are you just un/Not ]sure how to get out of here?_
+#
+TEXT
+   Let's see... The sewer is down thataway. And clean water is
+   running from thataway. And you don't want to wind up back in the
+   sewer. Hmmm... It's a hard one, isn't it? I do wonder whether you've
+   got the brains to crack this one... 
+#
+TEXT WHICH.WAY.THATAWAY?
+   Sorry, I can't see which way you are pointing. Which way is "thataway"?
+#
+TEXT increment DIRTY.STUFF
+
+   [You'd expect things here to be quite mucky, but it's not that bad.
+   I guess an occasional flood of sea water washes off the 
+   worst./]
+#
+TEXT increment NO.STEAL.KNIVES
+   [I dare say even sleeping dwarves have their knives with them, though
+   none are to be seen. But I do think it would be a mistake to risk
+   waking up the dwarves./No, you might disturb the dwarves][/. And that
+   would *not* be a good idea./!]
+#
+TEXT PINE.SOIL
+   The patch of soil is smooth and highly compacted. It's a wonder 
+   anything could grow in it.
+#
+TEXT increment MOUSE.HOLE
+   [Hole? What hole? Oh, that tiny one over there in the corner? Just
+   a mouse hole, I guess. Not unusual in pantries, I believe. It isn't
+   of any use to you, if that's what you are after/The tiny mouse hole
+   in the corner is far too small to be of any use to you].
+#
+TEXT increment STICKY.WEB
+   The cobweb threads are thick, very strong and[, take my word for 
+   it,/] quite amazingly sticky.[ I strongly advise against tangling
+   up with them!/]
+#
+TEXT assigned STUCK.IN.WEB
+   [You'd be a spider snack in no time at all/We'd have to 
+   get dwarves to cut you out, and... well, you know what dwarves are
+   like once they get a chance to wave their axes about... Stuff happens]!
+#
+TEXT increment NO.HANDLE.WEB
+   No way! [{STUCK.IN.WEB}/The web is far too sticky to be handled safely.]
+#
+TEXT increment EGGS.BEING.MUNCHED
+   [You edge up to the giant to have a look at the mess he is making of
+   the eggs, but he scowls at you rather nastily. You sensibly decide that 
+   prudence being the best part of valour, you don't really need to
+   examine giant's meal./You already tried that. The giant didn't like it,
+   remember?][/ It really would not be a good idea to irritate him./]
+#
+TEXT CASKET.SHELF
+   It's just a small rock shelf, [with/on which] the casket of
+   opals [is resting/used to rest].
+#
+TEXT increment PIT.IS.BOTTOMLESS
+   [Ahem... There is no *sensible* way down here. If you really wish
+   to verify the alleged bottomlessness of the pit, which I certainly
+   don't advise, you can always try jumping./Even if it were possible
+   to climb down that bottomless pit, which it isn't, it would take
+   literally forever, yes? So don't even think of it - you haven't got
+   the time./Aw, just jump in, if you have to!/There's no way down
+   the pit - got that?]
+#
+TEXT WICKED.UNICORN
+   The unicorn's [horn is long and very sharp./hoofs may look delicate,
+   but don't be fooled - they can pack quite a punch!/mane looks really
+   healthy - long and shiny. But the unicorn doesn't look all that
+   tame to me.] Best leave [the beast/=/it] alone!
+#
+TEXT NO.HORIZON
+   Dunes around you block all view of the desert horizon.
+#
+TEXT ASSAY.MARKS
+   The silver assay marks are too small to make out, and they are not
+   in themselves of importance anyway.
+#
+TEXT BEAMS.WOOD
+   Darkened with age. Hard. Nothing more to be said about it.
+#
+TEXT POMMEL.INLAY
+   The word THROWER is inlaid on the sword's pommel.
+#
+TEXT SOLID.STRIPS
+   The iron strips look pretty solid. That's because they are pretty solid.
+#
+TEXT ARMS.TOO.FULL
+   You arms are too full. You'd need a spare hand to remove the #.
+#
+TEXT BEANSTALK.SATED
+    The beanstalk doesn't seem to be hungry any more. And in any case,
+    you are out of fertiliser.
+#
+TEXT increment ITS.A.TRAY
+    Both trays are simply plastic extrusions from the body of the
+    machine, rather than separate components bolted onto it.[ Neither of
+    them has any features worth remarking upon./]
+#
+TEXT increment ITS.A.SLOT
+    You peer into the coin slot, [and see nothing at all. Not sure what 
+    made you think this would be a profitable exercise/but there's still
+    nothing to be seen in there].
+#
+TEXT increment ROD.NO.BEATER
+    [ Or were you intending to use the magic wand? That would not be
+    a good idea. You might break it./]
+#
+TEXT increment TREASURE.NO.BEATER
+    [ If you have some clever notions of using some of your
+    hard-won treasure, forget it. You might damage it, and that
+    would never do/ Treasure items do *not* make suitable rug
+    beaters].
+#
+TEXT cycle NO.BREAK.WALL
+   [Your puny attack would make no impression on the # wall/The #
+   walls are too sturdy for you to make any progress by trying to
+   smash them down/Bashing # walls is a singluarly pointless
+   activity].
+#
+TEXT NO.WALL.CLIMBING
+   Walls around here offer no handholds for climbing.
+#
+TEXT increment STONE.RIVERS
+   [OK, maybe "rivers" is putting it a bit strongly. T/As I said: t]he
+   walls look like solidified, partially overlapping frozen flows of
+   orange stone.[ Please don't feel this fact to have any profound
+   significance. Or a non-profound one, for that matter./]
+#
+TEXT HELLISH.SCENE
+   The bubbling, sulphurous lake, the barren island with its steam
+   geyser - it's a landscape worthy of a medieval image of hell.
+#
+TEXT FLOATING.ASH
+   The volcanic ash flickers in the air, as it falls into the gorge.
+#
+TEXT increment LEAKY.CHALICE
+   You pour the water from your # into the chalice, but it leaks out
+   through the chalice cracks as fast as you can pour it in.[ The net
+   result is one empty #, one empty chalice, and a damp patch on the
+   ground. I guess scooping water from a pool or a stream is the
+   only realistic way of persuading some to stay in the chalice,
+   however briefly./]
+#
+FRAGMENT WITH.CHAMPAGNE?
+   The only suitable liquid to hand appears to be the champagne in the
+   bucket. Do you mean to fill the chalice with that?_
+#
+TEXT POOF.GOES.CHALICE
+   You pour the champagne into the chalice, which suddenly crumbles to
+   dust [in your hand/where it stands]. Oopsie! Who would have thought
+   it was so allergic to alcohol...
+#
+TEXT NOT.HOLDING
+   You are not holding the #!
+#
+TEXT LAMP.SWITCH
+   The lamp switch has the shape of a tiny hemisphere which slides easily
+   between the "on" and the "off" positions under a light push of one's
+   thumb.
+#
+TEXT increment TWO.THUMBS
+   [You have two thumbs, and examining both of them reveals that they are
+   distinctly alike in their thumbness. This is not a fact of any 
+   importance, but you are clearly being very thorough, so I thought
+   I'de better mention the fact, just in case../Examining your thumbs is
+   still as unproductive as ever].
+#
+TEXT increment BATTERIES.INSIDE
+   [The batteries are inside the lamp, and there is no point extracting
+   them just for the sake of satisfying idle curiosity/There's nothing to
+   be gained by getting the batteries out of the lamp].
+#
+TEXT increment BUMPY.LANDING
+   [Ouch! A bit of a bumpy landing there, but fortunately nothing broken./
+   OK... Oooof! Better this time, but still a bit heavy on that landing./
+   Ah, much better! You are getting the hang of it./
+   A small, neat leap and you land as lightly as a feather.../
+   OK.]
+
+#
+TEXT increment PORTCULLIS.IN.THE.WAY
+   The # is too large to be thrown through the portcullis.[ And throwing
+   things here is not a recommended approach anyway./]
+#
+TEXT EGGS.RELOCATE
+   [The nest of golden eggs has vanished!/Done!]
+#
+TEXT NO.DONATE.BLOOD
+   That's a very noble thought, but alas, [we do not have the necessary
+   equipment/in the current circumstances also a remarkably stupid one].
+#
+TEXT increment NEST.RELOCATES
+   The nest of golden eggs has [just vanished from your hands and
+   promptly reappeared in its original place on/translocated to] the
+   ground[!/.]
+#
+TEXT increment SWAG.REMAINS
+   [ 
+  \
+   The dwarf must have carried something! As the smoke dissipates, you can
+   see an object left on the floor where the body was./ Aha! The
+   dwarf was carrying something!/ But something is left behind.../]
+#
+TEXT increment PLEASE.NOT
+   [If I've learned anything in my life, it is that in the long term
+   there is no pleasing people. So "please" as you please, but it won't
+   gain you anything./Real adventurers don't plead for favours. Real
+   adventurers do as has to be done -- if they can work it out, that is./
+   I told you once, and I told you twice! /][//All special pleading is
+   ignored in this game./=/No.][// What I tell you three times is true!/]
+#
+TEXT DARWIN.INVITE
+   The lettering on the turtle's back still says "I'm Darwin - ride me!".
+#
+TEXT cycle BIRD.RUCKUS
+   You wave the rod[ and are rewarded by a cacophonous chorus of
+   indignant protests from the bird cages. This in turn results
+   in much angry hissing from the snake pit. Better be careful
+   or all that ruckus will wake the dwarves at the other end
+   of this room./, thereby again provoking loud protests from the
+   caged birds and a hissy fit from the snakes in the pit. You'd better
+   hope that those dwarves at the other end are as fast asleep as
+   their snores suggest!/ with the predictably noisy response from the
+   birds and the snakes, this time joined by some angry loud grumbles
+   from north-east.
+   
+   Well, now you've gone and done it! Several sleepy looking dwarves
+   stagger into view and on seeing you instantly become very alert. 
+   The next few seconds are a confused blur at the end of which you 
+   are very painfully and very thoroughly dead. I did warn you, didn't I?]
+#
+TEXT increment ROD.SCARES.BIRD
+    You wave the rod, but the only result is an indignant squawk
+    from the cage.[ The bird obviously doesn't care for rods being
+    waved about./]
+#
+TEXT DEAL!
+    It's a deal!
+#
+TEXT increment NO.MELTING.ICE
+    [It would take more heat than you can possibly generate to make any
+    impression on these ice walls. And in any case, i/I]t wouldn't get
+    you anywhere.
+#
+TEXT increment CHALICE.CRACK
+    [Yes, shame about that crack! It/The crack] is not very conspicuous,
+    but just large enough for any liquid contents of the chalice to leak out
+    fairly rapidly.
+#
+TEXT cycle NO.NEED.DUNG
+    [As things stand, you have/You have currently] no use for
+    anything [quite //]so [unappetising/unattractive/smelly/unhygienic/messy].
+#
+TEXT NOT.AT.CLIFF.BASE
+    [Nothing to climb here. /]You are not actually at the cliff's base!
+#
+TEXT increment NOT.LEGAL.TENDER
+    You drop the bag[, luckily missing your foot. Were you hoping for
+    something more? I can't see why. The bag is *FAR* too big to stuff in
+    the coin slot and in any case, pieces of eight are not a legal
+    coinage around here/].
+#
+FRAGMENT COUNT.THEM
+    [no/one/two/three/four/five/six/seven/eight/nine/ten/$]
+#
+TEXT KEEP.IT.SIMPLE
+    I am sorry to be so simple-minded, but when you use words such as
+    "{ARG1}", my mind just goes blank.
+#
+TEXT increment FEEDER.PARTS
+    All parts of the bird table are just rough, grayish, well-weathered
+    wood.[ That includes the {ARG2}./]
+#
+TEXT increment NO.ANATOMY
+    [This is an adventure game, not an anatomy primer. T/
+    In this game t]here is no need to examine or handle body parts[!/.]
+#
+TEXT increment NO.WAKE.DWARVES
+    [I shouldn't go anywhere near those dwarves! It might wake them up
+    with rather unfortunate consequences./A word to the wise: stay
+    away from them dwarves, lest they wake up!]
+#
+TEXT ICE.NICHE
+    The niche is just a small[/, featureless] void melted into the ice 
+    wall. [You cannot see much of it because it is currently almost
+    completely filled by the rock-crystal sculpture of a rather 
+    prosperous looking pig./]
+#
+TEXT DARK.SHAFT
+    The shaft is sloping rather than vertical and it smells rather
+    unpleasantly. You cannot see very far into it, but you could probably
+    climb down some way for a better look.
+#
+TEXT TEETH.IN.PILE
+    You drop the teeth into a neat little pile.
+#
+TEXT RUSTY.PIPE
+    It is a pipe. It is rusty. It has water trickling out of it. 
+    Beyond these bare facts it is of no possible interest
+    to visiting adventurers such as yourself.
+#
+TEXT increment BAD.BASALT
+    [Some types of basalt rocks are easy to climb, but others can be
+    quite impossible to scale. And guess what? The cliff is of that other
+    kind./ As I have explained already, this basalt is not the climbable
+    kind./ Not a chance!]
+#
+TEXT PRE.SAY
+    OK - "{ARG2}".
+#
+TEXT NO.ON.OFF
+    Er... # is not something you can turn on or off!
+#
+#########################################################################

@@ -1,0 +1,7686 @@
+# Adventure770 -- Copyleft Mike Arnautov 1984-2022.
+#
+# Procedures.
+#
+#====================================================================
+#
+proc not.got, thing
+   ifflag thing, object
+      ifhere thing
+         quip not.holding, thing
+      fin
+      quip you.dont.have, thing
+   fin
+   quip hah!
+#
+#=====================================================================
+#
+proc handle.oil
+   ifnear flask, full.of.oil
+      or
+   ifnear bottle, full.of.oil
+      or
+   ifhere oil
+      ifeq status, 1
+         flag status, pls.clarify
+         quip do.what?, oil
+      fin
+      quip hah!
+   fin
+   quip i.dont.see, oil
+#proc handle.oil
+#   ifeq status, 1
+#      ifnear flask, full.of.oil
+#         or
+#      ifnear bottle, full.of.oil
+#         or
+#      ifhere oil
+#         flag status, pls.clarify
+#         quip do.what?, oil
+#      fin
+#      quip i.dont.see, oil
+#   fin
+#   respond get, drop, throw, pour, i.dont.see, arg2
+#   ifeq status, 1
+#      quip hah!
+#   fin
+#
+#=====================================================================
+#
+# NB: Bucket check is complicated by the historical fact that its 
+# water states are not contiguous.
+#
+proc handle.water
+   ifnear bucket
+      and
+   ifge bucket, mostly.full
+      or
+   ifnear bucket, full.of.water
+      or
+   ifnear flask, full.of.water
+      or
+   ifnear bottle, full.of.water
+      or
+   ifflag here, h20.here
+      ifeq status, 1
+         flag status, pls.clarify
+         quip do.what?, arg1
+      fin
+      quip hah!
+   fin
+   quip i.dont.see, water
+#proc handle.water
+#   ifeq status, 1
+#      ifnear flask, full.of.water
+#         or
+#      ifnear bottle, full.of.water
+#         or
+#      ifnear bucket, full.of.water
+#         or
+#      ifflag here, h20.here
+#         flag status, pls.clarify
+#         quip do.what?, arg1
+#      fin
+#      quip i.dont.see, arg1
+#   fin
+#   respond in, get, drop, throw, pour, drink, i.dont.see, arg2
+#   ifeq status, 1
+#      quip hah!
+#   fin
+#
+#=====================================================================
+#
+proc generic.no.do
+   ifeq status, 1
+      or
+   ifflag arg2, object
+      proceed
+   fin
+   ifflag context, arg2.distant
+      and
+      not
+   ifkey look
+      quip too.far.off
+   fin
+   ifflag context, arg2.here
+      respond get, no.pick.up, arg2
+      respond push, pull, nothing
+      respond kill, break, kick, no.violence
+   fin
+   ifany read, translate, fill, empty, lock, unlock, open, close
+      or
+   ifany clean, ride, feed, wear, eat, chew, drink, wake, remove
+      or
+   ifany sip, replace, fix sow, evict, tear, spill
+      ifeq nothing.doing.1, 0
+         say nothing.doing.1, arg2
+         quip nothing.doing.2, arg1
+      else
+         say nothing.doing.1, arg1
+         quip nothing.doing.2, arg2
+      fin
+   fin
+#
+#=====================================================================
+#
+proc bail.out
+#
+# Liquids are special!
+#
+   ifkey oil
+      call handle.oil
+   fin
+   ifkey water
+      call handle.water
+   fin
+#
+# Is he interested in bits of the unicorn?
+#
+   ifany hoofs, horn, mane
+      and
+   ifhere unicorn
+      respond horn, wicked.unicorn, 0
+      respond hoofs, wicked.unicorn, 1
+      respond mane, wicked.unicorn, 2
+   fin
+#
+# Whadayamean "something"?
+#
+   respond something, pardon?
+#
+# Generic ceiling response (specific ones handled elsewhere).
+#
+   ifany ceiling, roof
+      ifflag here, not.in.cave
+         or
+      ifflag here, indoors
+         quip hah!
+      fin
+   fin
+#
+# Yeah, minerals, man!
+#
+   respond minerals, minerals.aplenty
+#
+# Don't look at the sun!
+#
+   ifkey sun
+      ifflag here, not.in.cave
+         and
+         not
+      ifflag here, indoors
+         flag context, arg2.distant
+      fin
+   fin
+#
+# A general comment on wall caves.
+#
+   ifkey wall
+      and
+      not
+   ifflag here, not.in.cave
+      respond climb, no.wall.climbing
+      respond look, nothing.special, wall
+      respond kill, hit, kick, no.break.wall, cave
+      quip hah!
+   fin
+#
+# Is he scared of shadows?
+#
+   ifany shade, shadow
+      and
+   ifflag here, not.in.cave
+      and 
+      not
+   ifinrange here, above.sea, ylem
+      quip ignore.shadows
+   fin
+#
+# There's sand on them beaches!
+#
+   ifkey sand
+      ifnear quicksand
+         or
+      ifinrange here, island, island.ne
+         or
+      ifinrange here, desert.1, river.bed.2
+         or
+      ifinrange here, north.of.spire, west.of.spire
+         or
+      ifinrange here, scree, cliff.base.4
+         or      
+      ifinrange here, sandy.beach, beach.end
+         ifeq status, 1
+            flag status, pls.clarify   # Request clarification
+            quip do.what?, arg1
+         otherwise
+         ifkey get
+            quip no.future.in.it, sand
+         otherwise
+         ifkey look
+            ifnear quicksand
+               describe quicksand
+               quit
+            fin
+            ifinrange here, island, island.ne
+               quip golden.sand
+            fin
+            ifinrange here, sandy.beach, beach.end
+               quip dirty.sand
+            fin
+            quip black.sand   # Only the black desert left!
+         else
+            flush
+            quip hah!
+         fin
+      fin
+   fin
+#
+#  Desert horizon
+#
+   ifflag here, in.desert
+      respond horizon, no.horizon
+   fin
+#
+# Assay marks need special treatment!
+#
+   ifkey marks
+      and
+   ifhave bars
+      respond look, assay.marks
+      flag context, arg2.here
+   fin
+#
+# Dust and dirt are ubiquitous...
+#
+   ifany dust, dirt
+      ifflag here, not.in.cave
+         ifeq status, 1
+            quip no.future.in.it, arg1
+         fin
+         quip no.future.in.it, arg2
+      else
+         quip dirt.and.dust
+      fin
+   fin
+#
+# We also have quite a few corners in the cave.
+#
+   ifkey corner
+      and
+      not
+   ifflag here, not.in.cave
+      quip nooks.and.crannies
+   fin
+#
+# The sygil on the bust!
+#
+   ifkey sygil
+      and
+   ifnear bust
+      ifeq status, 2
+         quip hah!
+      fin
+      flag status, pls.clarify   # Request clarification
+      quip do.what?, arg1
+   fin
+#
+# Remember to allow for rusty things!
+#
+   ifkey rust
+      ifat south.side.chamber, cellar, cellar.view, half.stairs, storeroom
+         or
+      ifat shelves.east, roof, immense.n/s.passages, sw.repository
+         or
+      ifnear rod
+         or
+      ifnear dynamite
+         or 
+      ifnear sheet
+         quip hah!
+      fin
+   fin
+#
+# Only the lamp can be lit.
+#
+   ifkey light
+      and
+   ifgt status, 1
+      and
+      not
+   ifkey lamp
+      quip hah!
+   fin
+#
+# Deal with references to swag!
+#
+   ifkey swag
+      ifis arg1, swag
+         quip no.swag, arg1
+      else
+         quip no.swag, arg2
+      fin
+   fin
+
+#
+# Deal with hands, legs, etc...
+#
+   respond leg, legs no.anatomy
+#
+# Interact with Moorcock fans!
+#
+   respond elric, elric.lives
+   respond jerry, elric.preferred
+#
+# Deal with some fakes
+#
+   ifflag context, arg2.here
+      respond foliage, dull.stuff, foliage
+      respond cobwebs, dull.stuff, cobwebs
+   fin
+#
+# Now for some more generalised processing...
+#
+   ifeq status, 1   
+      ifflag arg1, object
+         and
+      ifnear arg1
+         ifflag arg1, mortal
+            quip what.about.them, arg1
+         else
+            flag  status, pls.clarify   # Request clarification
+            quip do.what?, arg1
+         fin
+      fin
+      ifinrange arg1, first.clarify, last.clarify
+            or
+         ifkey say
+         flag  status, pls.clarify   # Request clarification
+         quip could.you.clarify?
+      fin
+      ifinrange arg1, first.travel, last.travel
+         quip dont.know.the.way
+      fin
+      ifinrange arg1, first.pseudo, first.general
+         and
+         not
+      ifflag context, arg2.here
+         and
+         not
+      ifflag context, arg2.distant
+         quip i.dont.see, arg1
+      else
+         quip nocomprende.verb, arg1
+      fin
+   otherwise
+   ifkey look
+      ifkey daylight
+         and
+      ifflag here, not.in.cave
+         quip plenty.about, daylight
+      fin
+      ifkey space
+         and
+      ifflag here, not.in.cave
+         and
+         not
+      ifflag here, indoors
+         quip plenty.about, space
+      fin
+   fin
+   respond thumbs, hah!
+   ifeq status, 2
+      and
+   ifflag arg2, object
+      ifflag context, arg2.here
+         ifany kick, break, kill
+            quip no.violence
+         fin
+         quip what?
+      fin
+      ifkey water
+         ifflag here, h20.here
+            quip water.is.for.drinking
+         fin
+      otherwise
+      ifkey treasure
+         ifkey get
+            quip no.treasure, 0
+         fin
+         respond drop, no.treasure, 1
+      otherwise
+      ifkey all
+         ifkey get
+            quip no.all, 0
+         fin
+         respond drop, no.all, 1
+      fin
+     ifnear arg2
+         or
+      ifflag context, arg2.here
+         or
+      ifflag context, arg2.distant
+         call generic.no.do
+         say dunno.hao, arg1
+         quip such.a.thing, arg2
+      otherwise
+      ifflag arg2, seen
+         or
+      ifflag arg2, feature
+         or
+      ifflag arg2, mortal
+         or
+      ifkey plant
+         quip i.dont.see, arg2
+      else
+         quip no.understand    # Fake it!
+      fin
+   fin
+   ifflag arg2, place
+      ifkey island
+         quip i.dont.see, arg2
+      fin
+   fin
+   ifis arg2, wave
+      quip i.see.no.plural, wave
+   fin
+   ifinrange arg2, first.pseudo, last.pseudo
+      respond you, dont.get.personal
+      respond me, hah!
+      ifany hit, rock, ground
+         say hah!
+      otherwise
+      ifany wall, ceiling, roof
+         and
+         not
+      ifflag here, not.in.cave
+         quip hah!
+      else
+         ifinrange arg2, first.pseudo, first.general
+            ifflag context, arg2.here
+               or
+            ifflag context, arg2.distant
+               call generic.no.do
+               quip hah!
+            else
+               say i.dont.see, arg2
+            fin
+         else
+            ifkey sky
+               ifflag here, not.in.cave
+                  and
+                  not
+               ifflag here, indoors
+               else
+                  quip i.dont.see, sky
+               fin
+            fin            
+            call generic.no.do
+            say dunno.hao, arg1
+            say such.a.thing, arg2
+         fin
+      fin
+   else
+      say no.understand
+   fin
+   quit
+#
+#=====================================================================
+#
+proc vessel.contents
+   local contents
+#
+   eval contents, vessel
+   ifeq contents, full.of.water
+      or
+   ifge bucket, mostly.full
+      lda result, water
+   else
+      ifeq contents, full.of.oil
+         lda result, oil
+      else
+         ifeq contents, full.of.champagne
+            lda result, champagne
+         else
+            ifeq contents, dung
+               lda result, dung
+            else
+               set result, none
+            fin
+         fin
+      fin
+   fin
+   lda obj.ptr, water
+   add obj.ptr, contents
+#
+#=====================================================================
+#
+proc dispose.liquid
+   ifeq vessel, none
+      quip error
+   fin
+   call vessel.contents
+   ifis result, champagne
+      ifnear giant
+         quip no.upset.giant
+      fin
+      say waste.of.champagne
+   fin
+   deposit vessel, emptied
+   ifis vessel, flask
+   else
+      flag drop.here, damp
+   fin
+   ifeq silence, true
+      set silence, false
+      proceed
+   fin
+   say pour.liquid.1, result
+   say pour.liquid.2, vessel
+   ifis vessel, flask
+      quip blank
+   else
+      flag drop.here, damp
+      ifeq drop.here, here
+         quip, pour.liquid.3
+      else
+         quip blank
+      fin
+   fin
+#
+#=====================================================================
+#
+proc find.water, abort
+   ifhave bucket
+      ifeq bucket, full.of.water
+         or
+      ifge bucket, mostly.full
+         lda vessel, bucket
+         proceed
+      fin
+   fin
+   ifhave bottle, full.of.water
+      lda vessel, bottle
+      proceed
+   fin
+   ifhave flask, full.of.water
+      lda vessel, flask
+      proceed
+   fin
+   ifhere bucket
+      ifeq bucket, full.of.water
+         or
+      ifge bucket, mostly.full
+         lda vessel, bucket
+         proceed
+      fin
+   fin
+   ifhere bottle, full.of.water
+      lda vessel, bottle
+      proceed
+   fin
+   ifhere flask, full.of.water
+      lda vessel, flask
+      proceed
+   fin
+   ifeq abort, true
+      quip you.dont.have, water
+   fin
+   set vessel, none
+#
+#=====================================================================
+#
+proc water.beanstalk
+   ifeq vessel, none
+      call find.water, true
+   fin
+   ifnear beanstalk
+      quip beanstalk.not.thirsty
+   fin
+   deposit vessel, emptied
+   ifis vessel, flask
+      quip not.enough.water, flask
+   fin
+   say you.pour, water
+   say from.your, vessel
+   ifeq plant, gigantic
+      set plant, stunted
+      flag plant2, feature
+      say plant.shrivels
+   else
+      ifeq plant grown
+         set plant, gigantic
+         say plant.gigantic
+      else
+         set plant, grown
+         say plant.grown
+      fin
+      unflag plant2, feature
+   fin
+   set plant2, plant
+   say blank
+   quip plant
+#
+#=====================================================================
+#
+proc feed.beanstalk
+   local qualifier
+#
+   ifnear plant
+      quip plant.not.hungry
+   fin
+   ifnear beanstalk, gigantic
+      quip beanstalk.sated
+   fin
+   ifhave bucket, full.of.dung
+      or
+   ifhave packet
+   else
+      quip no.food.for.it
+   fin
+   ifhave packet
+      and
+      not
+   ifany bucket, dung
+      ifeq packet, stupe.gro
+         or
+      ifany open, tear
+      else
+         say got.fertiliser
+      fin   
+      apport packet, ylem
+      get wrapper
+      set qualifier, use.fertiliser
+   else
+      set bucket, dirtied
+      apport unicorn, ylem
+      set last.hintable, 0
+      set qualifier, use.dung
+   fin
+   set last.hintable, 0
+#   ifhave bucket, full.of.dung
+#      and
+#      not
+#   ifkey packet
+#      set bucket, dirtied
+#      apport unicorn, ylem
+#      set last.hintable, 0
+#      set qualifier, use.dung
+#   else
+#      ifhave packet
+#         ifeq packet, stupe.gro
+#            or
+#         ifkey packet
+#         else
+#            say got.fertiliser
+#         fin
+#         apport packet, ylem
+#         get wrapper
+#         set qualifier, use.fertiliser
+#      else
+#         quip no.food.for.it
+#      fin
+#   fin
+   ifeq beanstalk, stunted
+      say beanstalk.grown, qualifier
+      set beanstalk, grown
+      set wide.beach, grown
+      set beach.end, grown
+      set sandy.beach, grown
+      set hint.time, 0
+   else
+      unflag beanstalk.bottom, hintable
+      say beanstalk.gigantic, qualifier
+      set beanstalk, gigantic
+      set beanstalk2, gigantic
+      unflag beanstalk2, feature
+      set wide.beach, gigantic
+      set beach.end, gigantic
+      set sandy.beach, gigantic
+   fin
+   say blank
+   quip beanstalk
+#
+#=====================================================================
+#
+proc check.wearing
+   local state
+   local all.loop
+#
+   ifdoall
+      set all.loop, 1
+   fin
+   ifflag arg2, wearable
+      eval state, arg2
+      ifgt state, not.worn
+         ifeq all.loop, 0
+            say remove.it.first, arg2
+         fin
+         quit
+      fin
+   fin
+#
+#=====================================================================
+#
+proc find.oil, abort
+   ifhave bottle, full.of.oil
+      lda vessel, bottle
+      proceed
+   fin
+   ifhave flask, full.of.oil
+      lda vessel, flask
+      proceed
+   fin
+   ifhere bottle, full.of.oil
+      lda vessel, bottle
+      proceed
+   fin
+   ifhere flask, full.of.oil
+      lda vessel, flask
+      proceed
+   fin
+   ifeq abort, true
+      quip you.dont.have, oil
+   fin
+   set vessel, none
+#
+#=====================================================================
+#
+proc oil.door
+   ifeq vessel, none
+      call find.oil, true
+   fin
+   deposit vessel, emptied
+   ifis vessel flask
+   else
+      flag here, damp
+   fin
+   ifeq door, rusty
+      set door, oiled
+      quip door.now.oiled
+   fin
+   say you.do, oil
+   quip it.is, door
+#
+#=====================================================================
+#
+proc water.door
+   ifeq vessel, none
+      call find.water, true
+   fin
+   deposit vessel, emptied
+   ifis vessel, flask
+   else
+      flag here, damp
+   fin
+   ifeq door, oiled
+      set door, rusty
+      quip hinges.rust
+   fin
+   say you.do, water
+   quip it.is, door
+#
+#=====================================================================
+#
+proc is.it.dark?
+   ifnear lamp
+      and
+   ifgt lamp, switched.off
+      or
+   ifflag here, lit
+      or
+   ifnear starstone, iridescent
+      flag status, light.here
+      proceed
+   fin
+   ifinrange here, storeroom, shelves.west
+      ifeq trapdoor, opened
+         or
+      ifeq door2, opened
+         flag status, light.here
+         proceed
+      fin
+   fin      
+   unflag status, light.here
+#
+#=====================================================================
+#
+proc zap.bird
+   apport bird, ylem
+   ifloc snake, mtking
+      flag mtking, hintable
+   fin
+#
+#=====================================================================
+#
+proc water! quantity, message, container
+   local base.factor
+#
+   ifgt water, sated
+      respond sip, sip.water, 1
+      say urrp
+   else
+      respond sip, sip.water, 0
+      ifeq container, none
+         say message, container
+      fin
+   fin
+   ifis container, bucket
+      and
+   iflt bucket, quarter.full
+      ifeq water, sated
+         say drink.bucket
+      fin
+      ifeq bucket, full.of.water
+         set bucket, mostly.full
+      else
+         add bucket, 1
+      fin
+   otherwise
+   ifgt container, none
+      say message, container
+      deposit container, emptied
+   fin
+   random base.factor, base.thirst
+   add thirst.time, quantity
+   add thirst.time, base.factor
+   ifgt thirst.time, min.thirst
+      set thirst.time, min.thirst
+   fin
+   set water, sated                # Cure his thirst
+   quit
+#
+#=====================================================================
+#
+proc make.a.dwarf?
+   iflt dwarfcount, 9
+      and
+   chance 50
+      add dwarfcount, 1      # Resurrect a dwarf
+   fin
+   ifloc food, limbo
+      and
+      not
+   ifat pantry
+      apport food, pantry     # Make him carry food to pantry
+      unflag food, seen       # Prevent dwarves stealing it too soon
+   fin
+#
+#=====================================================================
+#
+proc choose.swag
+   local swag.count
+   local percent
+   local counter
+   local obj.ptr
+#
+   set swag.to.drop, 0
+   iflt dwarfcount, 1
+      proceed
+   fin
+   set swag.count, 0
+   itobj obj.ptr, storeroom, portable
+      add swag.count, 1
+   fin
+   set percent, swag.count
+   multiply percent, 100
+   divide percent, dwarfcount
+   multiply percent, dwarf
+   chance percent
+      random counter, swag.count
+      add counter, 1
+      itobj obj.ptr, storeroom, portable
+         sub counter, 1
+         ifeq counter, 0
+            set swag.to.drop, obj.ptr
+            proceed
+         fin
+      fin
+   fin
+#
+#=====================================================================
+#
+proc kill.some.dwarves, kill.all
+   local dummy
+#
+   iterate dummy, 1, 10       # Dummy counter
+      ifne kill.all, -1       # Unless just chasing them away
+         ifeq swag.to.drop, 0
+            call choose.swag
+         fin
+         ifgt swag.to.drop, 0
+            apport swag.to.drop, here
+            ifflag status, light.here
+               append swag.remains
+               say swag.to.drop
+            fin
+            set swag.to.drop, 0
+         fin
+         sub dwarfcount, 1
+      fin
+      sub dwarf, 1
+      ifeq dwarf, 0
+         apport dwarf, limbo
+         proceed
+      fin
+      ifne kill.all, 0
+         and
+      ifgt dwarf, 0
+      else                    # Just one to kill
+         proceed
+      fin
+   fin
+#
+#=====================================================================
+#
+proc wizard.evicts
+   local where
+   local junk
+   local obj.ptr
+#
+   random where, 5
+   ifeq where, 0
+      lda where, mazea.42
+   otherwise
+   ifeq where, 1
+      lda where, mazea.82
+   otherwise
+   ifeq where, 2
+      lda where, mists
+   otherwise
+   ifeq where, 3
+      lda where, junction
+   else
+      lda where division.in.passage
+   fin
+   itobj obj.ptr, here, portable
+      ifis obj.ptr, orb
+      else
+         apport obj.ptr, where
+         set junk, 1
+      fin
+   fin
+   ifloc orb, cellar
+      apport fake.orb, cellar.view
+   fin
+   say be.off, junk
+   ifeq junk, 0
+      move mists
+   fin
+   flush
+   move where
+#
+#=====================================================================
+#
+proc hide.things
+   local obj.ptr
+#
+   itobj obj.ptr, here, portable
+      apport obj.ptr, hidey.hole
+   fin
+#
+#=====================================================================
+#
+proc dump.things, where
+   local obj.ptr
+#
+   itobj obj.ptr, hidey.hole
+      apport obj.ptr, where
+      ifis obj.ptr, cage, bird
+         and
+      ifeq bird, caged
+         ifloc cage, hidey.hole
+            apport cage, where
+         else
+            apport bird, where
+         fin
+      fin
+   fin
+#
+#=====================================================================
+#
+proc nothing.big message, qualifier
+   local obj.ptr
+#
+   itobj obj.ptr, inhand, big
+      quip message, qualifier
+   fin
+#
+#=====================================================================
+#
+proc throw.it.at.orb
+   local text.ptr
+   local got.it
+   ifeq status, 1
+      default inhand
+      ifeq status, 1
+         proceed
+      fin
+   fin
+   ifflag arg2, big
+      quip portcullis.in.the.way, arg2
+   fin
+   lda text.ptr, down.the.drain
+   chance 10
+      and
+   ifloc orb, cellar
+      lda text.ptr, hit.orb
+      apport orb, sea.view
+      apport fake.orb, ylem
+      set got.it, 1
+   fin
+   say the.it, arg2
+   ifflag arg2, plural
+      say text.ptr, 1
+   else
+      say text.ptr, 0
+   fin
+   apport arg2, sea.view
+   ifgt got.it, 0
+      say lucky.shot
+   fin
+   quit
+#
+#=====================================================================
+#
+proc house.inventory, testing
+   local missing.rose
+   local obj.ptr
+#
+   set result,0
+   ifeq stage, mirror.world
+      proceed
+   fin
+   set missing.rose, 0
+   unflag starstone, valued   # To avoid problems - starstones being funny
+   unflag ring, valued        # in case he is wearing it
+   itobj obj.ptr, valued
+      ifloc obj.ptr, building     # If where it should be...
+            or
+      ifloc obj.ptr, ylem         # ... or gone for good
+            or
+      ifis obj.ptr, book
+      else
+         ifis obj.ptr, windrose
+            and
+            not
+         ifflag windrose, seen
+            set missing.rose, 1
+         else
+            flag ring, valued
+            flag starstone, valued
+            proceed
+        fin
+      fin
+   fin
+   flag ring, valued
+   flag starstone, valued
+   ifloc starstone, building  # We allow it to be in the building, 
+      or                      # Even though it does not score there
+   ifloc starstone, stupendous.view
+      or
+   ifloc starstone, ylem
+   else
+      proceed
+   fin
+   ifhave ring               # Ring temporarily non-valuable
+      or                     # in order to allow the adventurer
+   ifloc ring, building      # to lug it around with him.
+      or                     # Seems like everybody does this!
+   ifloc ring, ylem          # He won't score for it, of course...
+      ifeq missing.rose, 0
+         ifeq testing, 0
+            set stage, closing.soon       # Cave may close!
+         else
+            set result, closing.soon
+         fin
+      else
+         set result, -1      # Just the windrose missing.
+      fin
+   fin
+#
+#=====================================================================
+#
+# Visions are processed in the reverse order, so that the vision
+# corresponding to the lowest unsolved problem is set. Yes, I 
+# could have done it forward too, using "otherwise", but that didn't
+# exist at the time of coding, and I didn't fancy 20 offset levels.
+#
+proc visions
+#
+   set orb.vision, vanilla.vision         # Set default "no vision" value
+   call house.inventory, 1
+   ifeq result, closing.soon
+      set orb.vision, repository.vision
+   else
+      set orb.vision, hoard.vision
+   fin
+   ifflag windrose, seen
+   else
+      set orb.vision, rose.vision
+   fin
+   ifflag gates, special1
+   else
+      set orb.vision, gates.vision
+   fin
+   ifflag storeroom, been.here
+   else
+      set orb.vision, tower.vision
+   fin
+   ifflag temple, been.here
+   else
+      set orb.vision, temple.vision
+   fin
+   ifflag island, been.here
+   else
+      set orb.vision, island.vision
+   fin
+   ifflag rug, special1
+   else
+      set orb.vision, rug.vision
+   fin
+   ifflag beater, seen
+   else
+      set orb.vision, sapling.vision
+   fin
+   ifflag sunstone, special2
+   else
+      set orb.vision, spire.vision
+   fin
+   ifflag rug, valued
+   else
+      set orb.vision, fez.vision
+   fin
+   ifeq beanstalk, gigantic
+   else
+      set orb.vision, beanstalk.vision
+   fin
+   ifflag unicorn, seen
+   else
+      set orb.vision, chalice.vision
+   fin
+   ifeq dungeon, flagstone.moved
+   else
+      set orb.vision, dungeon.vision
+   fin
+   ifflag fangs, seen
+   else
+      set orb.vision, vampire.vision
+   fin
+   ifflag bucket, seen
+   else
+      set orb.vision, picnic.vision
+   fin
+   ifflag crown, seen
+   else
+      set orb.vision, crown.vision
+   fin
+   ifflag sceptre, seen
+   else
+      set orb.vision, skeleton.vision
+   fin
+   ifeq statue, 0
+      set orb.vision, statue.vision
+   fin
+   ifflag faces, been.here
+   else
+      set orb.vision, gorge.vision
+   fin
+   ifflag ring, seen
+   else
+      set orb.vision, ring.vision
+   fin
+   ifloc ogre, glassy
+      set orb.vision, ogre.vision
+   fin
+   ifeq sword, in.stone
+      set orb.vision, sword.vision
+   fin
+   ifloc spider, web.maze.4
+      set orb.vision, spider.vision
+   fin
+   ifflag web.maze.1, been.here
+   else
+      set orb.vision, giant.vision
+   fin
+   ifflag narrow.corridor, been.here
+   else
+      set orb.vision, plant.vision
+   fin
+   ifeq orb.vision, shown.vision
+      chance 75
+         set orb.vision, vanilla.vision
+      else
+         randomise orb.vision, 0
+         iflt orb.vision, shown.vision
+            set orb.vision, vanilla.vision
+         fin
+      fin
+   else
+      set shown.vision, orb.vision
+   fin
+   quip orb.vision
+#
+#=====================================================================
+#
+proc owl.flies.off
+   local offset
+#
+   flag owl, seen
+   ifflag status, light.here
+      say disturbed.owl
+      say blank
+   fin
+   set place.ptr, here
+   choose offset, 1, 3
+   chance 50
+      add place.ptr, offset
+   else
+      sub place.ptr, offset
+   fin
+   ifflag place.ptr, lit
+      or
+   ifflag place.ptr, not.in.cave
+      or
+   ifflag place.ptr, no.dwarf
+      set place.ptr, last.owl  # Failed - send him to last location
+   fin
+   apport owl, place.ptr
+   ifnear owl
+      ifat vestry
+         apport owl, chapel
+      else
+         apport owl, vestry
+      fin
+   fin
+#
+#=====================================================================
+#
+proc owl.comes, no.chance, some.chance
+   local obj.ptr
+   local mistake
+#
+   ifnear chasm
+      and
+   ifgt chasm, 0
+      or
+   ifnear spider
+   else
+      chance no.chance
+         quip you.hoot
+         proceed
+      fin
+      chance some.chance
+         quip distant.owl
+         proceed
+      fin
+   fin
+   ifflag status, light.here
+      quip owl.bounces
+   else
+      ifnear spider
+         say owl.kills
+         apport spider, ylem
+         set stuck.in.web, 1
+         set no.handle.web, 0
+         set web, with.documents
+         flag documents, seen
+         ifeq axe, by.spider
+            set axe, ground.state
+         fin
+      otherwise
+      ifnear chasm
+         and
+      ifgt chasm, 0
+         itobj obj.ptr, inhand, heavy
+            quip no.owl.express
+         fin 
+         ifat sw.of.chasm
+            goto ne.of.chasm
+         else
+            goto sw.of.chasm
+         fin
+         quip owl.express
+      otherwise
+      ifnear dwarf
+         say owl.kills
+         call kill.some.dwarves, 1
+      otherwise
+      ifnear dragon, on.rug
+         apport owl, ylem
+         ifflag documents, seen
+            quip owl.v.dragon, 0
+         else
+            quip owl.v.dragon, 1
+         fin
+      else
+         say owl.arrives
+      fin
+      locate last.owl, owl    # Remember where he came from
+      apport owl, here
+   fin
+   quit
+#
+#=====================================================================
+#
+proc catlogic
+   local temp.val
+   local current.exit
+   local north.dir
+   local forward.exit
+   local place.ptr
+#
+# Catacombs logic goes like this:
+#
+   ifeq status, 1
+      or
+   ifinrange arg1, first.direction, last.compass.point
+      set direction, arg1
+   else
+      set direction, arg2
+   fin
+   set temp.val, here
+   lda place.ptr, catacombs.entrance
+   sub temp.val, place.ptr
+   lda current.exit, c.exit
+   add current.exit, temp.val
+   eval forward.exit, current.exit
+   lda north.dir, north
+   ifeq forward.exit, none
+      flag here, hintable
+      set forward.exit, direction
+      deposit current.exit, direction
+      set cat.factor, 0
+   else
+      add forward.exit, cat.factor
+      sub forward.exit, 8
+      iflt forward.exit, north.dir
+         add forward.exit, 8
+      fin
+   fin
+   ifeq forward.exit, direction
+      ifat catacombs.exit
+         add cat.factor, 1
+         ifeq cat.factor, 8
+            set cat.factor, 0
+         fin
+         move fake.y2
+      fin
+      set place.ptr, here
+      add place.ptr, 1
+      move place.ptr
+   otherwise
+   ifat catacombs.13
+      ifeq portal.exit, none
+         set portal.exit, direction
+         set temp.val, direction
+      else
+         set temp.val, portal.exit
+         add temp.val, cat.factor
+         sub temp.val, 9
+         iflt temp.val, north.dir
+            add temp.val, 8
+         fin
+         iflt temp.val, north.dir # Will happen if cat.factor is 0 and ...
+            add temp.val, 8       # ... portal.exit is north
+         fin
+      fin
+      ifeq temp.val, direction
+         move catacombs.portal
+      else
+         move catacombs.12
+      fin
+   otherwise
+   ifat catacombs.entrance
+      set rest.exit, forward.exit
+      sub rest.exit, 4
+      iflt rest.exit, north.dir
+         add rest.exit, 8
+      fin
+      ifeq rest.exit, direction
+         set rest.exit, forward.exit
+         set rest.area, rest.exit
+         sub rest.area, north.dir
+         move rest.area
+      else
+         move catacombs.entrance
+      fin
+   else
+      set place.ptr, here
+      sub place.ptr, 1
+      move place.ptr
+   fin
+#
+#=====================================================================
+#
+proc chalice.power
+   local temp.val
+#
+   set chalice, 0
+   ifat building, streampit, pantry, rest.area
+      quip chalice.no.magic
+   fin
+   choose temp.val, 600, 750
+   add thirst.time, temp.val
+   ifgt thirst.time, min.thirst
+      set thirst.time, min.thirst
+   fin
+   set water, sated
+   ifflag admin, quest.accepted
+      quip chalice.now.drunk
+   fin
+   set temp.val, 0
+   ifflag admin, chalice.used
+      say help.after.all?
+      set temp.val, 2
+   otherwise
+   ifflag ring, seen
+      say chalice.magic, 1
+   else
+      say chalice.magic, 0
+   fin
+   set what.ring, 1
+   flag admin, chalice.used
+   set context q.chalice
+   quip chalice.query, temp.val
+#
+#=====================================================================
+#
+proc all.quiet?
+   ifflag status, light.here
+      and
+      not
+   ifdoall
+   else                         # If dark or in a doall loop, then no
+      set result, 1             # cameos, mutters, spontaneous hints etc
+      proceed
+   fin
+   set result, 0
+   ifflag status, ticked        # If clock has not ticked
+      or
+   ifgt stage, adventuring      # Mustn't be in endgame
+      or
+   ifflag here, not.in.cave     # Only in the cave
+      or
+   ifflag here, no.dwarf        # And only in dwarf-accessable areas
+      or
+   ifflag here, one.exit        # And only where there are several exits
+      or
+   ifflag pirate, special1      # And not if the pirate is chasing you
+      or
+   ifnear dwarf                 # And not if you're being plagued by dwarves
+      or
+   ifnear dragon                # Or near the dragon (living or dead) 
+      or
+   ifnear troll                 # Or arguing with the troll
+      or
+   ifnear snake                 # Or trying to get past the snake
+      or
+   ifnear ogre                  # Or facing the ogre
+      or
+   ifnear vampire               # Or talking to vampire
+      or
+   ifnear quicksand             # Or trying to cross the quicksand
+      or
+   ifgt  foobar, 0              # Or trying to do something to the eggs
+      or
+   ifflag crown, freebie        # Or listening to voices
+      set result, 1             # No spontaneous stuff, please!
+   fin
+#
+#=====================================================================
+#
+proc mutter.stuff
+   sub mutter.time, 1
+   iflt mutter.time, 1
+      and
+   chance 25
+      ifflag here, lit
+         proceed
+      fin
+      call all.quiet?
+      ifeq result, 1
+         proceed
+      fin
+      set orc.mutter, -1
+      ifflag orc.mutter, chalice.mutter
+         or
+      chance 75
+         or
+      ifloc chalice, ylem
+         or
+      ifflag ring, seen
+      else
+         set orc.mutter, chalice.mutter
+         flag orc.mutter, chalice.mutter
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, eggs.mutter
+            or
+         chance 75
+            or
+         ifflag web.maze.1, been.here
+         else
+            set orc.mutter, eggs.mutter
+            flag orc.mutter, eggs.mutter
+         fin
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, sword.mutter
+            or
+         chance 75
+            or
+         ifflag mushroom, seen
+            or
+            not
+         ifflag sword, seen
+         else
+            set orc.mutter, sword.mutter
+            flag orc.mutter, sword.mutter
+         fin
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, lava.mutter
+            or
+         chance 75
+            or
+         ifflag faces, been.here
+            or
+            not
+         ifflag fork, been.here
+         else
+            set orc.mutter, lava.mutter
+            flag orc.mutter, lava.mutter
+         fin
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, pentagram.mutter
+            or
+         chance 75
+            or
+            not
+         ifflag pentagram, been.here
+            or
+         ifflag djinn, special1       # Freed him from pentagram
+         else
+            set orc.mutter, pentagram.mutter
+            flag orc.mutter, pentagram.mutter
+         fin
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, orb.mutter
+            or
+         chance 75
+            or
+         ifflag faces, been.here
+         else
+            set orc.mutter, orb.mutter
+            flag orc.mutter, orb.mutter
+         fin
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, starstone.mutter
+            or
+         chance 75
+            or
+         ifloc starstone, stupendous.view
+            or
+            not
+         ifflag starstone, seen
+         else
+            set orc.mutter, starstone.mutter
+            flag orc.mutter, starstone.mutter
+         fin
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, catacombs.mutter
+            or
+         chance 75
+            or
+         ifflag insafe, been.here
+            or
+            not
+         ifflag catacombs.entrance, been.here
+         else
+            set orc.mutter, catacombs.mutter
+            flag orc.mutter, catacombs.mutter
+         fin
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, noside.mutter
+            or
+         chance 75
+            or
+            not
+         ifflag lair, been.here
+         else
+            set orc.mutter, noside.mutter
+            flag orc.mutter, noside.mutter
+         fin
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, plover.mutter
+            or
+         chance 75
+            or
+         ifflag pyramid, seen
+            or
+         ifflag plover, hintable
+         else
+            set orc.mutter, plover.mutter
+            flag orc.mutter, plover.mutter
+         fin
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, keys.mutter
+            or
+         chance 75
+            or
+            not
+         ifflag sceptre, seen
+         else
+            set orc.mutter, keys.mutter
+            flag orc.mutter, keys.mutter
+         fin
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, sewers.mutter
+            or
+         chance 75
+            or
+            not
+         ifflag low.room, been.here
+            or
+         ifflag culvert, been.here
+         else
+            set orc.mutter, sewers.mutter
+            flag orc.mutter, sewers.mutter
+         fin
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, scree.mutter
+            or
+         chance 75
+            or 
+            not
+         ifflag basalt.shelf, been.here
+            or
+         ifflag basalt.shelf.2, been.here
+         else
+            set orc.mutter, scree.mutter
+            flag orc.mutter, scree.mutter
+         fin
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, skull.mutter
+            or
+         chance 75
+            or 
+            not
+         ifflag skull, seen
+         else
+            ifloc skull, cave.5
+               or
+            ifloc skull, cave.6
+               or
+            ifloc skull, cave.7
+               set orc.mutter, skull.mutter
+               flag orc.mutter, skull.mutter
+            fin
+         fin
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, unicorn.mutter
+            or
+         chance 75
+            or 
+            not
+         ifflag unicorn, seen
+            or
+         ifloc unicorn, ylem
+            or
+         ifflag dung, seen
+         else
+            set orc.mutter, unicorn.mutter
+            flag orc.mutter, unicorn.mutter
+         fin
+      fin            
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, valuers.mutter
+            or
+         chance 75
+            or
+         ifflag rug, valued
+         else
+            set orc.mutter, valuers.mutter
+            flag orc.mutter, valuers.mutter
+         fin
+      fin
+      ifeq orc.mutter, -1
+         and
+      ifflag catacombs.lobby, been.here
+         and
+         not
+      ifat catacombs.lobby
+         ifflag orc.mutter, catacombs2.mutter
+            or
+         chance 75
+            or
+         ifflag catacombs.portal, been.here
+         else
+            set orc.mutter, catacombs2.mutter
+            flag orc.mutter, catacombs2.mutter
+         fin
+      fin
+      ifeq orc.mutter, -1
+         ifflag orc.mutter, no.mutter
+            or
+         chance 85
+         else
+           set orc.mutter, no.mutter
+           flag orc.mutter, no.mutter
+         fin
+      fin
+      choose mutter.time, 20, 100
+      ifgt orc.mutter, -1
+         set mutters, orc.mutter
+         say mutters
+         add mutter.time, 100
+      fin
+   fin
+#
+#=====================================================================
+#
+proc lost.in.mist
+   chance 20
+      move sword.place
+   fin
+   move swirling.mist
+#
+#=====================================================================
+#
+proc read.rock
+   set sword.place, 1
+   quip zorton.info
+#
+#=====================================================================
+#
+proc get.swag
+   local obj.ptr
+   local place.ptr
+   local temp.ptr
+   local swag.count
+   local percent
+   local count
+   local loot
+   local state
+#
+   iflt dwarfcount, 1
+      proceed
+   fin
+   set loot, 0
+   flag starstone, big    # Temporarily - to avoid unnecessary complications
+   flag food big          # We don't want dwarves stealing food!
+   ifloc magazines, witts.end
+      flag magazines, big # Don't steal them from the LLP location
+   fin
+   itobj obj.ptr, portable
+      ifflag obj.ptr, big
+      else
+         unflag obj.ptr, stealable
+         ifflag obj.ptr, seen
+            and
+            not
+         ifflag obj.ptr, big
+            and
+            not
+         ifnear obj.ptr
+            and
+            not
+         ifis obj.ptr, axe                # Have mercy on bad fighters!
+            set state, 1
+            ifflag obj.ptr, unstable
+               eval state, obj.ptr       
+            fin
+            ifgt state, 0                 # Leave alone things in the
+               locate place.ptr, obj.ptr  # unstable state
+               ifflag place.ptr, not.in.cave
+                  or
+               ifflag place.ptr, no.dwarf
+                  or
+               ifflag place.ptr, in.maze  # And have mercy on maze-mappers!
+               else
+                  add loot, 1
+                  flag obj.ptr, stealable # Potential loot!
+               fin
+            fin
+         fin
+      fin
+   fin
+   unflag starstone, big                  # Shrink it again
+   unflag magazines, big
+   unflag food, big
+   ifgt loot, 0
+      random count, loot
+      add count, 1
+      itobj temp.ptr, stealable           # Consider only potential swag
+         add swag.count, 1
+         ifgt count, 0
+            sub count, 1
+            ifeq count, 0                 # This is the object to be pinched
+               locate place.ptr, temp.ptr # Stash away its location...
+               set obj.ptr, temp.ptr      # ... and its identity
+            fin
+         fin
+      fin
+      set percent, swag.count
+      multiply percent, 100
+      divide percent, dwarfcount
+      multiply percent, dwarf
+      chance percent                      # It's a swap!
+         ifflag obj.ptr, valued
+         else
+            proceed
+         fin
+         random count, swag.count
+         add count, 1
+         itobj temp.ptr, storeroom
+            ifgt count, 0
+               sub count, 1
+               ifeq count, 0
+                  ifflag temp.ptr, valued
+                     or
+                  ifeq temp.ptr, swag.to.drop
+                     proceed
+                  fin
+                  apport temp.ptr, place.ptr
+               fin
+            fin
+         fin
+      fin
+      apport obj.ptr, storeroom
+   fin
+#
+#=====================================================================
+#
+proc swap.directions
+   local loc.ptr
+   local end.ptr
+#
+   ifeq status, 1
+      set loc.ptr, arg1
+   else
+      set loc.ptr, arg2
+   fin
+   ifinrange loc.ptr, first.direction, last.compass.point
+      add loc.ptr, 4
+      lda end.ptr, last.compass.point
+      ifge loc.ptr, end.ptr
+         sub loc.ptr, 8
+      fin
+      ifeq status, 1
+         set arg1, loc.ptr
+      else
+         set arg2, loc.ptr
+      fin
+   fin
+#
+#=====================================================================
+#
+proc start.cheating
+   local obj.ptr
+   local is.here
+#
+   ifkey rod
+      and
+   ifat sw.repository
+      proceed
+   fin
+   set faked.object, 0
+   ifeq status, 1
+      set obj.ptr, arg1
+   else
+      set obj.ptr, arg2
+   fin
+   ifflag obj.ptr, object
+      and
+   ifflag obj.ptr, portable
+      and
+      not
+   ifflag obj.ptr, valued
+      or
+   ifis obj.ptr, beanstalk
+      or
+   ifis obj.ptr, snake
+      or
+   ifis obj.ptr, dwarf
+   else
+      proceed
+   fin
+   ifnear obj.ptr
+      and
+      not
+   ifkey get   
+      proceed
+   fin
+   ifkey djinn
+      proceed
+   fin
+   ifnear obj.ptr
+      proceed
+   fin
+   set is.here, 0
+   ifflag obj.ptr, special1
+      and
+   ifat ne.repository
+      set is.here, 1
+   fin
+   ifflag obj.ptr, special2
+      and
+   ifat sw.repository
+      set is.here, 1
+   fin
+   ifnear arg2
+      or
+   ifeq is.here, 1
+   else
+      quip i.dont.see, arg2
+   fin
+   ifkey get
+      respond dwarf, hah!
+      ifflag arg2, plural
+         set already.had.one, 1
+      else
+         set already.had.one, 0
+      fin
+      ifflag obj.ptr, stealable
+         quip already.had.one, arg2
+      fin
+      iflt invct, strength
+         flag obj.ptr, stealable
+      else
+         flush
+         quip arms.are.full
+      fin
+   fin
+   set faked.object, obj.ptr
+   apport obj.ptr, here             # Cheat!
+#
+#=====================================================================
+#
+proc stop.cheating
+   local obj.ptr
+#
+   ifeq faked.object, 0
+   else
+      ifeq status, 1
+         set obj.ptr, arg1
+      else
+         set obj.ptr, arg2
+      fin
+      ifflag obj.ptr, object
+      else
+         proceed
+      fin
+      ifhave obj.ptr
+      else
+         apport faked.object, storeroom
+      fin
+   fin
+#
+#=====================================================================
+#
+proc debris.quip
+   ifat debris, sea.view, arched.corridor.1, blasted.repository
+      quip no.future.in.it, debris
+   fin
+   quip where?, debris
+#
+#=====================================================================
+#
+proc get.score
+   local obj.ptr
+   local temp.val
+#
+   set scorex, 0
+   set maxscore, 0
+   itobj obj.ptr, valued
+      ifloc obj.ptr, building
+         or
+      ifloc obj.ptr, nowhere       # Stuff from house shifted there
+         ifis obj.ptr, skull       # on escape from nowhere
+            or
+         ifis obj.ptr, bust
+            eval temp.val, obj.ptr
+            ifge temp.val, damaged     # Damaged is worth less
+               add scorex, 9
+            else
+               add scorex, full.value
+            fin
+         else
+            add scorex, full.value
+         fin
+      else
+         ifflag obj.ptr, seen
+            add scorex, seen.value
+         fin
+      fin
+      add maxscore, full.value
+   fin
+#
+# Now deal with the exceptions. The starstone, being schizoid, only
+# scores if its 2nd location is in the building.
+#
+   ifloc starstone, building
+      add scorex, seen.value
+      sub scorex, full.value
+   otherwise
+   ifloc starstone, stupendous.view  # This being the location immediately
+      add scorex, full.value         # preceding the building
+      sub scorex, seen.value
+   fin
+#
+# The tusk only becomes valued once it is dropped in the building.
+#
+   ifflag tusk, valued
+   else
+      add maxscore, full.value
+   fin
+#
+# The rug is only valued after being valued.
+#
+   ifflag rug, valued
+   else
+      add maxscore, full.value
+   fin
+#
+# Give him points for the coin. Note that since the coin cannot appear
+# unless the coins (plural) are spent, there is no need to up 'maxscore'.
+#
+   ifflag drachma, seen
+      add scorex, 3
+      ifloc drachma, building
+         or
+      ifloc obolus, building
+         add scorex, 3
+      fin
+   fin
+#
+# The famous Last Lousy Point! But to be kind to players, we allow
+# the magazines being dropped in the house too.
+#
+   ifloc magazines, building
+      or
+   ifloc magazines, nowhere      # Well, they *were* in the house!
+      or
+   ifloc magazines, witts.end
+      add scorex, 1
+   fin
+   add maxscore, 1               # Maximal mags credit
+#
+# Have we been busted?
+#
+   ifflag book, valued
+      add scorex, seen.value
+   fin
+#
+# Reward him for visiting special places...
+#
+   iflt stage, in.repository
+      ifflag road, been.here
+         add scorex, 1
+      fin
+      ifflag east.of.building, been.here
+         add scorex, 2
+      fin
+      ifflag stupendous.view, been.here
+         add scorex, 2
+      fin
+      ifflag debris, been.here
+         or
+      ifflag y2, been.here
+         add scorex, 8
+      fin
+      ifflag south.of.spire, been.here
+         add scorex, 8
+      fin
+      ifflag clearing, been.here
+         add scorex, 8
+      fin
+      ifflag lair, been.here
+         add scorex, 8
+      fin
+      ifflag rocky.beach, been.here
+         add scorex, 8
+      fin
+      ifflag faces, been.here
+         add scorex, 8
+      fin
+      ifflag audience, been.here
+         add scorex, 8
+      fin
+      ifflag djinn, special1
+         add scorex, 8
+      fin
+      ifflag beater, seen # Been to the ledge! (Can't test for been.here)
+         add scorex, 10
+      fin
+      ifflag island, been.here
+         add scorex, 10
+      fin
+      ifflag garden.nw, been.here
+         add scorex, 10
+      fin
+   else
+      add scorex, 99     # He couldn't have got here otherwise
+   fin
+   add maxscore, 99      # Maximal exploration credit
+#
+   ifgt stage, adventuring
+      set temp.val, stage
+      sub temp.val, adventuring
+      mult temp.val, closure.credit
+      add scorex, temp.val
+   fin
+   add maxscore, 96      # Maximal stage credit
+   set result, maxscore
+#
+   ifeq codex.reward, excessive
+      add  scorex, seen.value
+      add result, seen.value
+   fin
+#
+   set actual.score, scorex
+   ifne codex.reward, awarded
+      set losses, deaths
+      mult losses, 10
+      add losses, penalties
+      sub actual.score, losses
+   fin
+   iflt actual.score, 0
+      set actual.score, 0
+   fin
+#
+#=====================================================================
+#
+proc finis
+   call get.score
+   say you.scored, scorex
+   ifgt scorex, 770
+      say cheated
+   fin
+   ifgt losses, 0
+      say less.penalties, losses
+      say strictly.speaking, actual.score
+   fin
+   say maximal.score, maxscore
+   say move.count, turns
+   say blank
+   set result, scorex
+   sub result, losses
+   iflt actual.score, 50
+      say amateur
+      sub result, 50
+   otherwise
+   iflt actual.score, 150
+      say novice
+      sub result, 150
+   otherwise
+   iflt actual.score, 250
+      say apprentice
+      sub result, 250
+   otherwise
+   iflt actual.score, 350
+      say experienced
+      sub result, 350
+   otherwise
+   iflt actual.score, 450
+      say seasoned
+      sub result, 450
+   otherwise
+   iflt actual.score, 550
+      say junior.master
+      sub result, 550
+   otherwise
+   iflt actual.score, 650
+      say master.adventurer
+      sub result, 650
+   otherwise
+   iflt actual.score, 750
+      say senior.master
+      sub result, 750
+   otherwise
+   iflt actual.score, 770
+      say grandmaster
+      sub result, 770
+   otherwise
+   ifeq actual.score, 770
+      say champion
+      set result, 0
+   otherwise
+   iflt actual.score, 777
+      say imperfect.cheater
+      set result, 0
+   else
+      say cheater
+      set result 0
+   fin
+   say blank
+   mult result, -1
+   ifgt result, 0
+      ifeq result, 1
+         say only.need.one.point
+      else
+         say points.needed, result
+      fin
+   fin
+   say blank
+   stop
+#
+#=====================================================================
+#
+proc coroner
+   flush
+   say blank
+   unflag admin, nomagic                # Reset magic-inhibit mode
+   unflag admin, ticker                 # Clear once-per-move
+   unflag starstone, special1           # Forget we remarked on it
+   ifeq starstone, darkened          # If it has been activated...
+      set starstone, iridescent      # ... it should light up
+   fin
+   ifat swirling.mist, plain.2       # Objects are lost forever in
+      goto ylem                      # mist and in fog
+   fin
+   set blob, 0                       # Reset blob
+   apport blob, limbo                # and get rid of him
+   ifloc goblins, ylem
+   else
+      apport goblins, limbo          # Get rid of goblins, if around
+   fin
+   ifeq basilisk, twitching          # Adjust the basilisk so that
+      set basilisk, snoring          # he gets viewed from the south
+   else                              # as he should - whether he's
+      ifeq basilisk, petrified.to.south    # petrified or not...
+         set basilisk, petrified
+      fin
+   fin
+   ifgt crown, dormant
+      set crown, dormant
+   fin
+   ifeq safe, unlocked    # Has he died in the safe?
+      set safe, locked
+      set password, 0     # Invalidate password
+      unflag safe, special1  # Prime safe again
+   fin
+   add deaths, 1
+   ifgt stage, closing.soon
+      ifeq stage, exits.barred
+         say dead.&.closed
+      else
+         sub deaths, 1    # Don't charge for dying in repository
+      fin
+      call finis
+   fin
+   set water, sated                # Cure his thirst
+   choose thirst.time, 600, 700
+   set context, q.reincarnate
+   quip you.are.dead
+#
+#=====================================================================
+#
+proc rod.special.stuff
+   set it.is, 0
+   ifkey get
+      ifhere rod
+         proceed
+      fin
+      ifhave dynamite
+         quip you.have.it, arg2
+      fin
+      ifnear dynamite
+      else
+         ifat sw.repository
+            ifflag dynamite, seen
+               quip already.had.one, arg2
+            fin
+         else
+            proceed
+         fin
+      fin
+      flag dynamite, seen
+      iflt invct, strength
+         ifflag dynamite, stealable
+         else
+            flag dynamite, stealable
+            set it.is, 1
+         fin
+         get dynamite
+         set faked.object, 0
+         say you.do, arg1
+         ifeq dynamite, 0
+            quip it.is, rod
+         else
+            quip it.is, arg2
+         fin
+      fin
+      flush
+      quip arms.are.full
+   fin
+   ifany drop, throw
+      ifhave rod
+         set faked.object, 0
+         proceed
+      fin
+      ifhave dynamite
+         drop dynamite
+         say you.do, arg1
+         ifeq dynamite,0
+            quip it.is, rod
+         else
+            quip it.is, arg2
+         fin
+      fin
+      quip you.dont.have, arg2
+   fin
+   ifkey wave
+      ifhave rod
+         or
+      ifhave dynamite
+         ifat sw.repository
+            say bird.ruckus
+            ifeq bird.ruckus, 0  # Cycled through!
+               call coroner
+            fin
+            quit
+         else
+            quip nothing
+         fin
+      fin
+      quip you.dont.have, arg2
+   fin
+   ifkey look
+      ifnear rod
+         and
+      ifflag rod, stealable
+         and
+         not
+      ifhave dynamite
+         or
+      ifhave rod
+         quip nothing.special, arg2
+      otherwise
+      ifnear dynamite
+         quip rod.is.dynamite, 0
+      otherwise
+      ifat ne.repository
+         quip bundle.of.rods
+      otherwise
+      ifat sw.repository
+         quip rod.is.dynamite, 1
+      fin
+   else
+      quip rod.fiddling
+   fin
+#
+#=====================================================================
+#
+proc oyster.message
+   ifeq stage, in.repository
+   else
+      quip cant.read.it, oyster
+   fin
+   ifhave oyster
+   else
+      quip oyster.is.bare
+   fin
+   ifflag oyster, big        # Read before?
+      quip same.as.before, inscription
+   fin
+   say oyster.is.hint, hint.cost
+   set context, q.oyster
+   quip read.oyster?
+#
+#=====================================================================
+#
+proc phog                    # Control fog and glow in fog
+   ifinrange here, plain.1, plain.3
+   else
+      proceed                # Only bother if we are at plain.2!
+   fin
+   random plain.2, 8         # Change color of fog
+   unflag plain.2, lit       # Switch off local lighting
+   call is.it.dark?          # Check for artificial light sources
+   flag plain.2, lit         # Restore local lighting
+   ifflag status, light.here # Do we have light?
+      set glow, 0            # Switch glow off
+   else
+      randomise glow, 1      # Move the glow around
+   fin
+   flag status, light.here   # Recall the natural local illumination
+#
+#=====================================================================
+#
+proc alarm.stuff
+   local t.flag
+   local nont.flag
+   local temp.val
+#
+   sub alarm, 1
+   set temp.val, 0
+   ifflag admin, fire.out
+      or
+   ifgt alarm, 8
+   else
+      iflt alarm, 5
+         or
+      chance 20
+         or
+      ifat tower.upper.landing
+         set temp.val, 1
+      fin
+   fin
+   ifgt temp.val, 0
+      flag admin, fire.out
+      say alarm.cancelled
+      ifinrange here, tower.base, dwarves.quarters
+         ifat tower.roof
+            and 
+         ifeq trapdoor, closed
+            proceed
+         fin
+         say better.get.out.of.here
+         ifflag status, moved
+            say blank
+         fin
+      fin
+   otherwise
+   ifeq alarm, 1
+      set tower.top.window, 0    # Angry voices back on.
+      ifat tower.roof
+         and
+      ifeq trapdoor, closed
+         say door.bangs
+         set door2, closed
+         set tower.upper.landing, closed
+         proceed
+      fin
+      ifat top.of.chapel
+         set door2, closed
+         say dwarf.stares
+         proceed
+      fin
+      ifinrange here, tower.base, dwarves.quarters
+#
+# Dwarves appropriate the valuables.
+#
+         set t.flag, 0
+         set nont.flag, 0
+         ifat storeroom, shelves.east, shelves.west, tower.roof
+            lda place.ptr, storeroom
+         else
+            lda place.ptr, top.of.chapel
+         fin
+         itobj obj.ptr, inhand
+            ifflag obj.ptr, wearable
+               and
+            ifeq obj.ptr, worn
+            else
+               ifflag obj.ptr, valued
+                  set t.flag, 2
+                  apport obj.ptr, storeroom
+               else
+                  set nont.flag, 1
+                  apport obj.ptr, place.ptr
+               fin
+            fin
+         fin
+#
+# But not the thurible!
+#
+         locate place.ptr, thurible
+         ifinrange place.ptr, storeroom, dwarves.quarters
+            or
+         ifinrange place.ptr, garden.n, garden.se
+            apport thurible, road
+         fin
+         say blank
+#
+         ifat tower.base
+            add t.flag, nont.flag
+            set door2, closed
+            say caught.base, t.flag
+            move top.of.chapel
+         fin
+#
+         ifat dwarves.quarters
+            say dwarves.return, 0
+         otherwise
+         ifat tower.roof
+            say caught.roof
+         otherwise
+         ifat storeroom
+            ifeq door2, opened
+               say caught.storeroom, 0
+            else
+               say caught.storeroom, 1
+            fin
+         otherwise
+         ifat shelves.east, shelves.west
+            ifeq trapdoor, closed
+               say dwarves.return, 1
+            else
+               say dwarves.return, 2
+            fin
+         else
+            say caught.on.stairs
+         fin
+         say blank
+         set door2, closed
+         set tower.upper.landing, closed
+         call coroner
+      fin
+   fin
+#
+#=====================================================================
+#
+proc sneaks.die
+   ifflag status, light.here
+   else
+      say sneaky.crunch
+      call coroner
+   fin
+#
+#=====================================================================
+#
+proc goblin.check
+   ifnear goblins
+      ifeq goblins, 6
+         call coroner
+      fin
+      add goblins, 1
+   fin
+#
+#=====================================================================
+#
+proc here.you.can.see
+   local obj.ptr
+   local single
+   local count
+#
+   set result 0
+   itobj obj.ptr, here
+      ifis obj.ptr, glow
+         next
+      fin
+      flag obj.ptr, seen
+      ifflag obj.ptr, feature
+      else
+         add count, 1
+         ifeq count, 1
+            set single, obj.ptr
+            say blank
+         fin
+      fin
+      flag obj.ptr, seen
+      ifflag obj.ptr, valued
+      else
+         ifis obj.ptr, dwarf
+            or
+         ifis obj.ptr, giant
+         else
+            say obj.ptr
+            add result, 1
+         fin
+      fin
+   fin
+   itobj obj.ptr, here, valued
+      say obj.ptr
+   fin
+   ifhere dwarf
+      say dwarf
+   fin
+   ifhere giant
+      say giant
+   fin
+   ifeq count, 1
+      set it, single
+   fin
+   ifnear starstone, iridescent
+      flag starstone, special1   # Note we've seen it lit!
+   fin
+#
+   ifat sea.view
+      and
+   ifgt result, 0
+      say dirty.stuff, result
+   fin
+#
+#=====================================================================
+#
+proc list.dunes, dune.count
+   local mask
+   local counter
+   local dir
+   local locval
+#
+   set mask, 1
+   set result, 0
+   eval locval, here
+   ifeq locval, 0
+      proceed
+   fin
+   iterate counter, 1, 8
+      eval locval, here
+      intersect locval, mask
+      ifne locval, 0
+         add result, 1
+         ifgt dune.count, 0
+            ifeq result, 1
+               set dir.sep, 0
+            otherwise
+            ifeq result, dune.count
+               set dir.sep, 2
+            else
+               set dir.sep, 1
+            fin
+            say dir.sep, dir
+         fin
+      fin
+      add dir, 1
+      add mask, mask
+   fin
+#
+#=====================================================================
+#
+proc special.view
+   local temp.val
+   local desert.offset
+#
+      not
+   ifflag status, brief.display
+      and
+      not
+   ifflag status, terse.display
+      or
+   ifkey look
+      ifinrange here, desert.1, desert.last
+         and
+         not
+      ifis here, rocky.desert
+         ifat desert.3, desert.4, desert.8, desert.13, desert.16
+            set temp.val, 0
+         else
+            set temp.val, 1
+         fin
+         call list.dunes, 0
+         ifgt result, 0
+            add temp.val, 2
+         fin
+         append dune.types, temp.val
+         ifat desert.11, desert.19
+            say desert.outcrop, 0
+         fin
+         ifat desert.18
+            say desert.outcrop, 1
+         fin         
+         ifinrange here, desert.12, desert.last
+            set desert.offset, here
+            lda temp.val, desert.1
+            sub desert.offset, temp.val
+            ifat desert.12, desert.13, desert.14, desert.18, desert.19
+               say tall.black.spire, desert.offset
+            else
+               say massive.black.spire, desert.offset
+            fin
+         fin
+         chance 50
+            and
+            not
+         ifkey look
+            say ferocious.wind
+         fin
+      fin
+      ifflag here, in.desert
+         or
+      ifinrange here, north.of.spire, south.of.spire
+         or
+      ifat rocky.desert
+         ifkey look
+            and
+            not
+         ifat west.of.spire
+            say cliff.over.desert
+         else
+            say blank
+         fin
+         unflag here, been.here
+      otherwise
+      ifat spire.nearly.up, spire
+         say cliff.over.spire
+      otherwise
+      ifat pit
+         and
+      ifeq mists, steps.present
+         say rough.steps
+      fin
+   fin
+   ifflag here, damp
+      say ground.is.damp
+   fin
+#
+#=====================================================================
+#
+proc fishy.stuff
+      not
+   ifhere alarm
+      and
+   ifeq something.fishy, 4
+      set top.of.chapel, 1
+      say blank
+      describe alarm
+      apport alarm, here
+      flag alarm, seen
+      set alarm, 1
+   fin
+#
+#=====================================================================
+#
+proc describe.here, mode
+   ifat above.sea
+      proceed
+   fin
+   ifkey look
+      or
+   ifeq mode, long
+      describe here
+   else
+      say here
+   fin
+   ifinrange here, forest.1, dark.forest-1
+      and
+      not
+   ifat path
+      eval temp.ptr, here
+      ifeq temp.ptr, 0      # Exclude forest path!
+         say blank
+         say in.forest
+      fin
+   otherwise
+   ifat dark.forest
+      and 
+      not
+   ifflag dark.forest, special
+      flag dark.forest, special
+      say forest.poem
+   fin
+   call special.view
+   ifat top.of.chapel
+      call fishy.stuff
+   fin
+   call here.you.can.see
+   ifhave bear
+      say bear.follows
+   fin
+   call goblin.check
+#
+#=====================================================================
+#
+proc get.cage
+   ifnear cage
+      ifge invct, strength
+         say arms.are.full
+         flush
+         quit
+      fin
+      ifhave cage
+         quip you.have.it, cage
+      fin
+      get cage
+      say you.do, arg1
+      ifeq bird, caged
+         get bird
+         ifge stage, in.repository
+            flag bird, stealable   # For repository handling
+            flag cage, stealable   # Ditto
+         fin
+         quip cage.with.bird
+      fin
+      quip it.is, arg2
+   fin
+#
+#=====================================================================
+#
+proc get.bird
+   ifnear bird
+      ifhave bird
+         quip you.have.it, bird
+      fin
+      ifeq bird, caged
+         call get.cage
+      fin
+      ifnear cage
+         ifhave rod
+            quip bird.is.scared
+         fin
+         ifflag quips, trusting.bird
+         else
+            quip bird.distrustful
+         fin
+         unflag bird.chamber, hintable
+         ifhave cage
+            get bird
+         fin
+         set bird, caged
+         quip you.catch.bird
+      fin
+      quip need.cage
+   fin
+#
+#=====================================================================
+#
+proc get.knife
+   ifhere dwarf
+      ifflag dwarf, big
+         quip no.disarm.dwarf, dwarf
+      fin
+      quip knives.go.poof
+   fin
+#
+#=====================================================================
+#
+proc get.orb
+   ifhere orb
+      iflt invct, strength
+         get orb
+         apport fake.orb, ylem
+         quip you.do.it
+      fin
+      flush
+      quip arms.are.full
+   fin
+#
+#=====================================================================
+#
+proc get.starstone
+   local ret.val
+#
+   ifnear starstone
+      and
+   iflt invct, strength
+      and
+      not
+   ifhave starstone
+      ifeq starstone, 0
+         set starstone, 1
+         get starstone
+         quip got.starstone
+      fin
+      ifloc starstone, here
+         ifdoall    # Check for a "do all" loop
+            quip no.get.all.starstone
+         fin
+         quip no.get.starstone
+      fin
+   fin
+#
+#=====================================================================
+#
+proc drop.starstone
+   ifhave starstone
+      ifne drop.here, here
+         and
+      ifis drop.here, beanstalk.bottom
+         lda drop.here, beach.end
+      fin
+      apport starstone, drop.here
+      unflag starstone, special1
+      ifgt starstone, quiescent
+         or
+      ifat lair
+         set starstone, iridescent
+         ifat lair
+            say starstone.ignites!
+            ifflag status, light.here
+               set result, 0
+            else
+               flag status, light.here
+               set result, 1
+            fin
+         else
+            ifne drop.here, here
+               ifnear starstone    # Has it looped back?
+                  set starstone, darkened
+               fin
+               ifinrange here, above.abyss, above.volcano
+                  say starstone.lights.up, 1
+                  quip drop.abyss, 0
+               else
+                  say starstone.lights.up, 2 
+               fin
+            else
+               say starstone.lights.up, 0
+               ifflag status, light.here
+               else
+                  flag status, light.here
+                  flag status, moved
+                  say blank
+               fin
+            fin
+            quip blank
+         fin
+         ifnear owl
+            call owl.flies.off
+         fin
+         ifeq result, 1           # Was dark...
+            say blank
+            call describe.here, default
+         fin
+      else
+         ifne drop.here, here
+            ifinrange here, above.abyss, above.volcano
+               say starstone.bounces
+               quip drop.abyss, 0
+            fin
+         else
+            set drop.here, none
+         fin
+         ifflag status, light.here
+            quip starstone.falls, drop.here
+         else
+            quip dark.starstone
+         fin
+      fin
+      ifat cellar
+         call wizard.evicts
+      fin
+      ifeq drop.here, here
+         quit
+      fin
+      ifeq throw.it, true
+         say it.is, starstone
+         quip drop.text, 0
+      else
+         quip drop.text, starstone
+      fin
+   fin
+#
+#=====================================================================
+#
+proc drop.sunstone
+   ifhave sunstone
+   else
+      proceed
+   fin
+   add sunstone, 3
+   ifgt sunstone, 8
+      sub sunstone, 8
+   fin
+   apport sunstone, drop.here
+   ifnear sunstone
+      set sunstone.drops, 0
+   otherwise
+   ifinrange here, above.abyss, above.volcano
+      set sunstone.drops, 3
+   otherwise
+   ifis drop.here, beanstalk.bottom
+      set sunstone.drops, 2
+   else
+      set sunstone.drops, 1
+   fin
+   say sunstone.drops, sunstone
+   ifeq sunstone.drops, 3
+      append drop.abyss, 0
+      quit
+   fin
+   ifeq sunstone, 8
+      and
+      not
+   ifflag sunstone, special1
+      flag sunstone, special1
+      quip black.flash
+   fin
+   quit
+#
+#=====================================================================
+#
+proc drop.bird
+   ifne bird, 1 # I.e. caged
+      or
+      not
+   ifnear cage
+      proceed
+   fin
+   drop bird
+   set bird, freed
+   ifnear snake
+      apport snake, ylem
+      unflag mtking, hintable
+      unflag mtking, no.dwarf
+      quip bird.v.enemy, 0
+   fin
+   ifnear dragon
+      ifeq dragon, on.rug
+         call zap.bird
+         quip bird.v.enemy, 1
+      fin
+      quip you.free, arg2
+   fin
+   ifnear vampire
+      quip bird.v.enemy, 2
+   fin
+   ifnear troll
+      quip bird.v.enemy, 3          # Ignore bird
+   fin
+   ifnear ogre
+      call zap.bird
+      quip bird.v.enemy, 4          # Dismember the bird
+   fin
+   ifnear bear
+      ifeq bear, chained.ferocious
+         call zap.bird
+         quip bird.v.enemy, 5       # Catch and devour bird
+      fin
+      quip bird.v.enemy, 6
+   fin
+   ifnear basilisk
+      and
+   iflt basilisk, petrified
+      say bird.v.enemy, 7           # Petrify bird and you
+      call zap.bird
+      call coroner
+   fin
+   ifnear spider
+      call zap.bird
+      quip bird.v.enemy, 8
+   fin
+   ifnear dwarf
+      call zap.bird
+      say bird.v.dwarf, dwarf
+      quit
+   fin
+   ifat sw.repository
+      ifloc dynamite, ylem
+      else
+         say bird.v.enemy, 9
+         say dwarves.wake
+         call coroner
+      fin
+   fin
+   ifflag here, not.in.cave
+      and
+      not
+   ifinrange here, north.of.spire, basalt.shelf.2
+      and
+      not
+   ifflag here, indoors
+      ifloc snake, mtking
+         ifnear feeder
+            quip bird.is.free, 0
+         else
+            quip bird.is.free, 1
+         fin
+      else
+         call zap.bird
+         ifnear feeder
+            quip bird.is.free, 2
+         else
+            quip bird.is.free, 3
+         fin
+      fin
+   fin
+   say bird.is.free, 1
+   ifat cellar
+      call wizard.evicts
+   fin
+   quit
+#
+#=====================================================================
+#
+proc drop.cage
+   local qualifier
+#
+   ifhave cage
+      apport cage, drop.here
+      say you.do, arg1
+      ifhave bird
+         drop bird
+         say cage.with.bird
+         ifeq drop.here, here
+         else
+            ifat mists
+               set qualifier, 1          # Throwing up
+            else
+               set qualifier, 0          # Throwing down
+               say blank
+            fin
+            say indignant.bird, qualifier
+            apport bird, drop.here
+         fin
+      else
+         say it.is, arg2
+      fin
+      ifat beams
+         apport cage, chapel
+      fin
+      ifat cellar
+         call wizard.evicts
+      fin
+      quit
+   fin
+#
+#=====================================================================
+#
+proc drop.vase
+   ifhave vase
+      apport vase, drop.here
+      ifat soft
+         quip you.do.it
+      else
+         ifeq drop.here, here
+            ifhere pillow
+               set vase, 1
+               say vase
+               set vase, 0
+            else
+               set vase, 2
+               say vase
+               apport vase, ylem
+               apport pottery, here
+            fin
+         else
+            say shattered.it
+            apport vase, ylem
+            apport pottery, drop.here
+         fin
+      fin
+      ifat cellar
+         call wizard.evicts
+      fin
+      quit
+   fin
+#
+#=====================================================================
+#
+proc empty.vessel       # Generic vessel emptying code
+   ifeq vessel, none
+      quip, error
+   fin
+   eval object.state, vessel
+   ifgt object.state, emptied
+   else
+      quip is.empty, vessel
+   fin
+   ifnear dwarf
+      and
+   ifkey throw
+      call vessel.contents
+      deposit vessel, emptied
+      flag dwarf, special2               # Dvarves furious!
+      say the.it, result
+      say from.your, vessel
+      quip doused.dwarf, dwarf
+   fin
+   ifeq object.state, full.of.dung
+      ifis vessel, bucket
+         deposit vessel, dirtied
+      else
+         deposit vessel, emptied
+      fin
+      apport dung, drop.here
+      quip dump.dung
+   fin
+   call dispose.liquid
+#
+#=====================================================================
+#
+proc drop.vessel
+   local state
+#
+   ifhave arg2
+      eval state, arg2
+      ifeq here, drop.here
+      else
+         ifis vessel, bucket
+            and
+         ifeq bucket, full.of.dung
+            set bucket, dirtied
+         else
+            set bucket, emptied
+         fin
+         ifis vessel, flask
+            proceed
+         fin
+         ifis vessel, bucket
+            and
+         ifeq state, full.of.dung
+            apport dung, drop.here
+            proceed
+         fin
+         ifgt state, emptied
+            and
+            not
+         ifinrange here, north.of.spire, basalt.shelf.2
+            flag drop.here, damp
+         fin
+      fin
+      ifgt state, emptied
+         and
+      ifeq drop.here, here
+         drop arg2
+         quip you.deposit, arg2
+      fin
+   fin            
+#
+#=====================================================================
+#
+proc kill.dragon
+   ifgt dragon, on.rug
+      quip it.is.dead
+   fin
+   lda text.ptr, with.what?
+   save command, text.ptr
+   set context, q.dragon
+   quip text.ptr
+#
+#=====================================================================
+#
+proc dragon.slayer
+   set context, none
+   ifkey yes
+      restore command, text.ptr
+      set dragon, dead.body
+      ifat secret.n/e.canyon.2
+         lda here, secret.n/e.canyon.1
+         itobj obj.ptr, secret.n/e.canyon.2
+            ifflag obj.ptr, portable
+               apport obj.ptr, here
+            fin
+         fin
+      fin
+      apport teeth, here
+      apport rug, here
+      apport dragon, here
+      choose dragtime, 0, 5
+      add dragtime, 5
+      unflag dragon, schizoid
+      set rug, unrolled
+      say dragon.vanquished
+      say dragon
+      say rug
+      quip teeth
+   fin
+   ifany quit, no, n
+      restore command, text.ptr
+      say use.a.weapon, arg1
+      quip kill.the.whatever, arg2
+   fin
+   quip lets.be.prudent, 0
+#
+#=====================================================================
+#
+proc kill.bird
+   iflt stage, in.repository
+      call zap.bird
+      quip bird.is.dead
+   fin
+   quip leave.bird
+#
+#=====================================================================
+#
+proc kill.dwarf
+   set context, q.dwarf
+   lda text.ptr, with.bare.hands?
+   save command, text.ptr
+   quip text.ptr, dwarf
+#
+#=====================================================================
+#
+proc dwarf.slayer
+   local luck
+#
+   set context, none
+   ifkey yes
+      restore command, text.ptr
+      set luck, strength
+      sub luck, invct
+      add luck, 2
+      mult luck, 10
+      chance luck
+         say  killed.dwarf
+         call kill.some.dwarves, 0
+         quit
+      fin
+      chance luck
+         quip dwarf.dodges
+      fin
+      say dwarf.stabs
+      call coroner
+   fin
+   ifany quit, no, n
+      restore command, text.ptr
+      say use.a.weapon, arg1
+      quip kill.the.whatever, dwarf
+   fin
+   quip lets.be.prudent, 0
+#
+#=====================================================================
+#
+proc kill.ogre
+   set context, q.ogre
+   lda text.ptr, with.bare.hands?
+   save command, text.ptr
+   quip text.ptr, ogre
+#
+#=====================================================================
+#
+proc ogre.slayer
+   set context, none
+   ifkey yes
+      restore command, text.ptr
+      chance   50
+         quip ogre.too.tough
+      fin
+      say ogre.rips.head.off
+      call coroner
+   fin
+   ifany quit, no, n
+      restore command, text.ptr
+      say use.a.weapon, arg1
+      quip kill.the.whatever, ogre
+   fin
+   quip lets.be.prudent, 0
+#
+#=====================================================================
+#
+proc get.bear
+   ifnear bear
+      ifhave bear
+         quip already.got.bear
+      fin
+      ifat bear.room
+         and
+      iflt bear, unchained
+         quip bear.is.chained
+      fin
+      get bear
+      quip got.bear
+   fin
+#
+#=====================================================================
+#
+proc get.sword
+   ifnear sword
+      ifeq sword, in.stone
+         and
+      iflt invct, strength
+         ifeq mushroom, eaten
+            add sword, 1
+            get sword
+            unflag sword.place, hintable
+            quip got.the.sword
+         fin
+         quip sword.is.stuck
+      fin
+   fin
+#
+#=====================================================================
+#
+proc get.sceptre
+   local selector
+#
+   ifnear sceptre
+      ifeq sceptre, 0
+         and
+      iflt invct, strength
+         get sceptre
+         set sceptre, 1
+         random selector, 4
+         ifeq selector, 0
+            lda password, blerbi
+         otherwise
+         ifeq selector, 1
+            lda password, klaetu
+         otherwise
+         ifeq selector, 2
+            lda password, knerl
+         else
+            lda password, snoeze
+         fin
+         apport skeleton, ylem
+         ifeq safe, locked
+            quip whisper, password
+         fin
+         quip blew.safe
+      fin
+   fin
+#
+#=====================================================================
+#
+proc splatter
+#
+# Procedure 'splatter' should be called any time it is desirable to have
+# the adventurer fall to a painful death.  Before calling SPLATTER,
+# the calling routine should GOTO the place that is at the bottom of
+# whatever the adventurer has jumped into - if that place isn't
+# well-defined (bottom of the chasm, volcanic gorge, etc), then
+# go to Ylem.
+#
+   say plummet, deaths
+   call coroner
+#
+#=====================================================================
+#
+proc do.cameo               # Generate strange cameo appearances if possible
+   ifflag admin, cameo.tried
+      proceed
+   fin
+   flag admin, cameo.tried   # At most one per game
+   call all.quiet?
+   ifeq result, 1
+      proceed
+   fin
+   flag status, ticked       # Pretend clock ticked, to disable mutters
+   say cameo
+#
+#=====================================================================
+#
+proc close.the.cave
+   local obj.ptr
+#
+   say cave.now.closed
+   itobj obj.ptr
+      unflag obj.ptr, stealable
+      ifis obj.ptr, djinn
+      else
+         unflag obj.ptr, special1
+         unflag obj.ptr, special2
+      fin
+      ifflag obj.ptr, portable
+         ifhave obj.ptr
+            drop obj.ptr
+         fin
+      fin
+   fin
+   apport mirror, sw.repository
+   set bucket, emptied
+   set bottle, emptied
+   set flask, emptied
+   flag bottle special1
+   set bottle, emptied
+   flag plant, special1
+   flag beanstalk, special1
+   flag oyster, special1
+   set oyster, 0
+   unflag oyster, big          # In repository used as a 'read' flag
+   flag rod, special1
+   flag lamp, special1
+   set lamp, switched.off
+   set lamplife, 0
+   flag dwarf, special1
+   set dwarf, 0
+   flag dynamite, special2
+   flag snake, special2
+   flag cage, special2
+   set cage, 1              # No longer just discarded!
+   flag bird, special2
+   set bird, caged          # Cage the bird
+   flag pillow, special2
+   set notice, brilliged    # Change text of notice at stupendous view
+   set beanstalk, stunted   # So he can't get in by the back entrance
+   itplace place.ptr
+      ifflag place.ptr, not.in.cave
+         unflag place.ptr, been.here
+      fin
+   fin
+   flag rod, seen
+   set forest.12, 1         # Make sure the path exists!
+   flag nowhere, hintable   # May have been cleared in the "joke" stage
+   flag dark.forest, been.here
+   flag nowhere, been.here
+   set stage, in.repository
+   set slit, 1              # Convert slit into gap
+   set clock, 999
+   set there, 0             # Invalidate return location
+   move ne.repository
+#
+#=====================================================================
+#
+proc closing.time
+   set stage, exits.barred
+   set grate, locked
+   say closing.now               # Sepulchral voice
+   ifnear dwarf
+      say dwarf.quits, dwarf   # Fades into the gloom
+   fin
+   apport dwarf, limbo           # Get rid of him/them
+   set dwarf, 0                  # Zilch all present dwarves
+   set dwarfcount, 0             # Don't let him reappear
+   set swag.to.drop, 0
+   set fissure, 0                # Destroy bridge
+   set volcano, 0                # Destroy wheatstone bridge
+   apport troll, ylem            # Remove troll
+   apport dragon, ylem           # Remove dragon
+   set troll, gone.for.good      # Scared - inhibit return
+   apport troll2, sw.of.chasm    # Fetch fake troll
+   flag fissure, feature
+   flag volcano, feature
+   apport unicorn, ylem          # Remove unicorn, if present
+   set door2, closed             # Shut dwarves' stores
+   set door3, closed             # Shut dwarves' quarters
+   set tower.top.landing, closed # ... in the location description too!
+   set tower.top.window, 1       # No angry voices!
+   set dungeon, flagstone.fixed  # Replace and fix the flagstone.
+   set alarm, 1000               # Chase away the card players
+   set clock, 30                 # Time to try to leave
+#
+#=====================================================================
+#
+proc pirate.encounter, force
+   local obj.ptr
+   local got.some
+   local state
+#
+   ifeq force, 0
+      call all.quiet?
+      ifgt result, 0
+         proceed
+      fin
+   fin
+   unflag pirate, special1     # Clear "chasing"
+   set got.some, 0
+   unflag starstone, valued    # No stealing of the starstone!
+   itobj obj.ptr, valued
+      ifnear obj.ptr
+         eval state, obj.ptr
+         ifflag  obj.ptr, wearable
+            and
+         ifeq state, worn
+            and
+         ifhave obj.ptr    # This test *should* be unnecessary
+         else
+            apport obj.ptr, mazea.114
+            set got.some, 1
+         fin
+      fin
+   fin
+   flag starstone, valued
+   ifeq got.some, 0
+      ifflag pirate, seen         # First time thru?
+         or
+      iflt moves, 150             # Have we been here a while?
+         ifflag status, moved
+            say blank
+         fin
+         say rustling
+         flag pirate, special1    # Set "following"
+         choose clock, 4, 13
+      else
+         apport chest, mazea.114
+         apport message, mazed.140
+         flag pirate, seen
+         say pirate.runs
+      fin
+   else
+      say pirate.robs
+      ifflag pirate, seen
+      else
+         flag pirate, seen
+         apport chest, mazea.114
+         apport message, mazed.140
+      fin
+   fin
+   flag status, ticked       # Prevent any further events
+#
+#=====================================================================
+#
+proc dwarf.encounter, force
+   ifeq force, 0
+      call all.quiet?
+      ifeq result, 1
+         proceed
+      fin
+   fin
+   apport axe, here
+   flag dwarf, seen
+   flag axe, seen
+   say first.dwarf
+   flag status, ticked       # Prevent any further events
+#
+#=====================================================================
+#
+proc events                  # Administrative clock has ticked
+   local temp.val
+#
+   flag status, ticked
+   ifgt crown, dormant
+      or
+   ifat nowhere
+      proceed
+   fin
+   iflt stage, closing.soon
+      choose clock, 30, 39
+      ifgt sculpture, 0
+         randomise sculpture, 1
+      fin
+      ifgt sword, in.stone
+         randomise sword, 1
+      fin
+      ifgt dragon, on.rug
+         and
+      iflt dragon, rotting.carcass
+         sub dragtime, 1
+         ifeq dragtime, 4
+            or
+         ifeq dragtime, 0
+            add dragon, 1
+         fin
+      fin
+      ifflag djinn, special1
+         and
+         not
+      ifflag djinn, special2
+         and
+         not
+      ifnear dwarf
+         flag djinn, special2
+         say phuggg.data
+         set clock, 5
+         set lastclock, clock
+         proceed
+      fin
+      ifeq mushroom, eaten
+         sub mushtime, lastclock
+         iflt mushtime, 0
+            set mushroom, digested
+            set mushtime, 40
+            say mushroom
+            set mushroom, 0
+            set strength, carry.limit
+            add strength, 1  # Give him a mushroom after-effect as a bonus
+            set clock, 8
+            set lastclock, clock
+            proceed
+         fin
+      fin
+      ifflag mists, been.here
+         or
+      ifflag y2, been.here
+         and
+      ifloc snake, ylem
+         ifflag here, not.in.cave
+            or
+         ifflag here, no.dwarf
+            choose clock, 8, 17
+         else
+            ifflag status, light.here      # Only if not dark
+               and
+            ifgt moves, 150                # Have we been here a while without
+               and
+               not
+            ifflag pirate, seen            # Seeing him at least once?
+               or
+            ifflag pirate, special1        # Or was he chasing us?
+               or
+            chance  10                     # Or 10% of the time
+               and
+               not
+            ifflag chest, seen             # Haven't found his chest yet
+               and
+               not
+            ifnear dwarf                   # And not under attack by dwarves
+               and
+               not
+            ifflag here, lit               # And this place is dark
+               and
+               not
+            ifflag crown, freebie          # And not listening to the voices
+               call pirate.encounter, 1
+            else                           # No pirate. Maybe a dwarf?
+               set temp.val, dwarfcount
+               add temp.val, 2
+               mult temp.val, 7                    # Was 10.
+               ifnear dwarf
+                  or
+               chance temp.val
+                  and
+               iflt dwarf, dwarfcount              # More dwarves left...
+                  ifflag axe, seen                 # Seen first dwarf?
+                     apport dwarf, here
+                     add dwarf, 1
+                     ifeq dwarf, 1
+                        ifflag status, light.here
+                           say dwarf               # Announce him
+                        fin
+                        flag dwarf, special1       # First knife not thrown
+                        unflag dwarf, special2     # Not enraged
+                     fin
+                     ifeq swag.to.drop, 0
+                        call choose.swag
+                     fin
+                  else                             # First dwarf, coming up!
+                     ifflag here, one.exit
+                     else
+                        ifflag y2, been.here
+                           or
+                           not
+                        ifloc snake, mtking
+                           and
+                        ifflag status, light.here
+                           call dwarf.encounter, 1
+                        fin
+                     fin
+                  fin
+               fin
+            fin
+         fin
+      fin
+   else
+      ifeq stage, closing.soon         # Is it near closing time?
+         call closing.time
+      else                             # Must be closing time!
+         ifflag admin, panicked        # Did he try to get out?
+            unflag admin, panicked     # Reset panic flag
+            set clock, 15              # Let him get frantic
+         else                          # If he was calm
+            call close.the.cave
+         fin
+      fin
+   fin
+   set lastclock, clock
+#
+#=====================================================================
+#
+proc lamprey          # Lamp getting dim or has gone out
+   ifgt lamplife, 0
+      ifeq batteries, wornout
+         say lamp.getting.dim
+      else
+         ifnear batteries
+            say lamp.refuel
+            set batteries, wornout
+            set lamplife, 400
+         else
+            ifflag batteries, seen
+               say lamp.batteries
+            else
+               set lamp, getting.dim
+               ifinrange here, mazea.42, mazea.by.pit
+                  say lamp.is.dim, 1
+               else
+                  ifinrange here, mazed.107, mazed.140
+                     say lamp.is.dim, 2
+                  else
+                     say lamp.is.dim, 0
+                  fin
+               fin
+            fin
+         fin
+      fin
+   else
+      ifeq stage, exits.barred
+         call close.the.cave
+      else
+         ifnear batteries, fresh
+            say lamp.refuel
+            set batteries, wornout
+            add lamplife, 400
+         else
+            say lamp.is.dead
+            set lamp, switched.off
+            call is.it.dark?
+            flag admin, ranout      # Don't fall in a pit this move
+         fin
+      fin
+   fin
+#
+#=====================================================================
+#
+proc wise.guy
+   flag here, smartass
+   ifinrange here, ice.cave.1, ice.cave.30
+      or
+   ifat slide
+      flag slide, smartass
+      itplace place.ptr, ice.cave.1, ice.cave.30
+         flag place.ptr, smartass
+      fin
+   fin
+   ifflag here, in.desert
+      itplace place.ptr, desert.1, desert.last
+         flag place.ptr, smartass
+      fin
+   fin
+   ifinrange here, catacombs.portal, catacombs.exit
+      itplace place.ptr, catacombs.portal, catacombs.exit
+         flag place.ptr, smartass
+      fin
+   fin
+   ifinrange here, web.maze.1, web.maze.6
+      itplace place.ptr, web.maze.1, web.maze.6
+         flag place.ptr, smartass
+      fin
+   fin
+   ifinrange here, mazea.42, mazea.by.pit
+      itplace place.ptr, mazea.42, mazea.by.pit
+         flag place.ptr, smartass
+      fin
+   fin
+   ifinrange here, mazed.107, mazed.140
+      itplace place.ptr, mazed.107, mazed.140
+         flag place.ptr, smartass
+      fin
+   fin
+   quip as.you.wish
+#
+#=====================================================================
+#
+proc hint.logic
+   ifnear unicorn
+      and
+   ifflag dung, seen
+      and
+      not
+   ifflag here, hintable
+      proceed
+   fin
+   ifflag here, hintable
+   else
+      proceed
+   fin
+   ifflag here, smartass
+      and
+      not
+   ifkey help
+      proceed
+   fin
+   set text.ptr, 0
+   ifat sword.place
+      and
+   ifkey help
+      set hint.time, 0
+      quip weakling
+   fin
+   ifat depression
+      and
+   ifeq grate, locked
+      and
+      not
+   ifhave keys
+      lda text.ptr, cave.hint
+   otherwise
+   ifat beanstalk.middle
+      lda text.ptr, sapling.hint
+   otherwise
+   ifat bird.chamber
+      and
+   ifnear bird, freed
+      ifhave rod
+         lda text.ptr, bird.hint
+      else
+         ifflag quips, trusting.bird
+         else
+            lda text.ptr, bird.hint.2
+         fin
+      fin
+   otherwise
+   ifat mtking
+      and
+   ifnear snake
+      ifflag hints, snake.pending
+         ifkey help
+            and
+            not
+         ifflag here, smartass
+         else
+            lda text.ptr, snake.hint.2
+         fin
+      else
+         ifloc bird, ylem
+            lda text.ptr, snake.fool.hint
+         else
+            lda text.ptr, snake.hint
+         fin
+      fin
+   otherwise
+   ifat witts.end
+      lda text.ptr, witts.end.hint
+   otherwise
+   ifat plover, alcove, dark
+      and
+   ifflag plover, been.here   # We might not be there!
+      and
+      not
+   ifflag pyramid, seen
+      lda text.ptr, plover.hint
+   otherwise
+   ifat plain.2
+      lda text.ptr, fog.hint
+   otherwise
+   ifinrange here, mazea.42, mazea.by.pit
+      or
+   ifinrange here, mazed.107, mazed.140
+      or
+   ifinrange here, web.maze.1, web.maze.6
+      lda text.ptr, hint.maze
+   otherwise
+   ifinrange here, slide, ice.cave.30
+      lda text.ptr, ice.hint
+   otherwise
+#   ifinrange here, catacombs.portal, catacombs.exit
+   ifinrange here, catacombs.entrance, catacombs.exit
+      ifkey help
+         and
+         not
+      ifflag here, smartass
+         proceed
+      else
+         lda text.ptr, catacombs.hint
+      fin
+   otherwise
+   ifnear unicorn
+      and
+      not
+   ifflag dung, seen
+      lda text.ptr, unicorn.hint
+   otherwise
+   ifat phoney.shaft
+      lda text.ptr, shaft.hint
+   otherwise
+   ifat stream.maze.entrance, stream.maze
+      ifflag hints, sewer.exit
+         lda text.ptr, sewer.exit.hint
+      otherwise
+      ifflag hints, sewer.pending
+         lda text.ptr, sewer.hint.2
+      else
+         lda text.ptr, sewer.hint
+      fin
+   otherwise
+   ifat reservoir
+      lda text.ptr, reservoir.hint
+   otherwise
+   ifnear shadow
+      lda text.ptr, shadow.hint
+   otherwise
+   ifat breathtaker
+      lda text.ptr, gorge.hint
+   otherwise
+   ifat basilisk.den
+      lda text.ptr, basilisk.hint
+   otherwise
+   ifat by.figure
+      ifflag hints, statue.pending
+         ifkey help             # Spontaneous help only
+            and
+            not
+         ifflag here, smartass
+         else
+            lda text.ptr, statue.hint
+         fin
+      else
+         lda text.ptr, statue.hint
+         flag hints, statue.pending
+      fin
+   otherwise
+   ifnear ogre
+      lda text.ptr, ogre.hint
+   otherwise
+   ifnear safe
+      lda text.ptr, safe.hint
+   otherwise
+   ifat pentagram
+      ifkey help
+         lda text.ptr, pentagram.hint
+      else
+         proceed
+      fin
+   otherwise
+   ifat ravine.west
+      and
+   ifgt giant, hurt
+      lda text.ptr, picnic.hint
+      set temp.ptr, text.ptr
+      add temp.ptr, 1
+      deposit temp.ptr, 1
+      ifflag mask,seen
+         deposit temp.ptr, 0
+      fin
+   otherwise
+   ifat dungeon
+      ifeq dungeon, 0
+         lda text.ptr, dungeon.hint
+      else
+         iflt giant, blissful 
+            lda text.ptr, giant.hint
+         fin
+      fin
+   otherwise
+   ifat cave.5
+      lda text.ptr, skull.hint
+   otherwise
+   ifat beanstalk.bottom
+      lda text.ptr, beanstalk.hint
+      set temp.ptr, text.ptr
+      add temp.ptr, 1
+      ifeq beanstalk, grown
+         deposit temp.ptr, 1
+      else
+         deposit temp.ptr, 0
+      fin
+   otherwise
+   ifat island.05
+      lda text.ptr, pine.hint
+   otherwise
+   ifflag here, in.desert
+      lda text.ptr, dunes.hint
+   otherwise
+   ifat ridge
+      lda text.ptr, swamp.hint
+      ifeq island.02, shoes.found
+         set no.see.bog, 1       # Switch on in-flight message
+      fin
+   otherwise
+   ifat nowhere
+      iflt stage, adventuring
+         lda text.ptr, joke.hint
+      otherwise
+      ifeq escape, 0
+         lda text.ptr, nowhere.hint
+      fin
+   otherwise
+   ifat abyss
+      lda text.ptr, abyss.hint
+   otherwise
+   ifat spire
+      lda text.ptr, spire.hint
+   otherwise
+   ifat spire.nearly.up
+      lda text.ptr, jump.hint
+   otherwise
+   ifat garden.n
+      lda text.ptr, gates.hint
+   otherwise
+   ifat waterfall
+      lda text.ptr door.hint
+   otherwise
+   ifinrange here, tower.base, tower.top.landing
+      lda text.ptr, tower.hint   
+   otherwise
+   ifat arched.corridor.1
+      lda text.ptr, quicksand.hint
+   fin
+   ifeq text.ptr, 0
+      proceed
+   fin
+   set hint.time, 0
+   set context, q.help
+   say blank
+   quip text.ptr
+#
+#=====================================================================
+#
+proc hint.action
+   ifeq context, q.help
+      ifeq status, 0
+         or
+      ifkey yes
+         say ill.give.hint, hint.cost
+         set context, q.help.cost
+         quip want.hint? 
+      fin
+      ifany quit, no, n
+         set context, none
+         call wise.guy
+         quip just.wondered
+      fin
+      say yes.or.no?
+      quip text.ptr
+   fin
+   ifeq context, q.help.cost
+      ifeq status, 0
+         or
+      ifkey yes
+         ifeq stage, in.repository
+            and
+         ifis text.ptr, unicorn.hint
+            add text.ptr, 1
+         fin
+         add text.ptr, 1
+         say text.ptr
+         add penalties, hint.cost
+         unflag here, hintable
+         unflag here, smartass
+         sub text.ptr, 1
+         ifis text.ptr, windrose.help
+            flag hints, windrose.hinted
+            quit
+         fin
+         ifat stream.maze, stream.maze.entrance
+            ifflag hints,sewer.pending
+               or
+            ifflag hints, sewer.exit
+            else
+               flag stream.maze, hintable
+               flag stream.maze.entrance, hintable
+               flag hints, sewer.pending
+            fin
+            ifflag hints, sewer.exit
+               unflag stream.maze, hintable
+               unflag stream.maze.entrance, hintable
+            fin
+         fin
+         ifnear snake
+            ifis text.ptr, snake.hint.2
+               unflag hints, snake.pending
+            else
+               flag here, hintable
+               flag hints, snake.pending
+            fin
+         fin
+         ifat by.figure
+            ifis text.ptr, statue.hint.2
+               unflag hints, statue.pending
+            else
+               flag here, hintable     # May get another hint here!
+               flag hints, statue.pending
+            fin
+         fin
+         ifat ridge
+            and
+         ifeq island.02, shoes.found
+            set no.see.bog, 1          # Switch on the in-flight observation.
+         fin
+         ifat plover, alcove
+            or
+         ifat dark
+            unflag plover, hintable
+            unflag dark, hintable
+            unflag alcove, hintable
+         fin
+         ifat by.figure
+            and
+         ifflag dead.end.1, been.here
+            and
+         ifflag hints, statue.pending
+            say sucker.hint
+         fin
+         ifnear safe
+            unflag vault, hintable
+            unflag peelgrunt, hintable
+         fin
+         ifat witts.end
+            and
+         ifgt stuck, 30
+            set stuck, 30
+         fin
+         ifinrange here, slide, ice.cave.30
+            or
+         ifat slide
+            unflag slide, hintable
+            itplace place.ptr, ice.cave.1, ice.cave.30
+               unflag place.ptr, hintable
+            fin
+         fin
+         ifinrange here, catacombs.portal, catacombs.exit
+            itplace place.ptr, catacombs.portal, catacombs.exit
+               unflag place.ptr, hintable
+            fin
+         fin
+         ifinrange here, web.maze.1, web.maze.6
+            itplace place.ptr, web.maze.1, web.maze.6
+               unflag place.ptr, hintable
+            fin
+         fin
+         ifinrange here, mazea.42, mazea.by.pit
+            ifeq mazea.42, 0
+               say try.cheating
+            else
+               say blank
+            fin
+            itplace place.ptr, mazea.42, mazea.by.pit
+               unflag place.ptr, hintable
+            fin
+         fin
+         ifinrange here, mazed.107, mazed.140
+            itplace place.ptr, mazed.107, mazed.140
+               unflag place.ptr, hintable
+            fin
+         fin
+         ifflag here, in.desert
+            itplace place.ptr, desert.1, desert.last
+               unflag place.ptr, hintable
+            fin
+         fin
+         ifnear shadow
+            unflag east.window, hintable
+            unflag west.window, hintable
+         fin
+         ifinrange here, tower.base, shelves.west
+            iterate place.ptr, tower.base, shelves.west
+               unflag place.ptr, hintable
+            fin
+         fin
+         set context, none
+         quit
+      fin
+      ifany quit, no, n
+         set context, none
+         call wise.guy
+         quip as.you.wish
+      fin
+      say yes.or.no?
+      say want.hint?
+      quit
+   fin
+#
+#=====================================================================
+#
+proc no.move.possible
+   ifeq status, 2
+      flush
+      quip what?
+   fin
+   ifkey go
+      set text.ptr, arg2
+   else
+      set text.ptr, arg1
+   fin
+   ifflag status, light.here
+      ifinrange here, mazea.42, mazea.by.pit
+         and
+         not
+      ifflag here, one.exit
+         quip still.where.you.were
+      fin
+      ifflag here, in.desert
+         quip impassable.desert, text.ptr
+      otherwise
+      ifinrange here, above.abyss, above.volcano
+          respond north, ne, se, south, sw, nw, no.fall.abyss, text.ptr
+          respond down, not.a.good.idea
+      fin
+      quip no.can.go, text.ptr
+   fin
+   chance   25
+      and
+      not
+   ifat cellar
+      and
+   iflt stage, in.repository
+      ifflag here, not.in.cave
+         say crunch, 0
+      else
+         say crunch, 1
+         call coroner
+      fin
+   fin
+   quip oof!, text.ptr
+#
+#=====================================================================
+#
+proc break.vial
+   apport vial, ylem
+   say vial.bang
+   ifnear slime
+      apport slime, ylem
+      quip vial.effect, 5
+   else
+      ifnear dwarf
+         say blank
+         say vial.dwarf, dwarf
+         call kill.some.dwarves, -1    # Just chase them away
+         quit
+      fin
+      ifnear troll
+         quip vial.effect, 0
+      fin
+      ifnear bear
+         ifgt bear, chained.ferocious
+            quip vial.effect, 2
+         fin
+         quip vial.effect, 1
+      fin
+      ifnear snake
+         quip vial.effect, 3
+      fin
+      ifnear bird
+         quip vial.effect, 4
+      fin
+      ifnear dragon
+         and
+      ifeq dragon, on.rug
+         quip vial.effect, 6
+      fin
+      ifnear djinn
+         quip vial.effect, 7
+      fin
+      ifnear basilisk
+         and
+      iflt basilisk, petrified
+         quip vial.effect, 8
+      fin
+      ifnear goblins
+         quip vial.effect, 9
+         apport goblins, limbo
+      fin
+      ifnear spider
+         quip vial.effect, 10
+      fin
+      ifnear ogre
+         quip vial.effect, 11
+      fin
+      ifnear vampire
+         quip vial.effect, 12
+      fin
+   fin
+   quit
+#
+#=====================================================================
+#
+proc drop.vial
+   local state
+#
+   ifeq here, drop.here
+      ifhave vial
+         iflt vial, 16
+            add vial, 1
+         fin
+         set state, vial
+         sub state, 6
+         ifgt state, 0
+            multiply state, state
+            chance state
+               say vial.explodes
+               apport vial, ylem
+               call coroner
+            fin
+         fin
+      else
+         proceed
+      fin
+   else
+      apport vial,ylem
+      ifeq throw.it, true
+         say the.it, vial
+         say drop.text, 0
+      else
+         say drop.text, vial
+      fin
+      ifis drop.text, into.sewage
+         or
+      ifis drop.text, down.the.shaft
+         quit
+      else
+         quip distant.explosion
+      fin
+   fin
+#
+#=====================================================================
+#
+proc dwarf.attack
+#
+# This proc handles knife attacks by dwarves.  It should be
+# called with the variable FLEETFOOT set to the "survival asset" of
+# whatever the adventurer was doing (0 for just attacked, 50
+# or so for running, 25 for neither) to reflect the ease with
+# which the dwarf can hit the dude.
+#
+   local thrown
+   local luck
+#
+   ifflag status, light.here
+      set thrown, dwarf        # How many dwarves are here?
+      add thrown, 2            # Stretch the odds on knife-throwing a bit
+      random thrown, thrown    # Get # of knives, + 1
+      sub thrown, 1            # Get # of knives thrown
+      iflt thrown, 1           # Any actually thrown?
+         proceed               # If not, just go back
+      fin
+      unflag dwarf, big            # Currently not blocking
+      say knives.thrown, thrown    # Tell him that he's under attack
+      set luck, strength           # Let's figure out how agile he is at ...
+      sub luck, invct              # ... the moment....
+      mult luck, 5                 # 5 points per object that he could carry
+      ifflag dwarf, special2       # Is dwarf angry (more accurate) ? 
+         sub luck, 20              # If so, he's probably in trouble
+      fin
+      add fleetfoot, luck          # Add in the "fleet-foot" compensating factor
+      add fleetfoot, 35            # Give him chance even if he's loaded down
+      divide fleetfoot, thrown     # Chances are poor if > 1 knife thrown!
+      ifhave ring, worn            # If worn, ring will usually defend you
+         random luck, last.deflector-first.deflector+2    # But not always!
+         ifgt luck, 0              # If we got a zero, it doesn't help!
+            lda text.ptr, first.deflector-1
+            add text.ptr, luck     # Generate address of defense message
+            say text.ptr, thrown   # Tell him he's been reprieved this time
+            proceed                # Let 'im off for this once
+         fin
+      fin
+      chance fleetfoot             # Ok - did they all miss him?
+         or
+      ifflag dwarf, special1       # Is this the first attack recently?
+         say knives.miss, thrown   # He's safe this time - whew!
+         unflag dwarf, special1    # Clear "first attack" flag
+      else                         # Oh-oh - he's been stabbed!
+         say knives.got.you, thrown   # Tell him the bad news
+         call coroner              # Go clean up the bloody mess on the floor
+      fin
+   fin
+#
+#=====================================================================
+#
+proc weaponry    # Handle attacks with weapons
+   local luck
+   local modifier
+#
+   ifhave arg2
+      ifkey throw
+         and
+         not
+      ifat stupendous.view
+         drop arg2
+      fin
+      ifnear dwarf
+         set luck, strength
+         sub luck, invct
+         mult luck, 5
+         set modifier, dwarf
+         add modifier, 2
+         mult modifier, 15
+         add luck, modifier
+         ifany axe, swing
+            ifkey axe, swing
+            else
+               add luck, 15
+            fin
+         fin
+         chance luck
+            chance 5
+               and
+            ifeq dwarf, 1
+               and
+               not
+            ifflag quips, dwarf.quip
+               flag quips, dwarf.quip
+               set recent.event, demanding.dwarf
+               say crab.meat, arg2
+             else
+               say dwarf.poof
+            fin
+            call kill.some.dwarves, 0
+            ifgt dwarf, 0
+               set fleetfoot, 0
+               set backlash, 100
+            fin
+         else
+            say dwarf.dodges
+            set fleetfoot, 0      # Low "fleet foot" factor
+            set backlash, 100     # Dwarves will probably fight back
+         fin
+      else
+         ifnear snake
+            ifkey throw
+               get arg2
+            fin
+            quip cant.kill.snake
+         fin
+         ifnear dragon
+            quip no.kill.dragon, arg2
+         fin
+         ifnear bear
+            ifeq bear, chained.ferocious
+               ifkey throw
+                  ifkey axe
+                     set axe, by.bear
+                     quip axe.now.by.bear
+                  fin
+                  quip weapon.misses, arg2
+               fin
+               chance   50
+                  quip bear.misses
+               fin
+               say bear.gets.you
+               call coroner
+            fin
+            quip no.kill.bear, bear
+         fin
+         ifnear troll
+            quip troll.data
+         fin
+         ifnear ogre
+            ifkey swing
+               set ogre.chops.you, 0
+               ifkey trident
+                  set ogre.chops.you, 1
+               fin
+               say ogre.chops.you, arg2
+               call coroner
+            fin
+            ifany axe, trident
+               set ogre.halves.you, 0
+               ifkey trident
+                  set ogre.halves.you, 1
+               fin
+               say ogre.halves.you, arg2
+               call coroner
+            fin
+            unflag glassy, hintable
+            apport ogre, ylem
+            drop sword
+            unflag glassy, no.dwarf          # Can allow dwarves now
+            quip ogre.killed
+         fin
+         ifnear blob
+            quip slice.blob, arg2
+         fin
+         ifnear basilisk
+            ifgt basilisk, twitching
+               ifkey throw
+                  get arg2
+               fin
+               quip it.is.dead
+            fin
+            say axe.basilisk, arg2
+            call coroner
+         fin
+         ifnear djinn
+            quip rebound, arg2
+         fin
+         ifnear goblins
+            say kill.a.few, arg2
+            call coroner
+         fin
+         ifnear giant
+            ifat stupendous.view
+               quip annoyed.giant, arg2
+            fin
+            say enraged.giant, arg2
+            call coroner
+         fin
+         ifkey throw      # Must go through
+            get arg2      # "thrower" logic
+            proceed       # in upchuck     
+         fin
+         quip you.do.it
+      fin
+   else
+      call not.got, arg2
+   fin
+   quit
+#
+#=====================================================================
+#
+proc pass.phrase
+   local pwd
+   ifnear safe
+      unflag vault, hintable
+      unflag peelgrunt, hintable
+      ifeq safe, locked
+         ifeq status, 2
+            set pwd, arg2
+         else
+            set pwd, arg1
+         fin
+         ifeq pwd, password
+            set safe, unlocked
+            flag safe, special1
+            quip safe.opens
+         fin
+         ifflag safe, special1
+         else
+            set safe, fused        # Melt the safe's door shut
+            set blob, 1            # Wake up the blob
+            flag admin, ticker     # Blob is chasing us - quickly!
+            flag admin, nomagic    # Inhibit plugh etc
+            set grate, locked      # Lock him in the cave
+            quip safe.fuses
+         fin
+      fin
+   fin
+   ifnear gates
+      and
+   ifflag hints, keys.listed
+      quip safe.keys
+   fin
+
+   quip nothing
+#
+#=====================================================================
+#
+proc tick                     # Once-per-input routine
+   ifgt blob, 0
+      add blob, 1
+      ifgt blob, 15
+         apport blob, here
+      fin
+#
+# The blob is done separately (rather than directly via blob description)
+# in order to separate it from list of other objects
+#
+      say blob.chases
+      ifeq blob, 18
+         call coroner
+      fin
+   fin
+#
+#=====================================================================
+#
+proc plunge                # For plunging into a bottomless pit
+   goto ylem
+   ifeq lamp, switched.on
+      set lamplife, 0
+      ifhave lamp
+         say fall.&.starve
+      else
+         say fall.&.starved
+      fin
+   else
+      say fall.&.starved
+   fin
+   call coroner
+#
+#=====================================================================
+#
+proc too.dark.for.safety quit.flag
+   ifat cave.2
+      say dark.place, 0
+   otherwise
+   ifat pantry
+      say dark.place, 1
+   otherwise
+   ifat alcove, catacombs.portal
+      say dark.place, 2
+   otherwise
+   ifat ice.cave.29
+      say dark.place, 3
+   else
+      say it.is.now.dark
+   fin
+   ifne quit.flag, 0
+      quit
+   fin
+#
+#=====================================================================
+#
+proc upchuck
+   local qualifier
+#
+   ifkey bird              # Just drop it
+      or
+   ifkey bear              # You can't throw bear into chasm!
+      proceed
+   fin
+   ifeq throw.text, none
+      and
+   ifeq throw.here, here
+      proceed             # What are we doing here???
+   fin
+   ifeq throw.it, true
+      say the.it, arg2
+      ifflag arg2, plural
+         set qualifier, 1
+      else
+         set qualifier, 0
+      fin
+      say throw.text, qualifier
+   else
+      say throw.text, arg2        # Must not be a quip!
+   fin
+   apport arg2, throw.here
+   ifis arg2, bust
+      set bust, damaged
+   fin
+   ifkey vase
+      apport vase, ylem
+      apport pottery, throw.here
+      ifloc pottery, ylem
+      else
+         quip shattered.it
+      fin
+   fin
+   ifat mists
+      ifkey nugget
+         set nugget.room, 1    # Make steps permanently absent,...
+         set snake, 1          # ... but give the sucker a chance!
+         quip no.fool.steps
+      fin
+   fin
+   ifkey bottle
+      and
+   ifgt bottle, emptied
+      set bottle, emptied
+      ifinrange throw.here, north.of.spire, basalt.shelf.2
+      else
+         flag throw.here, damp
+      fin
+   fin
+   ifkey bucket
+      and
+   ifgt bucket, emptied
+      ifeq bucket, full.of.dung
+         set bucket, dirtied
+         apport dung, throw.here
+      else
+         set bucket, emptied
+         ifinrange throw.here, north.of.spire, basalt.shelf.2
+         else
+            flag throw.here, damp
+         fin
+      fin
+   fin
+   ifkey flask
+      and
+   ifgt flask, emptied
+      set flask, emptied
+   fin
+   ifkey cage
+      and
+   ifhave bird
+      apport bird, throw.here
+      ifloc bird, ylem
+      else
+         ifat mists
+            set qualifier, 1          # Throwing up
+         else
+            set qualifier, 0          # Throwing down
+            say blank
+         fin
+         say indignant.bird, qualifier
+      fin
+      quit
+   fin
+   ifkey lamp
+      and
+   ifeq lamp, switched.on
+      set lamp, switched.off
+      call is.it.dark?
+      ifflag status, light.here
+      else
+         call too.dark.for.safety, 1
+      fin
+   fin
+   ifat mists
+      say blank
+   fin
+   quit
+#
+#=====================================================================
+#
+proc grope.for.it      # Grope around in the dark for objects
+   local luck
+#
+   ifeq status, 1      # Did he say what to get?
+      quip cant.see.anything, 0
+   fin
+   ifflag arg2, object
+      ifhave arg2
+         or
+         not
+      ifflag arg2, portable
+         proceed
+      fin
+      set luck, invct
+      sub luck, strength
+      mult luck, 5
+      add luck, 60
+      chance luck
+         say grope.fall, arg2
+         call coroner
+      fin
+      quip grope.miss, arg2
+   fin
+#
+#=====================================================================
+#
+proc prod.tide
+   add tide, 1
+   chance 40
+      sub tide, 2
+      iflt tide, 0
+         set tide, 1
+      fin
+   fin
+   say blank
+   ifeq tide, high.tide
+      ifat culvert, culvert.south
+         add tide, 1
+      fin
+      ifhave food
+         apport food, limbo
+      fin
+      goto sea.view,
+      say tide.description, tide
+      call coroner
+   fin
+   say tide.description, tide
+#
+#=====================================================================
+#
+proc giant.stuff, giving
+   local obj.ptr
+   local count
+   local state
+   local zorro
+#
+   ifhave mask
+      and
+   ifeq mask, worn
+      set zorro, 1
+   fin
+   ifgt giant, hurt         # I.e. picnicking or watching
+      ifflag giant, big     # Have we just arrived?
+         unflag giant, big
+      else
+         proceed
+      fin
+      ifnear rug
+         and
+      ifflag beater, seen
+         ifeq giving, 1
+            say no.drink.flying
+         otherwise         
+         ifeq giant, picnicking
+            set giant, watching
+            ifeq giant.will.watch, -1
+               ifhave rug
+                  say fly.time, zorro
+               fin
+               set giant.will.watch, zorro
+            otherwise
+            ifeq giant.will.watch, zorro
+               say fly.soon
+            otherwise
+            iflt giant.will.watch, 2
+               say fly.too?, zorro
+               set giant.will.watch, 2
+            else
+               say fly.soon
+            fin
+         fin
+         proceed
+      otherwise
+      ifeq zorro, 1
+         ifnear bucket
+            ifeq bucket, full.of.water
+               or
+            ifge bucket, mostly.full
+               or
+            ifeq bucket, full.of.champagne
+               say drink.up
+               proceed
+            fin
+         fin
+         say zorro.friend, giving
+         unflag ravine.west, hintable
+         ifhave bucket
+            ifeq bucket, dirtied
+               or
+            ifeq bucket, full.of.dung
+               smove ravine.west, giant.put.off
+            fin
+            ifeq bucket, emptied
+               set bucket, full.of.champagne
+               say have.some.more
+            else
+               say empty.your.bucket
+            fin
+            proceed
+         fin
+         ifloc bucket,limbo
+            set bucket, full.of.champagne
+            flag bucket, seen
+            iflt invct, strength
+               get bucket
+               say have.a.drink, 0
+               proceed
+            else
+               apport bucket, here
+               say have.a.drink, 1
+               say blank
+               say bucket
+            fin
+         else
+            say bring.your.bucket
+         fin
+      else
+         smove ravine.west, buzz.off
+      fin
+      proceed
+   fin
+   ifhave deeds
+      say my.deeds!
+      unflag giant, special1
+      apport sapphire, here
+      flag sapphire, seen
+      apport box, beanstalk.top
+      flag ravine.west, hintable
+      apport giant, stupendous.view
+      set stupendous.view, 1
+      set beanstalk.top, 1
+      unflag stupendous.view, been.here
+      set giant, picnicking
+      apport deeds, ylem
+      proceed
+   fin
+   ifhave nest
+      set giant, blissful
+      choose giant.time, 40, 60
+      say giant.picks.up, 0
+      say egg.foo
+      apport nest, limbo
+   else
+      ifeq giant, resting
+         ifflag giant, seen
+            and
+            not
+         ifhave food
+            and
+            not
+         ifflag giant, special1
+            and
+         chance 4
+            say hungry.giant
+            flag giant, special1
+            proceed
+         else
+            set count, 0
+            itobj obj.ptr, inhand
+               ifis obj.ptr, lamp
+               else
+                  ifis obj.ptr, bottle        # He might need it for the plant!
+                     and
+                  iflt plant, gigantic
+                  else
+                     ifflag obj.ptr, wearable   # Keep worn objects
+                        eval state, obj.ptr
+                        iflt state, worn
+                           drop obj.ptr
+                           add count, 1
+                        fin
+                     else
+                        drop obj.ptr
+                        add count, 1
+                     fin
+                  fin
+               fin
+            fin
+            ifnear food                      # He ate it!
+               sub count, 1
+            fin
+            say giant.picks.up, count
+            flush                            # In case we had a "let"
+            ifnear food
+               apport food, limbo
+               smove pantry, miserable.morsel
+            else
+               set giant, getting.ready
+               choose giant.time, 5, 8
+               ifgt mouse.time, -1
+                  choose mouse.time, 4, 7
+               fin
+               smove dungeon, stay.in.there
+            fin
+         fin
+      fin
+      ifeq giant, getting.ready
+         say giant.picks.up, 0
+         flush                               # In case we had a "let"
+         ifgt giant.time, 0
+            smove dungeon, stay.in.there
+         fin
+         say giant.eats.you
+         set giant, resting
+         call coroner
+      fin
+   fin
+#
+#=====================================================================
+#
+proc dungeon.stuff
+   local luck
+#
+   ifeq giant, getting.ready
+      ifgt mouse.time, -1
+         sub mouse.time, 1
+      fin
+      ifeq mouse.time, 0         # But you must not blink!
+         say helpful.mouse
+         flag mouse, seen
+         set mouse.time, -1
+      fin
+      iflt giant.time, 1
+         set luck, 9
+         add luck, giant.time
+         iflt luck, 1
+            set luck, 1
+         fin
+         multiply luck, 10
+         chance luck
+            say grab.miss
+         else
+            say got.you
+            say giant.eats.you
+            goto quarters
+            set giant, resting
+            call coroner
+         fin
+      fin
+   fin
+#
+#=====================================================================
+#
+proc thirst.factor
+   local temp.val
+#
+   ifeq water, desperate
+      ifflag water, special1
+         sub thirst.time, invct
+      else
+         sub thirst.time, 1
+      fin
+      ifinrange here, north.of.spire, basalt.shelf.2
+         sub thirst.time, 1
+      fin
+      iflt thirst.time, 1
+         say youve.collapsed
+         call coroner
+      fin
+      iflt thirst.time, 3
+         say iam.thirsty!
+      fin
+      proceed
+   fin
+#
+   ifflag water, special1
+      set temp.val, invct
+      divide temp.val, 3
+      add temp.val, 4
+   else
+      set temp.val, 2
+   fin
+   add temp.val, temp.val
+   unflag water, special1
+   ifinrange here, north.of.spire, basalt.shelf.2
+      add temp.val, temp.val
+   fin
+   sub thirst.time, temp.val
+#
+  iflt thirst.time, 40
+      iflt water, desperate
+         say iam.thirsty!
+         set water, desperate
+         set thirst.time, invct
+         add thirst.time, 2
+         add thirst.time, thirst.time
+      fin
+   otherwise
+   iflt thirst.time, 140
+      and
+   ifeq water, sated
+      say thirsty.work, invct
+      set water, parched
+   fin      
+#
+#=====================================================================
+#
+proc shadow.shutup
+   ifflag shadow, special2       # Shadow about to wave?
+      flag shadow, special1    # Postpone the act
+      unflag shadow, special2
+   fin
+#
+#=====================================================================
+#
+proc foo.to.you.too
+   ifgt foobar, 0
+      set foobar, 0
+      lda nuffink, sok!
+      quip cant.you.read?
+   fin
+   quip nuffink
+#
+#=====================================================================
+#
+proc unstable.pick.up
+   unflag arg2, unstable
+   ifis arg2, bottle
+      set bottle, emptied
+   otherwise
+   ifis arg2, skull
+      add skull, 1
+      ifgt skull, damaged
+         quip no.break.skull
+      fin
+   else
+      deposit arg2, 1
+   fin
+#
+#=====================================================================
+#
+proc pick.up
+   local state
+#
+   ifflag arg2, wearable
+      eval state, arg2
+      ifgt state, not.worn
+         deposit arg2, not.worn
+         ifis arg2, ring
+         else
+            unflag arg2, freebie
+         fin
+      fin
+   fin
+   ifflag arg2, unstable
+      call unstable.pick.up
+   fin
+#
+#=====================================================================
+#
+proc rats.stuff
+   ifgt rats, 1
+      respond eat, bleah
+      respond feed, rats.might.eat.you
+      respond kill, they.are.too.fast, rats
+   fin
+   describe rats
+   quit
+#
+#=====================================================================
+#
+proc sow.teeth
+   set teeth, 0
+   ifkey throw
+      and
+      not
+   ifat cellar
+      and
+      not
+   ifnear goblins
+      call upchuck
+   fin
+   say scatter.teeth
+   drop teeth
+   ifat cellar
+      call wizard.evicts
+   fin
+   ifnear goblins
+      apport teeth, ylem
+      apport goblins, ylem
+      ifflag status, light.here
+        quip dragon.warriors
+      else
+        append teeth.unseen
+        quit
+      fin
+   fin
+   quit
+#
+#=====================================================================
+#
+proc look.bridge
+   ifnear fissure
+      quip delicate.structure
+   fin
+   ifnear volcano
+      quip fragile.arch
+   fin
+   ifnear chasm
+      ifeq chasm, 0
+         quip rickety.affair
+      fin
+      quip bridge.is.gone
+   fin
+   ifat cave.4, cave.5
+      quip strange.bridge
+   fin
+   quip i.dont.see, bridge
+#
+#=====================================================================
+#
+proc keep.talking, talk.from, talk.to
+   set talk.next, talk.from
+   set talk.end, talk.to
+   say talk.from
+   add talk.next, 1
+   ifgt talk.next, talk.to
+      set context, none    # We are done
+      quit
+   fin
+   set context, q.more
+   quip more?
+#
+#=====================================================================
+#
+proc do.introduction
+   quip intro
+#
+#=====================================================================
+#
+proc fake.note msg wrd
+   ifany notice, note, sign, message, lettering, words
+      respond look, read, msg, wrd
+      respond get, break, kick, push, pull, leave.it.alone, arg2
+      flag context, arg2.here
+      call bail.out
+   fin
+#
+#=====================================================================
+#
+proc fake.window
+   ifkey out
+      respond climb, window, climbing.out.risky
+      ifkey look
+         proceed
+      fin
+   fin
+   ifkey window
+      respond look, its.a.window
+      respond rub, break, kick, open, close, no.glass, arg1
+      respond climb, climbing.out.risky
+      flag context, arg2.here
+      call bail.out
+   fin
+#
+#=====================================================================
+#
+proc unicorn.stuff
+   ifloc unicorn, sw.repository
+      ifflag unicorn, special2
+         ifflag unicorn, special1
+            unflag unicorn, special1
+            quip bump.nose
+         else
+            apport unicorn, ylem
+            quip unicorn.departs
+         fin
+      else
+      say bump.nose
+         ifflag unicorn, special1
+            flag unicorn, special2
+            quip stop.pissing.about
+         fin
+         flag unicorn, special1
+         quit
+      fin
+   fin
+   quip bump.nose
+#
+#=====================================================================
+#
+proc open.bivalve
+   ifnear arg2
+      ifhave arg2
+         quip drop.the.bivalve, arg2
+      fin
+      ifhave trident
+         ifkey clam
+            apport clam, ylem
+            apport oyster, here
+            apport pearl, culdesac
+            quip bivalve.opened, 0
+         fin
+         quip bivalve.opened, 1
+      fin
+      quip no.open.bivalve, arg2
+   fin
+#
+#=====================================================================
+#
+proc check.all
+   ifany get, drop, undo, redo
+      proceed
+   fin
+   ifis arg1, all
+      quip fancy.that
+   fin
+   ifkey right          # All right - all right?
+      quip good
+   fin
+   say bad.all.1, arg1
+   quip bad.all.2, arg2
+#
+#=====================================================================
+#
+proc sculpture.stuff
+   local base
+   local name
+#
+   ifnear sculpture
+   else
+      call bail.out
+   fin
+   set name, arg2
+   lda base, first.sculpture.fake
+   sub name, base
+   ifeq sculpture, 0
+      and
+   ifeq name, 1
+      or
+   ifeq sculpture, name
+      lda arg2, sculpture
+   else
+      call bail.out
+   fin
+#
+# The rest of this procedure does nothing other than stopping translator
+# grumping about unused symbols.
+#
+   ifany pig, eel, emu, elf, squirrel, vulture, rabbit
+      or
+   ifany elephant, snail, condor, lizard, ibex
+      or
+   ifany frog, tiger, mule, moose, dog, phoenix, nymph
+      quip blank
+   fin
+#
+#=====================================================================
+#
+proc drink.champagne
+   ifkey sip
+      iflt sip.count, max.sips
+         add sip.count, 1
+         quip sip.champagne
+      fin
+      quip no.sip.champagne
+   fin
+   quip family.game
+#
+#=====================================================================
+#
+proc mask.stuff
+   ifhave mask, worn
+      ifflag status, light.here
+         and
+         not
+      ifflag mask, special1
+         flag mask, special1
+         say zorro.outfit
+      fin
+   fin
+   ifat stupendous.view
+      proceed
+   fin
+   ifgt masktime, 0
+      sub masktime, 1
+   fin
+   ifeq mask, worn
+   else
+      proceed
+   fin
+   ifhave mask, worn
+      ifeq masktime, 4
+         say mask.getting.warm
+      otherwise
+      ifeq masktime, 2
+         say better.remove.mask
+      otherwise
+      ifeq masktime, 0
+         apport mask, ylem
+         ifflag bucket, seen
+            and
+            not
+         ifat bucket stupendous.view
+            say mask.goes.poof, 1
+         else
+            say mask.goes.poof, 0
+         fin
+      fin
+   fin
+#
+#=====================================================================
+#
+proc consult.sunstone, direction
+   local dir
+   local base
+#
+   ifeq direction, none
+      or
+      not
+   ifhave sunstone
+      proceed
+   fin
+   set dir, direction
+   lda base, north         
+   sub dir, base
+   add dir, 1
+   ifeq sunstone, dir
+      set dir, 0
+   else
+      ifeq dir, 1
+         set dir, 8
+      else
+         sub dir, 1
+      fin
+      ifeq sunstone, dir
+         set dir, 0
+      else
+         ifgt dir, 6
+            sub dir, 6
+         else
+            add dir, 2
+         fin
+         ifeq sunstone, dir
+            set dir, 0
+         fin
+      fin
+   fin
+   ifeq dir, 0
+      quip sunstone.stops.you, direction
+   fin
+#
+#=====================================================================
+#
+proc stir.sands, where
+   local desval
+#
+   choose desval, 1, 255
+   ifis where, desert.1
+      intersect desval, 48    # S and SW
+   otherwise
+   ifis where, desert.2
+      intersect desval, 113    # N, S, SW and W
+   otherwise
+   ifis where, desert.3
+      or
+   ifis where, desert.4
+      intersect desval, 241   # N, S, SW, W and NW
+   otherwise
+   ifis where, desert.5
+      intersect desval, 209   # N, S, W and NW
+   otherwise
+   ifis where, desert.6
+      intersect desval, 129
+   otherwise
+   ifis where, desert.7,
+      intersect desval, 254   # All bar N
+   otherwise
+   ifis where, desert.9
+      intersect desval, 223   # All bar SW
+   otherwise
+   ifis where, desert.10
+      intersect desval, 143   # N, NE, E, SE, NW
+   otherwise
+   ifis where, desert.11, 
+      intersect desval, 56    # SE, S, SW
+   otherwise
+   ifis where, desert.12
+      intersect desval, 125   # N, E, SE, S, SW, W
+   otherwise
+   ifis where, desert.14
+      intersect desval, 239   # All bar S
+   otherwise
+   ifis where, desert.15
+      intersect desval, 222   # All bar N and SW
+   otherwise
+   ifis where, desert.16
+      intersect desval, 191   # All bar W
+   otherwise
+   ifis where, desert.17
+      intersect desval, 87    # N, NE, E, S, W
+   otherwise
+   ifis where, desert.18
+      intersect desval, 131   # N, NE, NW
+   otherwise
+   ifis where, desert.19
+      intersect desval, 56    # SE, S, SW
+   otherwise
+   ifis where, desert.20
+      intersect desval, 109   # N, E, SE, SW, W
+   otherwise
+   ifis where, desert.21
+      intersect desval, 142   # NE, E, SE, NW
+   otherwise
+   ifis where, desert.22
+      intersect desval, 22    # NE, E, S
+   otherwise
+   ifis where, desert.last
+      intersect desval, 11    # N, NE, SE
+   fin
+#
+   deposit, where, desval
+#
+#=====================================================================
+#
+proc blow.sands
+   ifflag status, moved
+   else
+      say blank
+   fin
+   say sands.blow
+   ifflag status, moved
+      say blank
+   fin
+   call stir.sands, here
+   set desloc, 0
+   set destime, 0
+#
+#=====================================================================
+#
+proc desert.stuff
+   local counter
+   local temp.val
+   local dir
+   local state
+#
+   unflag here, been.here
+   ifflag status, moved
+      eval state, here
+      ifeq state, 0
+         call stir.sands, here
+      fin
+   fin
+   ifflag desloc, moved
+      call blow.sands
+      unflag desloc, moved
+      proceed
+   fin
+   ifflag there, in.desert
+      and
+   ifflag status, moved
+      ifeq here, desloc
+         set desloc, there
+         proceed
+      fin
+      set dir, 0
+      ifinrange arg1, first.direction, last.compass.point
+         set dir, arg1
+      else
+         ifkey walk
+            and
+         ifinrange arg2, first.direction, last.compass.point
+            set dir, arg2
+         fin
+      fin
+      ifeq dir, 0
+         proceed
+      fin
+      ifne dir, unblocked.dir
+         lda temp.val, north
+         set state, dir
+         sub state, temp.val
+         set desbit, 1
+         ifgt state, 0
+            iterate counter, 1, state
+               add desbit, desbit
+            fin
+         fin
+         eval desmask, there
+         intersect desmask, desbit
+         ifgt desmask, 0
+            say no.cross.sand, dir
+            goto there
+            set there, desloc
+            unflag status, moved
+            set blocked.dir, dir
+         fin
+      else
+         set desloc, there
+         set unblocked.dir, 0
+         call stir.sands, here
+      fin
+   fin
+   ifeq destime, 6
+      set temp.val, 100
+   else
+      set temp.val, destime
+      multiply temp.val, 5
+   fin
+   add destime, 1
+   chance temp.val
+      call blow.sands
+   fin
+   say blank
+#
+#=====================================================================
+#
+proc spire.drop
+   ifeq status, 1
+      proceed
+   fin
+   lda text.ptr, really.spire.drop?
+   set context, q.spire.drop
+   save command, text.ptr
+   quip text.ptr
+#
+#=====================================================================
+#
+proc do.spire.drop
+   local qualifier
+#
+   ifeq status, 0
+      or
+   ifkey yes
+      restore command, text.ptr
+      set context, none
+      ifkey sunstone
+         or
+      chance 50
+         apport arg2, ylem
+         set qualifier, 0
+         ifflag arg2, plural
+            set qualifier, 1
+         fin
+         say you.do, arg1
+         say it.is..., arg2
+         quip wind.gets.it, qualifier
+      else
+         call drop
+      fin
+      proceed
+   fin
+   ifany quit, no, n
+      set context, none
+      choose qualifier, 0, 4
+      quip very.wise, qualifier
+   fin
+   restore command, text.ptr
+   say yes.or.no?
+   quip text.ptr
+#
+#=====================================================================
+#
+proc vampire.stuff
+   local state
+#
+   set obj.ptr,0
+   ifany bottle, flask, bucket
+      set obj.ptr, arg2
+      ifhave obj.ptr
+      else
+         call not.got, obj.ptr
+      fin
+      eval state, obj.ptr
+      ifgt state, emptied
+      else
+         quip nothing.in.it, obj.ptr
+      fin
+      ifeq state, full.of.water
+         say drink.offered, arg2
+         quip vampire.no.water
+      fin
+      ifeq state, full.of.oil
+         quip vampire.no.oil
+      fin
+      ifeq state, full.of.dung
+         quip vampire.no.dung
+      fin
+      ifeq state, full.of.champagne
+         ifeq vampire, asleep
+            quip vampire.had.enough
+         fin
+         ifkey bucket
+            set bucket, emptied
+            apport bucket, here
+            set vampire, content
+            quip vampire.drinks
+         fin
+         quip not.enough.drink
+      fin
+   fin
+   ifkey water
+      call find.water, false
+      ifeq vessel, none
+         quip you.dont.have, water
+      fin
+      say drink.offered, vessel
+      quip vampire.no.water
+   fin
+   ifkey champagne
+      ifeq vampire, asleep
+         quip vampire.had.enough
+      fin
+      ifhave bucket, full.of.champagne
+         set vampire, content
+         set bucket, emptied
+         apport bucket, here
+         quip vampire.drinks
+      fin
+      ifhave bottle, full.of.champagne
+         or
+      ifhave flask, full.of.champagne
+         quip not.enough.drink
+      fin
+      quip you.dont.have, champagne
+   fin
+   ifkey oil
+      ifhave bucket, full.of.oil
+         or
+      ifhave bottle, full.of.oil
+         or
+      ifhave flask, full.of.oil
+         quip vampire.no.oil
+      fin
+      quip you.dont.have, oil
+   fin
+   say the.it, vampire
+   quip dont.want.it, arg2
+#
+#=====================================================================
+#
+proc vampires.gift, switch
+   local temp.val
+#
+   ifflag fangs, seen
+      proceed
+   fin
+   apport fangs, here
+   flag fangs, seen
+   set vampire, asleep
+   lda temp.val, fangs
+   set it, temp.val
+   quip vampire.rewards, switch
+#
+#=====================================================================
+#
+proc wind.blows
+   local qualifier
+#
+   ifany mask, magazines, spices, rags, seed
+      ifany seed, mask
+         set qualifier, 0
+      else
+         set qualifier, 1
+      fin
+      say wind.blows.it, arg2
+      quip blows.it.off, qualifier
+   fin
+#
+#=====================================================================
+#
+proc feed.bird
+   ifhave seed
+      apport seed, limbo
+      ifhave rod
+         and
+      ifhere bird, freed
+         say scattered.seed
+         quip bird.ignores.seed
+      fin
+      ifflag quips, trusting.bird
+         quip polite.bird
+      else
+         flag quips, trusting.bird
+         quip bird.now.trusts, 0
+      fin
+   fin
+   quip bird.not.hungry
+#
+#=====================================================================
+#
+proc bridge.stuff
+   local obj.ptr
+   local count
+#
+   ifkey look
+      proceed
+   fin
+   ifkey throw
+      ifeq status, 1
+         or
+         not
+      ifhave arg2
+         proceed
+      fin
+      ifkey skull
+         set skull, damaged
+         flag skull, unstable
+         lda throw.here, river.bed.2
+      else
+         set throw.here, ylem
+      fin
+      lda throw.text, into.the.river
+      proceed
+   fin
+   ifat cave.4
+      set bridge.limit, 0
+      itobj obj.ptr, inhand, valued
+         add bridge.limit, 1
+      fin
+      say weak.bridge
+      move cave.5
+   fin
+   itobj obj.ptr, inhand, valued
+      add count, 1
+   fin
+   ifgt count, bridge.limit
+      say bridge.collapses
+      ifhave skull,
+         apport skull, river.bed.2
+      fin
+      goto ylem
+      call coroner
+   fin
+   say weak.bridge
+   move cave.4
+#
+#=====================================================================
+#
+proc whirlpool.dive
+   local obj.ptr
+   local obj.val
+   local kept.some
+   local lost.some
+   local outcome
+#
+   ifeq status, 0
+      or
+   ifkey yes
+      restore command, text.ptr     
+      unflag reservoir, hintable
+      ifhave bird
+         apport bird, ylem
+      fin
+      itobj obj.ptr, inhand
+         eval obj.val, obj.ptr
+         ifis obj.ptr, ring, beads
+            and
+         ifeq obj.val, worn
+            set kept.some, 1
+         otherwise
+         ifis obj.ptr, lamp
+         else
+            apport obj.ptr, ylem
+            set lost.some, 1
+         fin
+      fin
+      ifeq lost.some, 0
+         set kept.some, 0
+      fin
+      add outcome, lost.some
+      add outcome, kept.some
+      sub outcome, 1
+      set into.the.whirlpool, 0
+      ifhave lamp
+         add outcome, 2
+         set invct, 1
+         ifeq lost.some, 0
+            set lost.some, 1         # Only pretending!
+            set outcome, 4
+         fin
+         ifeq lamp, switched.on
+            set into.the.whirlpool, 1
+         fin
+      else
+         set invct, 0
+      fin
+      say into.the.whirlpool
+      ifgt lost.some, 0
+         say strong.current, outcome
+      else
+         say blank
+      fin
+      set context, none
+      smove reservoir.north, out.of.the.whirlpool
+   fin
+   ifany quit, no, n
+      set context, none
+      quip ok!
+   fin
+   restore command, text.ptr
+   say yes.or.no?
+   quip text.ptr
+#
+#=====================================================================
+#
+proc positive.vetting
+   ifeq context, q.wizard
+      set context, none
+      ifeq status, 0
+         or
+      ifkey yes
+         set context, q.prove.it
+         quip prove.it
+      fin
+      respond quit, no, n, ok!
+   fin      
+   set context, none
+   add penalties, 10
+   quip oh.pooh, 0
+#
+#=====================================================================
+#
+proc maze.escape
+   local obj.ptr
+   set context, none
+#
+   ifeq status, 0
+      or
+   ifkey yes
+      add penalties, hint.cost
+      itobj obj.ptr, inhand, valued
+         drop obj.ptr
+      fin
+      ifhave tusk
+         drop tusk     # It may not be valuable yet!
+      fin
+      say foof
+      ifinrange here, mazea.42, mazea.by.pit
+         move west.end.of.mists
+      fin
+      ifinrange here, mazed.107, mazed.140
+         move long.hall.west
+      fin
+      ifinrange here, slide, ice.cave.30
+         move ice
+      fin
+   fin
+   respond quit, no, n, ok!
+   quip lets.be.prudent, 0
+#
+#=====================================================================
+#
+proc save.this
+   set context, none
+   unflag here, been.here
+   ifis arg2, save             # Can't be just 'save'! We wouldn't be here.
+      exec 11                  # Copy 1st word to 2nd
+   fin
+   ifgt alarm, 1               # Fire alarm keeps ticking!
+      add alarm, 1
+   fin
+   save file, result           # Save program image
+   ifeq result, 0
+      set context, q.continue
+      say continue.now?, hint.cost
+      quip want.to.continue?
+   fin 
+   ifeq result, 2              # Already have such save!
+      save command, text.ptr
+      set context, q.delete
+      quip delete.image?
+   else
+      set context, none
+      quip cant.save
+   fin
+#
+#=====================================================================
+#
+proc save.it
+   ifeq context, q.save
+      set context, none
+      respond quit, no, n, if.not.not
+      ifeq status, 0
+         or
+      ifkey yes
+         restore command, text.ptr
+         iflt status, 2
+            set context, q.save.what
+            set status, no.match      # No matching on the reply!
+            quip save.what?
+         fin
+         call save.this
+      fin
+      quip lets.be.prudent, 0
+   fin
+   ifeq status, 0
+      or
+   ifkey yes
+      add penalties, hint.cost
+      set context, none
+      quip ok!
+   fin
+   ifany quit, no, n
+      say well.meet.again
+      call finis
+   fin
+   say yes.or.no?
+   say continue.now?, hint.cost
+   quip want.to.continue?
+#
+#=====================================================================
+#
+proc art.of.memory
+   local ret.val
+#
+   ifeq context, q.remember
+      set context, none
+      ifeq status, 0
+         or
+      ifany yes, remember
+         save memory, ret.val
+         ifeq ret.val, 0
+            quip memory.image
+         else
+            quip memory.fails
+         fin
+      fin
+      respond quit, no, n, as.you.wish
+      quip lets.be.prudent, 0
+   else
+      set context, none
+      ifeq status, 0
+         or
+      ifkey yes
+         restore memory, ret.val
+         ifeq ret.val, 0
+            add penalties, 1
+            flag status, moved
+            quip old.image
+         fin
+         quip no.memory.image
+      fin
+      respond quit, no, n, as.you.wish
+      quip lets.be.prudent, 0
+   fin
+#
+#=====================================================================
+#
+proc resurrection.shuffle
+   local obj.ptr
+   local state
+   local place.ptr
+#
+   ifeq status, 0
+      or
+   ifkey yes
+      set context, none
+      say lazarus.job
+      say blank
+      ifeq deaths, lives
+         call finis
+      else
+         ifhave vase
+            apport vase, ylem
+            get pottery
+         fin
+         ifhave bottle
+            set bottle, emptied
+         fin
+         ifhave flask
+            and
+            not
+         ifeq flask, sealed
+            set flask, emptied
+         fin
+         locate place.ptr, rod
+         ifinrange place.ptr, north.of.spire, cave.8
+            apport rod, road
+         fin
+         itobj obj.ptr, inhand
+            drop obj.ptr
+            ifflag obj.ptr, wearable
+               eval state, obj.ptr
+               ifeq state, worn
+                  deposit obj.ptr, not.worn
+               fin
+            fin
+            ifis obj.ptr, ring
+               or
+            ifis obj.ptr, axe
+               apport obj.ptr, road
+            fin
+         fin
+         set invct, 0
+         set lamp, switched.off
+         goto  building
+         set there, 0
+         apport lamp, road
+         ifeq lamplife, 0
+            ifflag lair, been.here
+            else
+               locate   place.ptr, batteries
+               ifeq batteries, wornout
+                  or
+                  not
+               ifflag place.ptr, not.in.cave
+                  apport lamp, ylem
+               fin
+            fin
+         fin
+         apport dwarf, limbo
+         set dwarf, 0
+         unflag pirate, special1   # Clear chasing mode
+         quit
+      fin
+   fin
+   ifany quit, no, n
+      call finis
+   fin
+   say yes.or.no?
+   quip reincarnate?
+#
+#=====================================================================
+#
+proc sentry.kills
+   local obj.ptr
+#
+   restore command, text.ptr
+   say sentry
+   itobj obj.ptr, inhand
+      ifflag obj.ptr, valued
+         apport obj.ptr, storeroom
+      else
+         drop obj.ptr
+      fin
+   fin
+   call coroner
+#
+#=====================================================================
+#
+proc show.nouns
+   ifany quit, no, n
+      set context, none
+      quip as.you.wish
+   fin
+   vocab vocab.nouns
+   vocab alarm, seen
+   vocab axe
+   vocab bag, seen
+   vocab basilisk, seen
+   vocab batteries, seen
+   vocab beads, seen
+   vocab bear, seen
+   vocab beater, seen
+   vocab bird, seen
+   vocab bones, bones.room, been.here
+   vocab book, imaze.book, been.here, book.voc
+   vocab bottle
+   vocab bowl, seen, bowl.voc
+   vocab box, seen, box.voc
+   vocab bracelet, seen
+   vocab bridge, seen
+   vocab bucket, seen
+   vocab bust, seen
+   vocab cage seen
+   vocab caviar, champagne, seen
+   vocab chain, seen
+   vocab chalice, seen
+   vocab champagne, seen
+   vocab chasm, sw.of.chasm, been.here
+   vocab chest, seen, chest.voc
+   vocab clam, seen
+   vocab coffin, seen
+   vocab coins, seen
+   vocab crown, seen
+   vocab crucifix, seen
+   vocab curtains, seen
+   vocab diamonds, seen
+   vocab dinghy, seen
+   vocab djinn, seen
+   vocab documents, seen
+   vocab door, seen
+   vocab drachma, seen
+   vocab dragon, seen
+   vocab drain, seen
+   vocab dung, seen
+   vocab dwarf, seen, dwarf.voc
+   vocab eggs, seen, eggs.voc
+   vocab emerald, seen
+   vocab fangs, seen
+   vocab flask, seen
+   vocab flower, seen
+   vocab fog, plain.2, been.here
+   vocab food, seen
+   vocab gates, seen
+   vocab giant, seen
+   vocab goblins, seen
+   vocab nugget, seen, gold.voc
+   vocab gong, seen
+   vocab grate, seen
+   vocab grill, seen
+   vocab helmet, seen
+   vocab horn, seen
+   vocab imp, seen
+   vocab inscription, seen, inscription.voc
+   vocab jewellery, seen
+   vocab keys
+   vocab lamp
+   vocab machine, seen, machine.voc
+   vocab magazines, seen, magazine.voc
+   vocab mask, seen
+   vocab mirror, seen
+   vocab mist
+   vocab mushroom, seen
+   vocab mustafa, seen, mustafa.voc
+   vocab notice, seen
+   vocab ogre, seen
+   vocab oil, east.pit, been.here
+   vocab opals, seen, opals.voc
+   vocab orb, seen, orb.voc
+   vocab owl, seen
+   ifeq packet, stupe.gro
+      vocab packet, seen, packet.voc
+   else
+      vocab packet, seen
+   fin
+   vocab pearl, seen
+   vocab pillow, seen
+   vocab pine, island.05, been.here
+   vocab pirate, seen
+   ifflag plant, seen
+      or
+   ifflag beanstalk, seen
+      vocab plant, seen, plant.voc
+   else
+      vocab plant, object
+   fin
+   vocab plaque, seen
+   vocab plate, seen
+   vocab portcullis, seen
+   vocab pottery, seen, pottery.voc
+   vocab pyramid, seen
+   vocab rags, seen
+   vocab rat, seen
+   vocab ring, seen
+   vocab rod, seen
+   vocab rope, seen
+   vocab rose, tower.roof, been.here
+   vocab rosebowl, seen
+   vocab rug, seen
+   vocab safe, seen
+   vocab sapling, seen
+   vocab sapphire, seen
+   vocab sceptre, seen
+   vocab sculpture, seen
+   vocab seal, seen
+   vocab shoes, seen, shoes.voc
+   vocab bars, seen, silver.voc
+   vocab skeleton, seen
+   vocab skull, seen
+   vocab slime, seen
+   vocab snake, seen
+   vocab spices, seen
+   vocab spider, seen
+   vocab spire, spire, been.here
+   vocab spoon, seen
+   vocab spyglass, seen
+   vocab stalactite, seen
+   vocab starstone, seen
+   vocab statue, seen
+   vocab steps, seen
+   vocab sunstone, seen
+   vocab sword, seen
+   vocab tablet, seen
+   vocab teeth, seen
+   vocab throne, seen
+   vocab thurible, seen
+   vocab tortoise, seen
+   vocab trapdoor, seen
+   vocab tree
+   vocab trident, seen
+   vocab troll, seen
+   vocab tusk, seen
+   vocab unicorn, seen
+   vocab vampire, seen
+   vocab vase, seen
+   vocab vial, seen
+   vocab water
+   vocab web, seen
+   vocab windrose, seen, rose.voc
+   vocab wrapper, seen
+   vocab yacht, seen
+   say blank
+   ifeq context, none
+      quit
+   fin
+   set context, q.vocab.2
+   quip more?
+#
+#=====================================================================
+#
+# Randomise some of the cycling texts.
+#
+proc randomise.texts
+   randomise one.at.a.time, 0
+   randomise dark.warning, 0
+   randomise no.fucking, 0
+   randomise nocomprende, 0
+   randomise nocomprende.verb, 0
+   randomise nocomprende.object, 0
+   randomise no.understand, 0
+   randomise no.can.go, 0
+   randomise i.dont.see, 0
+   randomise impassable.desert, 0
+   randomise naturally.nothing, 0
+   randomise tell.me.more, 0
+   randomise its.tears.are.wet, 0
+   randomise just.scenery, 0
+   randomise not.a.good.idea, 0
+   randomise spire.there, 0
+   randomise no.point.in.that, 0
+   randomise no.agriculture, 0
+   randomise dunno.hao, 0
+   randomise not.much.of.it, 0
+   randomise no.pick.up, 0
+   randomise dark.exit, 0
+   randomise dark.exits, 0
+   randomise well.worn.steps, 0
+   randomise door.in.the.way, 0
+   randomise bad.idea, 0
+   randomise look.around, 0
+   randomise you.have.it, 0
+   randomise be.serious!, 0
+   randomise pacifist, 0
+   randomise which.way?, 0
+   randomise hah!, 0
+   randomise dont.know.the.way, 0
+   randomise no.enlightenment, 0
+   randomise nothing.to.climb, 0
+   randomise do.what?, 0
+   randomise it.wont.budge, 0
+   randomise get.on.with.it, 0
+   randomise you.jump, 0
+   randomise its.just.a, 0
+   randomise attention.to.detail, 0
+   randomise not.a.hope, 0
+   randomise creaky.shed.door, 0
+   randomise no.more.to.say, 0
+   randomise star.lights, 0
+   randomise hang.on!, 0
+   randomise tis.amusing, 0
+   randomise no.violence, 0
+   randomise jerry.words, 0
+   randomise scruffy.vegetation, 0
+   randomise not.droppable, 0
+   randomise u.turn, 0
+   randomise nothing.doing.1, 0
+   randomise troll.zorro, 0
+   randomise it.would.seem, 0
+   randomise vandal!, 0
+   randomise caught.climbing, 0
+#   randomise fiddle.ok, 0       # Better not randomise!
+#   randomise fiddle.ignore, 0   # Ditto.
+   randomise we.have.light, 0
+   randomise nothing.to.undo, 0
+   randomise no.kick.it, 0
+   randomise crying.no.help, 0
+   randomise indecisions, 0
+   set nothing.doing.2, nothing.doing.1
+   randomise typo, 0             # TYPO is structured in blocks of 4
+   divide typo, 4                # messages, so randomise to the start
+   multiply typo, 4              # of a block.
+#
+#=====================================================================
+#
+proc restore.it
+   ifeq lamp, switched.on     # If the lamp is on
+      add lamplife, 1         # Compensate for following move
+   fin
+   set context, q.keep.image
+   quip save.the.image
+#
+#=====================================================================
+#
+proc early.restore
+   set context, none
+   ifeq status, 0
+      or
+   ifkey yes
+      add penalties, hint.cost
+      call restore.it
+   fin
+   ifany no, n
+      say ok!
+   else
+      say lets.be.prudent, 0
+   fin
+   exec 28              # Restore temporary memory save
+   set context, none
+   quit
+#
+#=====================================================================
+#
+proc restored
+   local tmp
+   set context, none
+#
+# The following kludge is necessary to preserve upward compatibility of
+# saved games after placing the block of magic words at the top of the
+# verbs pile. This is further complicated by an earlier cock-up, which
+# actually motivates this change.
+#
+   ifinrange password, 725, 740
+      ifeq password, 738
+         or
+      ifeq password, 739
+         lda password, blerbi
+      otherwise
+      ifeq password, 734
+         lda password, klaetu
+      otherwise
+      ifeq password, 732
+         lda password, knerl
+      otherwise
+      ifle password, 727
+         lda password, snoeze
+      fin
+   fin
+#
+   call randomise.texts   
+   ifeq status, 0
+      or
+   ifkey yes
+      say ok!
+   otherwise
+   ifany no, n
+      restore command
+      exec 3, result             # Flush the image
+      ifeq result, 0
+         say its.gone
+      else
+         say its.not.gone
+      fin
+   else
+      say lets.be.prudent, 1
+   fin
+   goto here
+   unflag here, been.here
+   quip blank
+#
+#=====================================================================
+#
+proc set.it.up
+   set stage, little.joke
+   set result, 1     # Nominate persistent flag
+   exec 14, result   # Get its value
+   ifne result, 1
+      say spiel
+      goto nowhere
+      unflag status, moved
+      set there, here
+      set context, none
+      quit
+   else
+      flag status, moved
+      goto road
+      set there, here
+      say blank
+      set context, q.intro
+      quip instructions?
+   fin
+#
+#=====================================================================
+#
+proc open.mine.door
+   set door1, outside.view
+   set waterfall, opened
+   set mine, opened
+   say door.opens, word.ptr
+   flag mine, lit
+   ifat mine
+      and
+      not
+   ifflag status, light.here
+      set status, 1
+      lda arg1, look
+      say blank
+      call look
+   fin
+   quit
+#
+#=====================================================================
+#
+proc close.mine.door
+   set waterfall, closed
+   set mine, closed
+   unflag mine, lit
+   ifeq dwarven, 0
+      or
+   ifkey bknrd             # "Close" in Humanish
+      ifis arg1, bknrd
+         say nocomprende.verb, arg1
+      otherwise
+      ifgt status, 1
+         say nocomprende.object, arg2
+      fin
+      say blank
+      ifkey open
+         set it.door, 1
+      else
+         set it.door, 0
+      fin
+      say door.slams.shut
+   else
+      say you.do, close
+      say it.is, door
+   fin
+   ifat mine
+      set door1, inside.view
+      call is.it.dark?
+      ifflag status, light.here
+      else
+         say blank
+         call too.dark.for.safety, 1
+      fin
+   fin
+#
+#=====================================================================
+#
+proc close.door2
+   set tower.upper.landing, ajar
+   set door2, ajar
+   quip stores.door.shuts
+#
+#=====================================================================
+#
+proc wall.stuff
+   ifkey look
+      quip its.a.wall, 0
+   otherwise
+   ifkey climb
+      quip no.climb.wall
+   otherwise
+   ifkey follow
+      quip no.follow.wall
+   else
+      quip hah!      
+   fin
+#
+#=====================================================================
+#
+proc feed.unicorn
+   ifnear food
+      ifloc dung, ylem
+         or
+         not
+      ifflag dung, seen
+         apport food, limbo
+         apport dung, here
+         flag dung, seen
+         set unicorn, 1
+         quip unicorn.eats
+      else
+         say the.it, unicorn
+         quip dont.want.it, food
+      fin
+   fin
+   quip no.food.for.it
+#
+#=====================================================================
+#
+proc tooth.stuff
+   ifnear teeth
+   else
+      ifflag teeth, seen
+         quip i.dont.see, teeth
+      fin
+      quip no.understand
+   fin
+   ifkey get
+      and
+   ifhave teeth
+      quip you.have.it, teeth
+   fin
+   ifany drop, throw
+      and
+      not
+   ifhave teeth
+      call not.got, teeth
+   fin
+   quip teeth.plural, arg1
+#
+#=====================================================================
+#
+proc beach.stuff
+   fakearg strips, sand
+   ifany water, sea
+      respond in, go, in, no.swim, 0
+      respond get, salt.h20.bad
+   fin
+   ifkey drink
+      call find.water, false
+      ifne vessel, none
+         proceed
+      fin
+      quip salt.h20.bad
+   fin
+   ifkey climb
+      ifkey palms
+         or
+      ifeq status, 1
+         ifnear palms
+            quip no.palm.climbing
+         fin
+         ifkey palms
+            call bail.out
+         fin
+      fin
+   fin
+   ifkey fill
+      ifany flask, bottle, bucket
+         and
+      ifnear arg2
+         quip salt.h20.bad
+      fin
+   fin
+   ifat sandy.beach, wide.beach, beach.end
+      ifkey beanstalk
+         and
+      ifgt beanstalk, stunted
+         quip too.far.to.see, beanstalk
+      fin
+      respond debris, no.future.in.it, arg2
+      respond wood, useless.bits, wood
+   fin
+   ifkey look
+      respond sea, waves, water, sea.vista
+      respond view, horizon, far.horizon
+      respond shore, its.a.shore
+      ifkey beach
+         set status, 1
+         call look
+         quit
+      fin
+   fin
+   ifany cliff, chalk
+      and
+   ifinrange here, rock.shelf, beanstalk.top
+      ifeq status, 1
+         quip what.about.them, cliff
+      fin
+      flag context, arg2.here
+   fin
+#
+#=====================================================================
+#
+proc climbing.check
+   local obj.ptr
+#
+   itobj obj.ptr, inhand, big
+      ifis obj.ptr, lamp
+      else
+         quip text.ptr
+      fin
+      set lamp.in.teeth, 0
+      ifhave lamp
+         set lamp.in.teeth, 1
+      fin
+   fin
+#
+#=====================================================================
+#
+proc tower.climbing
+   ifat tower.roof
+      lda text.ptr, tower.climb.tricky
+   else
+      lda text.ptr, no.climb.tower
+   fin
+   call climbing.check
+   flag here, special
+   ifat tower.roof
+      smove garden.s, down.the.tower
+   else
+      smove tower.roof, up.the.tower
+   fin
+#
+#=====================================================================
+#
+proc lets.knock
+   local place.ptr
+#
+   ifeq door2, closed
+      set door2, ajar
+      set tower.upper.landing, ajar
+      set alarm, 10
+      itplace place.ptr, tower.base, dwarves.quarters
+         unflag place.ptr, been.here
+      fin
+      quip knock.knock
+   fin
+   quip dont.knock
+#
+#=====================================================================
+#
+proc in.forest.actions
+   ifkey grass
+      ifis arg1, grass
+         respond grass, attention.to.detail, arg1
+      else
+         respond grass, attention.to.detail, arg2
+      fin
+   fin
+   respond berries, no.berries
+   ifkey look
+      respond forest, around, in.forest
+      respond sapling, saplings, various.saplings
+      respond tree, pine, maple, birch, ash, a.tree.is.a.tree
+      respond bushes, undergrowth, generic.undergrowth
+      respond sky, up, forest.scenery, 0
+      respond floor, down, forest.scenery, 1
+      respond vegetation, dull.stuff, vegetation
+   fin
+   ifkey climb
+      ifeq status, 1
+         or
+      ifany tree, maple, pine
+         ifat hill
+            quip dull.view, 1
+         else
+            quip dull.view, 0
+         fin
+      fin
+      respond sapling, birch, ash, too.young
+      flag context, arg2.here
+      proceed
+   fin
+   ifkey cut
+      ifany tree, maple, birch, ash, sapling, saplings
+         proceed
+      fin
+      ifany bushes, undergrowth
+         quip no.point.in.that
+      fin
+   fin
+   ifany undergrowth, foliage, maple, birch, pine, sapling, saplings, ash
+      or
+   ifany tree, maple, ash, sapling, saplings, bushes, floor, sky, vegetation
+      flag context, arg2.here
+   fin
+#
+#=====================================================================
+#
+proc by.house.actions
+   ifkey grass
+      ifis arg1, grass
+         respond grass, attention.to.detail, arg1
+      else
+         respond grass, attention.to.detail, arg2
+      fin
+   fin
+   ifkey building
+      ifeq status, 1
+         ifat road
+            proceed
+         fin
+         quip right.next.to.you, arg1
+      fin
+      respond look, house.info
+      respond climb, no.point.in.that
+      ifany in, walk
+         ifat road
+            proceed
+         else
+            quip i.dont.see, door
+         fin
+      fin
+      quip hah!
+   fin
+   ifkey forest
+      respond look, in.open.forest
+      ifeq status, 1
+         or
+      ifany go, in
+         quip forest.all.around
+      fin
+      quip hah!
+   fin
+   ifeq status, 1
+      and
+   ifany tree, maple, pine, vegetation, roof, bricks
+      exec 11
+   fin
+   ifkey kick
+      respond building, wall, bricks, no.kick.it, wall
+      respond maple, pine, tree, no.kick.it, tree
+   fin
+   ifany tree, maple, pine, vegetation, roof, bricks, wall, building
+      and
+   ifany kill, break
+      quip no.violence
+   fin
+   respond tree, no.handy.them, tree
+   respond maple, pine, no.handy.them, arg2
+   respond vegetation, dull.stuff, vegetation
+   respond roof, building.roof
+   respond bricks, house.bricks
+   ifkey corner
+      respond look, wall.corners, 2
+      flag context, arg2.here
+   fin
+   ifkey wall
+      respond look, building.wall
+      respond climb, no.point.in.that
+      respond push, pull, get, house.bricks
+      respond break, no.violence
+      quip hah!
+   fin
+   call in.forest.actions
+#
+#=====================================================================
+#
+proc in.dense.forest.actions
+   ifkey look
+      respond forest, dense.forest
+      respond track, road, dirt.track, 0
+      ifany ground, down
+         quip dirt.track, 1
+      fin
+      ifkey tree
+         fakecom tree, conifer
+      fin
+      respond conifer, prickly.conifers, arg2
+      respond undergrowth, generic.undergrowth
+   fin
+   ifkey forest
+      ifany go, in
+         or
+      ifeq status, 1
+         quip forest.all.around
+      fin
+      flag context, arg2.here
+      proceed
+   fin
+   ifkey climb
+      and
+   ifany tree, conifer
+      quip no.climb.fir, 0
+   fin
+   ifany tree, conifer, firs, undergrowth, ground
+      flag context, arg2.here
+   fin
+#
+#=====================================================================
+#
+proc in.dark.forest.actions
+   ifkey look
+      ifkey forest
+         say forest.description
+         quip blank
+      fin
+      respond up, sky, dark.forest.scenery, 0
+      respond down, ground, dark.forest.scenery, 1
+      ifkey tree
+         fakecom tree, conifer
+      fin
+      respond conifers, prickly.conifers, arg2
+      respond undergrowth, generic.undergrowth
+      ifany path, track
+         ifat dark.forest
+            and 
+         ifeq dark.forest, 0
+         else
+            ifkey path
+               quip dark.path, 0
+            else
+               quip dark.path, 1
+            fin
+         fin
+      fin
+   fin
+   respond climb, no.climb.fir, 0
+   ifany undergrowth, conifers, tree, ground, sky
+      flag context, arg2.here
+      proceed
+   fin
+   ifkey forest
+      ifany go, in
+         or
+      ifeq status, 1
+         quip forest.all.around
+      fin
+      flag context, arg2.here
+      proceed
+   fin
+#
+#=====================================================================
+#
+proc in.valley.actions
+   ifkey grass
+      ifis arg1, grass
+         respond grass, attention.to.detail, arg1
+      else
+         respond grass, attention.to.detail, arg2
+      fin
+   fin
+   ifkey look, valley
+      ifat end.of.valley
+         quip green.valley, 1
+      fin
+      quip green.valley, 0
+   fin
+   ifany bed, rock
+      respond look, no.look.rock
+      ifkey dig
+         proceed
+      fin
+      ifgt status, 1
+         flag context, arg2.here
+         proceed
+      fin
+   fin
+   respond tree, maple, pine, no.handy.them, arg2
+   respond vegetation, dull.stuff, vegetation
+#
+#=====================================================================
+#
+proc abyss.hah, type
+   respond abyss, hah!
+   ifeq type, 0
+      respond wall, hollow, hollows, hah!
+   otherwise
+   ifeq type, 1
+      respond stars, lights, hah!
+   otherwise
+   ifeq type, 2
+      respond stars, bats, hah!
+   fin
+#
+#=====================================================================
+#
+proc imaze.stuff, type
+   local qualifier
+#
+   ifkey jump
+      ifany down, in, abyss
+         ifat imaze.wall.1, imaze.wall.2, imaze.book
+            set qualifier, 0
+         else
+            set qualifier, 1
+         fin
+         say abyss.fall, qualifier
+         goto ylem
+         call coroner
+      else
+         quip no.jumping.over.abyss
+      fin
+   fin
+   ifkey go
+      or
+   ifeq status, 1
+      ifany north, ne, east, se, south, sw, west, nw
+         ifis arg1, go
+            set arg1, arg2
+         fin
+         quip no.fall.abyss, arg1
+      fin
+   fin
+   call abyss.hah, type
+   lda throw.here, ylem
+   lda drop.here, ylem
+   lda throw.text, throw.abyss
+   lda drop.text, drop.abyss
+#
+#=====================================================================
+#
+proc abyss.stuff, type
+   local qualifier
+#
+   ifkey jump
+      and
+   ifany down, in, abyss
+      set status, 1
+   fin
+   ifkey go
+      or
+   ifeq status, 1
+      ifany east, west
+         set place.ptr, here
+         ifkey east
+            add place.ptr, 1
+         else
+            sub place.ptr, 1
+         fin
+         move place.ptr
+      fin
+      ifkey jump
+         ifat above.abyss
+            set qualifier, 0
+         otherwise
+         ifat above.glow
+            set qualifier, 2
+         else
+            set qualifier, 1
+         fin
+         say abyss.fall, qualifier
+         goto ylem
+         call coroner
+      fin
+   fin
+   call abyss.hah, type
+   lda throw.here, ylem
+   lda drop.here, ylem
+   lda throw.text, throw.abyss
+   lda drop.text, drop.abyss
+#
+#=====================================================================
+#
+proc handle.dirt
+   respond look, its.dirt
+   respond get, no.point.in.that
+   ifkey dig
+      proceed
+   fin
+   flag context, arg2.here
+   call bail.out      
+#
+#=====================================================================
+#
+proc follow.it place1, dir1, place2, dir2
+   ifeq place2, none
+      ifflag here, not.in.cave
+         call consult.sunstone, dir1
+      fin
+      move place1
+   fin
+   ifflag here, not.in.cave
+      ifeq there, place1
+         call consult.sunstone, dir2
+      otherwise
+      ifeq there, place2
+         call consult.sunstone, dir1
+      fin
+   fin
+   ifeq there, place1
+      move place2
+   otherwise
+   ifeq there, place2
+      move place1
+   else
+      quip need.a.direction
+   fin
+#
+#=====================================================================
+#
+proc chew.stem
+   ifhave fangs, worn
+      quip no.chew.stem
+   fin
+   quip bleah
+#
+#=====================================================================
+#
+proc stream.stuff
+   respond look, its.tears.are.wet, stream
+   respond cross, ive.crossed
+   respond enter, swim, too.little.water
+   ifkey drink
+      call drink
+   fin
+#
+#=====================================================================
+#
+proc check.dung trace
+   ifnear dung
+      or
+   ifnear bucket, full.of.dung
+      proceed
+   fin
+   ifeq trace, 1
+      and
+   ifnear bucket, dirtied
+      proceed
+   fin
+   ifeq status, 2
+      and
+   ifis arg2, dung
+      quip i.dont.see, arg2
+   else
+      quip i.dont.see, dung
+   fin
+#
+#=====================================================================
+#
+proc plant.things      
+   local score
+   local count
+   local chosen
+#
+   set score, 1
+   itobj obj.ptr, hidey.hole
+      add score, 2
+   fin
+   random count, score
+   set chosen, none
+   itobj obj.ptr, hidey.hole
+      ifeq count, 0
+         set chosen, obj.ptr
+      fin
+      sub count, 1
+   fin
+   ifgt chosen, none
+      apport chosen, here
+      ifis chosen, cage, bird
+         and
+      ifeq bird, caged
+         ifloc cage, hidey.hole
+            apport cage, here
+         else
+            apport bird, here
+         fin
+      fin
+   fin
+#
+#=====================================================================
+#
+proc river.jump, switch
+   ifeq status, 1
+      or
+   ifkey across
+      quip no.jump.river, switch
+   fin
+   ifany in, river, down
+      say drowned.in.river
+      goto ylem
+      ifhave skull
+         set skull, damaged
+         apport skull, river.bed.2
+      fin
+      call coroner
+   fin
+#
+#=====================================================================
+#
+proc plants.stuff, type
+   ifany vegetation, plants, plant
+   else
+      proceed
+   fin
+   ifkey look
+      ifeq type, 0
+         quip dense.tangle
+      otherwise
+      ifeq type, 1
+         quip tropical.plants
+      otherwise
+      ifeq type, 2
+         quip not.much.of.it, vegetation
+      otherwise
+      ifeq type, 3
+         quip swamp.plants
+      otherwise
+      ifeq type, 4
+         quip just.generic, vegetation
+      fin
+      proceed
+   fin
+   respond get, no.point.in.that
+   respond eat, chew, might.be.poison
+   flag context, arg2.here
+   call bail.out
+#
+#=====================================================================
+#
+proc abyss.view, type
+   respond abyss, abyss.looks.back
+   ifeq type, 0
+      respond wall, abyss.wall
+      respond hollow, hollows, abyss.hollows
+      respond void, dark.void
+   otherwise
+   ifeq type, 1
+      respond lights, star.lights
+      respond stars, star.dust
+      respond down, void, star.dust
+   otherwise
+   ifeq type, 2
+      respond bats, shapes, maybe.bats
+      respond down, void, abyss.bat.view
+      respond stars, star.dust
+   fin
+#
+#=====================================================================
+#
+proc ice.stuff
+   ifkey look
+      respond ice, dirty.ice
+      respond ceiling, roof, up, its.a.ceiling, c.ice
+      respond floor, floor.not.ice
+      respond wall, icy.wall
+      ifany passage, corridor, tunnel
+         ifat ice
+            quip dark.exit, passage
+         fin
+         ifflag here, one.exit
+            quip dark.exit, tunnel
+         fin
+         quip dark.exits, tunnel
+      fin
+      proceed
+   fin
+   ifkey ice
+      respond get, hah!
+      respond kill, hit, kick, no.break.wall, ice
+      respond cut, push, pull, no.point.in.that
+      respond melt, no.melting.ice
+   fin
+   ifkey go
+      or
+   ifeq status, 1
+      ifat ice
+      else
+         respond maze, you.are.there
+      fin
+      proceed
+   fin
+   ifany ice, tunnel, passage, corridor, maze
+      flag context, arg2.here
+      call bail.out
+   fin
+#
+#=====================================================================
+#
+proc garden.stuff
+   ifkey garden
+      ifkey look
+         set status, 1
+         proceed
+      otherwise
+      ifkey go
+         or
+      ifeq status, 1
+         quip you.are.there
+      fin
+      flag context, arg2.here
+      proceed
+   fin
+   ifkey flower
+      and
+      not
+   ifnear flower
+      respond look, rose.flowers
+      respond get, cut, no.pick.roses
+      flag context, arg2.here
+      proceed
+   fin
+   ifkey roses
+      respond look rose.flowers
+      respond get, cut, no.pick.roses
+      flag context, arg2.here
+      proceed
+   fin
+   ifany bushes, tangle
+      respond look, wild.rose.bushes
+      respond cut, no.cut.roses
+      flag context, arg2.here
+      proceed
+   fin
+   ifkey thorns
+      respond look, sharp.thorns
+      flag context, arg2.here
+      proceed
+   fin
+   ifany grass, weeds
+      respond look, attention.to.detail, grass
+      respond get, ordinary.grass
+      flag context, arg2.here
+      proceed
+   fin
+   ifkey path
+      ifkey look
+         ifat garden.n, garden.sw, garden.se
+            quip gravel.path, 1
+         else
+            quip gravel.path, 0
+         fin
+      fin
+      ifkey dig
+         call dig
+      fin
+   fin
+   ifkey gravel
+      respond look, attention.to.detail, gravel
+      respond get, not.required
+      ifkey dig
+         call dig
+      fin
+      flag context, arg2.here
+      proceed
+   fin
+#
+#=====================================================================
+#
+proc drop.check, t.only
+   local obj.ptr
+   local no.drop.count
+   local state
+#
+   itobj obj.ptr, inhand
+      ifeq t.only, 0
+         or
+      ifflag obj.ptr, valued
+         ifflag obj.ptr, wearable
+            eval state, obj.ptr
+            ifeq state, worn
+               add no.drop.count, 1
+            else
+               proceed     # There is something to drop!
+            fin
+         else
+            proceed
+         fin
+      fin
+   fin
+   ifeq no.drop.count, 0
+      ifkey treasure
+         quip no.treasure, 1
+      fin
+      quip no.all, 1
+   fin
+   quip no.drop.worn
+#
+#=====================================================================
+#
+proc except.check
+   local obj.ptr
+   local tmp.ptr
+   local where
+   local loot
+   local do.count
+   local except.count
+   local worn.count
+   local state
+#
+   ifkey treasure
+      set loot, 1
+   fin
+   lda where, inhand
+   ifkey get
+      set where, here
+   fin
+   itobj obj.ptr
+      set tmp.ptr, obj.ptr
+      exec 32, tmp.ptr
+      ifeq tmp.ptr, 1
+         ifany drop, down
+            ifhave obj.ptr
+            else
+               say hang.on!
+               ifflag obj.ptr, portable
+               else
+                  quip not.droppable, obj.ptr
+               fin
+               chance 50
+                  quip you.arent.carrying, obj.ptr
+               fin
+               call not.got, obj.ptr
+            fin
+         else
+            ifhave obj.ptr
+               quip you.have.it, obj.ptr
+            fin
+            ifnear obj.ptr
+            else
+               quip i.dont.see, obj.ptr
+            fin
+         fin
+      fin
+      ifloc obj.ptr, where
+         ifeq loot, 0
+            or
+         ifflag obj.ptr, valued
+            and
+         ifflag obj.ptr, portable
+            ifeq tmp.ptr, 1
+               add except.count, 1
+            else
+               set state, none
+               ifkey drop
+                  and
+               ifflag obj.ptr, wearable            
+                  eval state, obj.ptr
+               fin
+               ifeq state, worn
+                  add worn.count, 1
+               else
+                  add do.count, 1
+               fin
+            fin
+         fin
+      fin
+   fin
+   ifgt do.count, 0
+      proceed
+   fin
+   ifgt worn.count, 0
+      quip no.drop.worn
+   fin
+   ifeq where, here
+      ifeq except.count, 0
+         ifeq loot, 1
+            quip, no.treasure, 0
+         fin
+         quip no.all, 0
+      fin
+      ifeq loot, 1
+         quip no.other.treasure, 0
+      fin
+      quip no.other.objects, 0
+   fin
+   ifeq except.count, 0
+      ifeq loot, 1
+         quip no.treasure, 1
+      fin
+      quip no.all, 1
+   fin
+   ifeq loot, 1
+      quip no.other.treasure, 1
+   fin
+   quip no.other.objects, 1
+#
+#=====================================================================
+#
+proc done.it!, qualifier
+   set stage, victory!      # Victory!
+   call get.score
+   say treasure.1, qualifier
+   set context, q.good.news.1
+   quip more.good.news?
+#
+#=====================================================================
+#
+proc temple.magic, mode
+   set temple, vault.open
+   apport ring, limbo
+   set ring, not.worn
+   flag thurible, seen
+   say open.vault, mode
+#
+#=====================================================================
+#
+proc tie.them
+   tie shoes, swamp.hint.body
+   tie door2, door2.is, landing.door, door2.inside
+   tie trapdoor, near.trap, distant.trap, roof.trap, light.trap
+   tie trapdoor, storeroom.view, its.a.roof
+   tie plain.2, fogg
+   tie island.02, half.hidden.shoes
+   tie seal, pick.up.seal
+   tie blob, blob.chases
+   tie slit, look.slit
+   tie codex.reward, no.get.book
+   tie owl.grips, owl.express, no.owl.express
+   tie above.sea, island.view, island.ahead
+   tie rats rats.here
+   tie pine, no.water.pine
+   tie beanstalk, no.climb.cliff, patch.of.soil
+   tie mists, dome.state
+   tie beater, its.a.sapling
+   tie casket, casket.shelf
+#
+#=====================================================================
+#
+proc mirror.jump
+   itobj obj.ptr
+      ifhave obj.ptr
+         apport obj.ptr, ylem
+      fin
+   fin
+   set stage, middle.of.nowhere
+   flag nowhere, been.here             # To force brief description
+   smove nowhere, through.the.mirror
+#
+#====================================================================
+#
+proc lets.go.back
+   set stage, mirror.world
+   ifloc starstone, stupendous.view
+      apport starstone, nowhere
+   else
+      apport starstone, ylem
+   fin
+   unflag starstone, portable
+   ifloc magazines, witts.end
+      unflag magazines, portable
+   fin
+   itobj obj.ptr
+      ifflag obj.ptr, portable
+         ifloc obj.ptr, building
+            apport obj.ptr, nowhere
+         else
+            apport obj.ptr, ylem
+         fin
+      fin
+   fin
+   apport giant, ylem
+   set beanstalk, 0
+   set beanstalk2, 0
+   set stupendous.view, 0
+   set feeder, 1
+   unflag depression, hintable
+   smove road, back.to.reality
+#
+#====================================================================
+#
+proc litter.check
+   ifeq no.litter.please, 0         # Hasn't dropped wrapper in this session
+      or
+   ifflag quips, litterbug          # Got Georged already!
+      or
+      not
+   ifflag here, not.in.cave         # George is an outdoors sort of chap.
+      or
+   ifinrange here, island, ylem     # And he doesn't go to new lands
+      or
+   ifnear wrapper
+      or
+   ifloc wrapper, limbo, ylem, house    # Permitted locations
+      or
+      not
+   ifflag status, light.here        # Got to be able to see him!
+      or
+   ifne stage, adventuring
+      proceed
+   fin
+   ifloc wrapper hidey.hole
+      apport wrapper, ylem
+      flag quips, litterbug
+      add penalties, 5
+   else
+      chance 80
+         proceed
+      fin
+      apport wrapper, hidey.hole
+   fin
+   say no.litter.please
+#
+#====================================================================
+#
+proc default.read what
+   ifkey read
+      and
+   ifeq status, 1
+      set arg2, what
+      set status, 2
+   fin
+#
+#====================================================================
+#
+proc read.the.rug
+   ifnear rug
+      ifeq rug, rolled.up
+         or
+      ifeq rug, unrolled
+         ifkey look
+            proceed
+         fin
+         quip no.read.rug, rug
+      fin
+      ifkey look
+         and
+      ifflag rug, special2
+         proceed
+      fin
+      ifany rug, pattern
+         flag rug, special2
+         quip read.rug
+      fin
+   fin
+#
+#====================================================================
+#
+proc sunstone.cheat msg modifier
+   local temp.val
+   ifhave sunstone
+      set temp.val, sunstone
+      ifinrange temp.val, 6, 8
+         quip msg, modifier
+      fin
+   fin
+#
+#====================================================================
+#
+#text NEW.ONE
+#   So let's start a new one...
+proc which.to.restore?
+   local count
+
+   set count, 0
+   exec 34, count
+   ifeq count, 1
+      and
+   ifeq context, none
+      say restoring.game, arg2
+      proceed
+   fin
+   say saved.games, count
+   ifeq count, 0
+      ifne context, none
+#         say new.one
+         say "So let's start a new one..."
+      else
+         quip blank
+      fin
+   fin
+   ifgt count, 0
+      and
+      not
+   ifcgi
+      exec 34, count
+   fin
+   ifeq context, none      
+      set context, q.restore.what
+      set status, no.match
+#      add count, 1
+      quip restore.what?, count
+   fin
+   say blank
+#
+#====================================================================
+#
+proc do.materials
+   call material, nugget, gold
+   call material, crucifix, gold
+   call material, bars, silver
+   call material, seal, quartz
+   call material, gong, bronze
+   call material, crown, iridium
+   call material, pyramid, platinum
+   call material, beads, turquoise
+   call material, ring, mithril
+   call material, bracelet, jade
+   call material, tusk, ivory
+   call material, crucifix, amethyst
+   call material, flower, metal
+   call material, wrapper, paper
+   call material, packet, paper
+   call material, knocker, brass
+   call material, door, iron
+   call material, ironwork, iron
+   ifnear chest
+      or
+   ifnear door2
+      and
+      not
+   ifnear gates
+      and
+      not
+   ifnear door
+      and
+   ifany iron, ironwork, strips
+      respond look, solid.strips
+      flag context, arg2.here
+   fin
+#
+#====================================================================
+#
+proc material, thing, substance
+   ifkey substance
+      and
+   ifnear thing
+      fakecom substance, thing
+   fin
+#
+#====================================================================
+#
+proc try.dir dir, destination
+   call consult.sunstone, dir
+   move destination
+#
+#====================================================================
+#
+proc sea.water.check
+   ifinrange here, island, island.ne
+      or
+   ifinrange here, rocky.beach, beach.end
+      quip salt.h20.bad
+   fin
+#
+#====================================================================
+#
+proc cliff.check
+   ifkey climb
+      ifeq status, 1
+         or
+      ifany cliff, up
+         quip bad.basalt
+      fin
+   fin
+   flag context, arg2.here
+#
+#====================================================================
+#
+proc wiz.reports # A stub routine, augmented, if necessary in debug.acd
+   proceed
+#
+#====================================================================
+

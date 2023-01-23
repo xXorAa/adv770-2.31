@@ -1,0 +1,59 @@
+#!/usr/bin/perl -w
+# sortref: copyright Mike Arnautov 2003-2016, licensed              
+# under GPL (version 3 or later) or the Modified BSD Licence, 
+# whichever is asserted by the supplied LICENCE file.   
+#
+use strict;
+#
+# If Perl is available, this utility is automatically invoked by advbld
+# when asked to produce a cross-reference of A-code source being processed.
+#
+# The sortxrefs utility reformats an acdc-generated .xrf file (assumed to be
+# in the current directory) and sorts it into a more useful format, creating
+# a file suffixed with .xrefs. It also sorts game entities by name into an
+# .nrefs suffixed file, and by refno into an .rrefs suffixed one.
+#
+my $refcnt = 0;
+my $count = 0;
+my %hash = ();
+my %refs = ();
+my @list = ();
+#
+our $FILE = shift || (glob "*.xrf")[0] or 
+  die "No .xrf file found in the current directory!\n";
+open FILE or die "$FILE: $!\n";
+while (<FILE>)
+{
+   @list = split ' ';
+   if ($list[0] eq '+')
+   { 
+      $refs{$list[2]} = $list[1];
+      $refcnt++;
+   }
+   else
+   {
+      $hash{"$list[0] $list[1] $list[-1]"} .= $_;
+      $count++;
+   }
+}
+close FILE;
+#
+$FILE =~ s/xrf$/xrefs/;
+open FILE, ">$FILE" or die "$FILE: $!\n";
+for (sort keys %hash)
+   { print FILE "$hash{$_}" }
+close FILE;
+print "Sorted by name $count cross-reference entries into $FILE.\n";
+$FILE =~ s/xrefs$/nrefs/;
+open FILE, ">$FILE" or die "$FILE: $!\n";
+for (sort keys %refs)
+   { printf FILE "%6d  %s\n", $refs{$_},  $_ }
+close FILE;
+print "Sorted by name $refcnt entity refnos into $FILE.\n";
+$FILE =~ s/nrefs$/rrefs/;
+open FILE, ">$FILE" or die "$FILE: $!\n";
+for (sort { $refs{$a} <=> $refs{$b} } keys %refs)
+   { printf FILE "%6d  %s\n", $refs{$_},  $_ }
+close FILE;
+print "Sorted by refno $refcnt entity refnos into $FILE.\n";
+

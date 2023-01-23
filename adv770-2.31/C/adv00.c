@@ -480,6 +480,18 @@
 #  endif
 #endif
 
+#ifdef QDOS
+#  ifndef CONSOLE
+#     define CONSOLE
+#  endif
+#  ifndef NO_READLINE
+#     define NO_READLINE
+#  endif
+#  ifndef NO_SLOW
+#     define NO_SLOW
+#  endif
+#endif
+
 /* Deal with all possible combinations of handling the game's data set */
 
 #ifdef USEDB
@@ -658,9 +670,9 @@ short *placebits = (short *)((unsigned char *)intIM + OFFSET_LOCBIT);
 short *varbits = (short *)((unsigned char *)intIM + OFFSET_VARBIT);
 int *objlocs = NULL;
 #ifdef UNDO
-   int intim [IMSZ];
-   unsigned char *image = (unsigned char *)intim;
-   int *inhand = (int *)((unsigned char *)intim + OFFSET_LOCS);
+   int intim2 [IMSZ];
+   unsigned char *image2 = (unsigned char *)intim2;
+   int *inhand = (int *)((unsigned char *)intim2 + OFFSET_LOCS);
    unsigned char *diffs = NULL;
    unsigned char *dptr = NULL;
    unsigned char *edptr;
@@ -994,15 +1006,15 @@ int utf8_to_unicode(char *line, unsigned index, unsigned len, unsigned *res)
  * the sequence in bytes. NB Invalid UTF-8 will be converted to a one-byte
  * sequence.
  */
+  unsigned value;
+  unsigned char c = line[index];
+  unsigned bytes, mask, i;
+
   if (index >= len) 
   {
     *res = 0;
     return 0;
   }
-
-  unsigned value;
-  unsigned char c = line[index];
-  unsigned bytes, mask, i;
 
   *res = c;
   line += index;
@@ -1255,6 +1267,11 @@ void dub_rot (short *root, int parent, int child, int dir)
 short *btadd (short *root, char *word, int len)
 {
    char wbuf [80];
+   int parent;
+   int child;
+   int dir;
+   short *new_rec;
+   int reclen;
 #if UTF8 == 1
    len = utf8_recase ('L', word, len, wbuf, 80); 
 #else
@@ -1265,11 +1282,11 @@ short *btadd (short *root, char *word, int len)
 #ifdef SCENERY
 fprintf(stderr, "ADDING '%s'\n", wbuf);
 #endif /* SCENERY */
-   int parent = 0;
-   int child = *(root + 1);
-   int dir;
-   short *new_rec;
-   int reclen = BT_TXT  + 1 + len / 2;
+   parent = 0;
+   child = *(root + 1);
+   dir;
+   *new_rec;
+   reclen = BT_TXT  + 1 + len / 2;
    if (*(root + 1) > 0)
    {
       while (child > 0)
@@ -1655,7 +1672,7 @@ void showchar (char c, char target)
 #else
    if (cps && target != 'L')
    {
-      usleep (cps);   /* Pause for slow output */
+      //usleep (cps);   /* Pause for slow output */
       fputc (c, fh);
       fflush (stdout);                          /* Make sure slowness is visible */
    }
@@ -2682,7 +2699,7 @@ void save_changes (void)
    }
    else
    {
-      for (cnt = 0, optr = image, iptr = IMAGE; cnt < IMAGE_SIZE;
+      for (cnt = 0, optr = image2, iptr = IMAGE; cnt < IMAGE_SIZE;
          cnt++, optr++, iptr++)
       {
          if (*optr != *iptr &&
@@ -2721,7 +2738,7 @@ void save_changes (void)
          edptr = dptr;
       }
    }
-   memcpy (image, IMAGE, IMAGE_SIZE);
+   memcpy (image2, IMAGE, IMAGE_SIZE);
 }
 #endif /* UNDO */
 /*===========================================================*/
@@ -4743,7 +4760,7 @@ restore_it:
                      diffs = d;
                      diffsz = diflen;
                      dptr = diffs + len;
-                     memcpy (image, IMAGE, IMAGE_SIZE);
+                     memcpy (image2, IMAGE, IMAGE_SIZE);
                      fread (&len, 1, sizeof (int), game_file);
                      edptr = diffs + len;
                   }
@@ -7163,7 +7180,7 @@ void  undo (void)
 #ifdef ADVCONTEXT
    value[ADVCONTEXT] = 0;
 #endif
-   memcpy (image, IMAGE, IMAGE_SIZE);
+   memcpy (image2, IMAGE, IMAGE_SIZE);
    return;
 }
 /*===========================================================*/
@@ -7207,7 +7224,7 @@ void redo (void)
 #endif
       }
       inv_check ();
-      memcpy (image, IMAGE, IMAGE_SIZE);
+      memcpy (image2, IMAGE, IMAGE_SIZE);
    }
    if (cnt > acnt) acnt++;
    value [UNDO_STAT] = acnt;
